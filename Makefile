@@ -11,7 +11,7 @@ TEST_SRC_PATH = tests
 TEST_OBJ_PATH = build/tests/obj
 TEST_BIN_PATH = build/tests
 
-CFLAGS += -I$(INCLUDE_PATH) -I/usr/local/include -fPIC `pkg-config --cflags glib-2.0`
+CFLAGS += -I$(INCLUDE_PATH) -I/usr/local/include -fPIC
 LDFLAGS += -L/usr/local/lib -Lbuild -lzmq -lczmq -lpthread -lthemis -lsoter
 
 ifeq ($(PREFIX),)
@@ -25,7 +25,7 @@ ifdef DEBUG
 	CFLAGS += -DDEBUG -g
 endif
 
-CFLAGS += -Werror -Wno-switch -DHERMES_USE_MONGO
+CFLAGS += -Werror -Wno-switch
 ifndef ERROR
 include src/srpc/srpc.mk
 include src/protocols/protocols.mk
