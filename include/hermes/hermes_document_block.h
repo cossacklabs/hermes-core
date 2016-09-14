@@ -27,7 +27,7 @@ hermes_document_block_t* hermes_document_block_create(const char* owner_id, cons
 hermes_document_block_t* hermes_document_block_create_from_blob(const char* user_id, const uint8_t* blob, const size_t blob_length);
 void hermes_document_block_destroy(hermes_document_block_t** block);
 
-int hermes_document_block_save(hermes_document_block_t* block);
+int hermes_document_block_update(hermes_document_block_t* block);
 int hermes_document_block_grant_access(hermes_document_block_t* block, const char* user_id, const uint32_t rights_mask);
 
 int hermes_document_block_to_blob(hermes_document_block_t* block, uint8_t** blob, size_t* blob_length);
