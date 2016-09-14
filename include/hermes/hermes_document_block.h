@@ -21,6 +21,8 @@
 #ifndef HERMES_HERMES_DOCUMENT_BLOCK_H_
 #define HERMES_HERMES_DOCUMENT_BLOCK_H_
 
+#include <hermes/crypt.h>
+
 typedef struct hermes_document_block_t_ hermes_document_block_t;
 
 hermes_document_block_t* hermes_document_block_create(const char* owner_id, const char* doc_id, const char* name, const uint8_t* data, const size_t data_length);

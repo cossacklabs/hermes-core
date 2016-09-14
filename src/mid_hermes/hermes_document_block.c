@@ -86,6 +86,10 @@ hermes_document_block_t* hermes_document_block_create_from_blob(const char* user
   return block;
 }
 
+hermes_document_block_t* hermes_document_block_create_form_id(const char* unser_id, const char* doc_id, const char* block_id){
+  
+}
+
 void hermes_document_block_destroy(hermes_document_block_t** block){
   HERMES_CHECK(*block, return);
   free((*block)->id);
@@ -99,7 +103,7 @@ void hermes_document_block_destroy(hermes_document_block_t** block){
 }
 
 int hermes_document_block_save(hermes_document_block_t* block){
-
+  
 }
 
 int hermes_document_block_grant_access(hermes_document_block_t* block, const char* user_id, const uint32_t rights_mask){
