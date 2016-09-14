@@ -32,6 +32,14 @@ void hermes_crypter_destroy(hermes_crypter_t** crypter);
 int hermes_crypter_encrypt(hermes_crypter_t* crypter, const uint8_t* public_key, const size_t public_key_length, const uint8_t* data, const size_t data_length, uint8_t** encrypted_data, size_t* encrypted_data_length);
 int hermes_crypter_decrypt(hermes_crypter_t* crypter, const uint8_t* public_key, const size_t public_key_length, const uint8_t* encrypted_data, const size_t encrypted_data_length, uint8_t** data, size_t* data_length);
 
+int hermes_crypter_encrypt_with_token(hermes_crypter_t* crypter, const uint8_t* public_key, const size_t public_key_length, const uint8_t* token, const size_t token_length, const uint8_t* data, const size_t data_length, uint8_t** encrypted_data, size_t* encrypted_data_length);
+int hermes_crypter_encrypt_with_creating_token(hermes_crypter_t* crypter, const uint8_t* public_key, const size_t public_key_length, const uint8_t* data, const size_t data_length, uint8_t** encrypted_data, size_t* encrypted_data_length, uint8_t** token, size_t* token_length);
+int hermes_crypter_decrypt_with_token(hermes_crypter_t* crypter, const uint8_t* public_key, const size_t public_key_length, const uint8_t* token, const size_t token_length, const uint8_t* encrypted_data, const size_t encrypted_data_length, uint8_t** data, size_t* data_length);
+
+int hermes_crypter_mac_with_token(hermes_crypter_t* crypter, const uint8_t* public_key, const size_t public_key_length, const uint8_t* token, const size_t token_length, const uint8_t* data, const size_t data_length, uint8_t** mac, size_t* mac_length);
+int hermes_crypter_mac_with_creating_token(hermes_crypter_t* crypter, const uint8_t* public_key, const size_t public_key_length, const uint8_t* data, const size_t data_length, uint8_t** mac, size_t* mac_length, uint8_t** token, size_t* token_length);
+
+
 int hermes_crypter_sign(hermes_crypter_t* crypter, const uint8_t* data, const size_t data_length, uint8_t** signed_data, size_t* signed_data_length);
 int hermes_crypter_verify(hermes_crypter_t* crypter, const uint8_t* public_key, const size_t public_key_length, const uint8_t* signed_data, const size_t signed_data_length, uint8_t** data, size_t* data_length);
 
