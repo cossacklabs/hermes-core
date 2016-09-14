@@ -62,13 +62,13 @@ hermes_crypter_t* hermes_crypter_create(const uint8_t* private_key, const size_t
   crypter->crypter_pid = fork();
   HERMES_CHECK(-1 != crypter->crypter_pid, hermes_crypter_destroy(&crypter); return NULL);
   if(0 == crypter->crypter_pid){
+    HERMES_LOG("encrypter", "process started");
     close(crypter->crypt_reader_pipe[1]);
     close(crypter->crypt_writer_pipe[0]);
     uint32_t command=0;
     uint8_t* buf;
     while(true){
       ssize_t a=read(crypter->crypt_reader_pipe[0], &command, sizeof(uint32_t));
-      fprintf(stderr, "%i\n", a);
       HERMES_CHECK(sizeof(uint32_t) == a, _exit(EXIT_FAILURE));
       size_t key_length, data_length, res_data_length;
       uint8_t *key, *data, *res_data;
@@ -76,6 +76,7 @@ hermes_crypter_t* hermes_crypter_create(const uint8_t* private_key, const size_t
       case EXIT:
 	command = EXITED;
 	HERMES_CHECK(sizeof(uint32_t)==write(crypter->crypt_writer_pipe[1], &command, sizeof(uint32_t)), _exit(EXIT_FAILURE));
+	HERMES_LOG("encrypter", "process stoped");
 	_exit(EXIT_SUCCESS);
       case ENCRYPT:
 	HERMES_CHECK(read_data_from_pipe(crypter->crypt_reader_pipe[0], &key, (uint32_t*)(&key_length)), _exit(EXIT_FAILURE));
@@ -87,6 +88,7 @@ hermes_crypter_t* hermes_crypter_create(const uint8_t* private_key, const size_t
 	free(data);
 	HERMES_CHECK(write_data_to_pipe(crypter->crypt_writer_pipe[1], res_data, (uint32_t)res_data_length), _exit(EXIT_FAILURE));
 	free(res_data);
+	HERMES_LOG("encrypter", "encryption complete");
 	break;
       case DECRYPT:
 	HERMES_CHECK(read_data_from_pipe(crypter->crypt_reader_pipe[0], &key, (uint32_t*)(&key_length)), _exit(EXIT_FAILURE));
@@ -98,6 +100,7 @@ hermes_crypter_t* hermes_crypter_create(const uint8_t* private_key, const size_t
 	free(data);
 	HERMES_CHECK(write_data_to_pipe(crypter->crypt_writer_pipe[1], res_data, (uint32_t)res_data_length), _exit(EXIT_FAILURE));
 	free(res_data);
+	HERMES_LOG("encrypter", "decryption complete");
 	break;
       case SIGN:
       case VERIFY:

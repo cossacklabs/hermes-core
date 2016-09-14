@@ -23,5 +23,6 @@
 #endif
 
 #define HERMES_CHECK_PARAM(cond) HERMES_CHECK(cond, HERMES_INVALID_PARAM)
+#define HERMES_LOG(component, msg) fprintf(stdout, "log: %s - %s\n", component, msg);
 
 #endif /* HERMES_UTILS_H_ */
