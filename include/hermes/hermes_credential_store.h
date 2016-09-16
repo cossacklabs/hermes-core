@@ -21,6 +21,9 @@
 #ifndef HERMES_HERMES_CREDENTIAL_STORE_H_
 #define HERMES_HERMES_CREDENTIAL_STORE_H_
 
+#include <stdint.h>
+#include <stdlib.h>
+
 typedef struct hermes_credential_store_t_ hermes_credential_store_t;
 
 hermes_credential_store_t* hermes_credential_store_create();

@@ -18,18 +18,5 @@
  *
  */
 
-#include <hermes/hermes_credential_store.h>
-
-struct hermes_credential_store_t_{
-  FILE *file; 
-};
-
-hermes_credential_store_t* hermes_credential_store_create(){
-  
-}
-
-void hermes_credential_store_destroy(hermes_credential_store_t** store);
-
-int hermes_credential_store_get_pub_key(hermes_credential_store_t* store, const char* id, uint8_t** pub_key, size_t* pub_key_length);
 
 

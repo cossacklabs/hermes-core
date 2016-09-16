@@ -18,5 +18,12 @@
  *
  */
 
-#include <hermes/mid_hermes.h>
+#include <hermes/hermes_document.h>
+
+struct hermes_document_t_{
+  const char* id;
+  hermes_document_block_t* main_block;
+  
+};
+
 

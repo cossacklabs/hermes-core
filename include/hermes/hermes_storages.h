@@ -22,15 +22,19 @@
 #define HERMES_HERMES_STORAGES_H_
 
 #include <hermes/hermes_credential_store.h>
+#include <hermes/hermes_record_set_store.h>
+#include <hermes/hermes_access_key_store.h>
 
 typedef struct hermes_storages_t_ hermes_storages_t;
+
+extern hermes_storages_t* hermes_storages;
 
 hermes_storages_t* hermes_storages_create();
 
 void hermes_storages_destroy(hermes_storages_t** storages);
 
 hermes_credential_store_t* hermes_storages_get_credential_store(hermes_storages_t* storages);
-//hermes_record_set_store_t* hermes_storages_get_record_set_store(hermes_storages_t* storages);
-//hermes_access_key_store_t* hermes_storages_get_access_key_store(hermes_storages_t* storages);
+hermes_record_set_store_t* hermes_storages_get_record_set_store(hermes_storages_t* storages);
+hermes_access_key_store_t* hermes_storages_get_access_key_store(hermes_storages_t* storages);
 
 #endif /* HERMES_HERMES_STORAGES_H_ */
