@@ -142,6 +142,13 @@ int hermes_user_load_block(hermes_user_t* user, const char* doc_id, const char* 
   return 0;
 }
 
+int hermes_user_delete_block(hermes_user_t* user, hermes_document_block_t* block){
+  HERMES_CHECK(user && user->crypter && block && block->is_loaded && block->mac && block->mac_length, return -2);
+  HERMES_CHECK(0== hermes_record_set_delete_block(hermes_storages_get_record_set_store(hermes_storages), block->doc_id, block->id,  block->mac, block->mac_length), return -1);
+  return 0;
+}
+
+
 int hermes_user_grand_access_to_block(hermes_user_t* user, const char* user_id_granting_access_to, hermes_document_block_t* block, int rights_mask){
   HERMES_CHECK(user && user->crypter, return -2);
   HERMES_CHECK(block && block->is_loaded && block->id && block->doc_id, return -2);
@@ -163,14 +170,23 @@ int hermes_user_grand_access_to_block(hermes_user_t* user, const char* user_id_g
     free(block->read_token);
     block->read_token=NULL;
     HERMES_CHECK(0==hermes_access_key_store_get_read_token(hermes_storages_get_access_key_store(hermes_storages), block->doc_id, block->id, user->id, &(block->read_token), &(block->read_token_length)), free(owner_public_key); free(user_granting_to_public_key); return -1);
-    HERMES_CHECK(0==hermes_crypter_create_token_from_token(user->crypter, owner_public_key, owner_public_key_length, user_granting_to_public_key, user_granting_to_public_key_length, block->read_token, block->read_token_length, &new_token, &new_token_length), free(owner_public_key); free(user_granting_to_public_key); return -1);
-    HERMES_CHECK(0 == hermes_access_key_store_set_read_token(hermes_storages_get_access_key_store(hermes_storages), block->doc_id, block->id, user_id_granting_access_to, new_token, new_token_length), free(owner_public_key); free(user_granting_to_public_key); free(new_token); return -1);
-    free(new_token);    
+    if(block->read_token_length){
+      HERMES_CHECK(0==hermes_crypter_create_token_from_token(user->crypter, owner_public_key, owner_public_key_length, user_granting_to_public_key, user_granting_to_public_key_length, block->read_token, block->read_token_length, &new_token, &new_token_length), free(owner_public_key); free(user_granting_to_public_key); return -1);
+      HERMES_CHECK(0 == hermes_access_key_store_set_read_token(hermes_storages_get_access_key_store(hermes_storages), block->doc_id, block->id, user_id_granting_access_to, new_token, new_token_length), free(owner_public_key); free(user_granting_to_public_key); free(new_token); return -1);
+      free(new_token);
+    }
     break;
   default:
     break;
   }
   free(owner_public_key);
   free(user_granting_to_public_key);
+  return 0;
+}
+
+int hermes_user_deny_access_to_block(hermes_user_t* user, const char* user_id_denying_access_to, hermes_document_block_t* block){
+  HERMES_CHECK(user && user->crypter && block && block->is_loaded && block->mac && block->mac_length, return -2);
+  HERMES_CHECK(0==hermes_access_key_store_rem_read_token(hermes_storages_get_access_key_store(hermes_storages), block->doc_id, block->id, user->id, user_id_denying_access_to), return -1);
+  HERMES_CHECK(0==hermes_access_key_store_rem_update_token(hermes_storages_get_access_key_store(hermes_storages), block->doc_id, block->id, user->id, user_id_denying_access_to), return -1);
   return 0;
 }

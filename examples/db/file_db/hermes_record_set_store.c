@@ -54,6 +54,14 @@ int store_block(hermes_record_set_store_t* store, const char* doc_id, const char
   return 0;  
 }
 
+int delete_block(hermes_record_set_store_t* store, const char* doc_id, const char* block_id){
+  HERMES_CHECK(store, return -1);
+  char block_file_name[1024];
+  sprintf(block_file_name, "%s%s_%s", RECORD_SET_STORE_FOLDER, doc_id, block_id);
+  remove(block_file_name);
+  return 0;
+}
+
 struct hermes_record_set_store_t_{ 
   int a; //unused
 };
@@ -92,7 +100,7 @@ int hermes_record_set_get_block(hermes_record_set_store_t* store, const char* do
   FILE* block_file = fopen(block_file_name, "rb");
   HERMES_CHECK(block_file, return -1);
 
-  //determine publik key file size
+  //determine public key file size
   fseek(block_file, 0L, SEEK_END);
   *blob_length = ftell(block_file)-16; //last data in block file is MAC, that must not return; 
   fseek(block_file, 0L, SEEK_SET);
@@ -101,6 +109,13 @@ int hermes_record_set_get_block(hermes_record_set_store_t* store, const char* do
   HERMES_CHECK(*blob, fclose(block_file); return -1);
   HERMES_CHECK((*blob_length) == fread(*blob, 1, *blob_length, block_file), free(*blob); *blob=NULL; fclose(block_file); return -1);
   fclose(block_file);
+  return 0;
+}
+
+int hermes_record_set_delete_block(hermes_record_set_store_t* store, const char* doc_id, const char* block_id, const uint8_t* mac, const size_t mac_length){
+  HERMES_CHECK(store, return -1);
+  HERMES_CHECK(0==check_file_mac(store, doc_id, block_id, mac, mac_length), return -1);
+  delete_block(store, doc_id, block_id);
   return 0;
 }
 

@@ -36,9 +36,10 @@ void hermes_user_destroy(hermes_user_t** user);
 
 int hermes_user_save_block(hermes_user_t* user, hermes_document_block_t* block);
 int hermes_user_load_block(hermes_user_t* user, const char* doc_id, const char* block_id, hermes_document_block_t** block);
+int hermes_user_delete_block(hermes_user_t* user, hermes_document_block_t* block);
 
 int hermes_user_grand_access_to_block(hermes_user_t* user, const char* user_id_granting_access_to, hermes_document_block_t* block, int rights_mask);
-
+int hermes_user_deny_access_to_block(hermes_user_t* user, const char* user_id_denying_access_to, hermes_document_block_t* block);
 
 #endif /* HERMES_HERMES_USER_H_ */
   

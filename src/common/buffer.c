@@ -38,7 +38,7 @@ struct buffer_t_{
 };
 
 buffer_t* buffer_create(){
-  buffer_t* buffer=malloc(sizeof(buffer_t));
+  buffer_t* buffer=malloc(sizeof *buffer);
   HERMES_CHECK(buffer, return NULL);
   buffer->capacity_=1;
   buffer->length_=0;

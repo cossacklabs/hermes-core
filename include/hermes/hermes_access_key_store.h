@@ -30,11 +30,13 @@ hermes_access_key_store_t* hermes_access_key_store_create();
 void hermes_access_key_store_destroy(hermes_access_key_store_t** store);
 
 int hermes_access_key_store_set_read_token(hermes_access_key_store_t* store, const char* doc_id, const char* block_id, const char* user_id, const uint8_t* token, const size_t token_length);
-int hermes_access_key_store_set_read_token(hermes_access_key_store_t* store, const char* doc_id, const char* block_id, const char* user_id, const uint8_t* token, const size_t token_length);
+int hermes_access_key_store_set_update_token(hermes_access_key_store_t* store, const char* doc_id, const char* block_id, const char* user_id, const uint8_t* token, const size_t token_length);
 
 int hermes_access_key_store_get_read_token(hermes_access_key_store_t* store, const char* doc_id, const char* block_id, const char* user_id, uint8_t** token, size_t* token_length);
-int hermes_access_key_store_get_read_token(hermes_access_key_store_t* store, const char* doc_id, const char* block_id, const char* user_id, uint8_t** token, size_t* token_length);
+int hermes_access_key_store_get_update_token(hermes_access_key_store_t* store, const char* doc_id, const char* block_id, const char* user_id, uint8_t** token, size_t* token_length);
 
+int hermes_access_key_store_rem_read_token(hermes_access_key_store_t* store, const char* doc_id, const char* block_id, const char* user_id, const char* user_id_remoing_token_to);
+int hermes_access_key_store_rem_update_token(hermes_access_key_store_t* store, const char* doc_id, const char* block_id, const char* user_id, const char* user_id_remoing_token_to);
 
 
 #endif /* HERMES_HERMES_ACCESS_KEY_STORE_H_ */

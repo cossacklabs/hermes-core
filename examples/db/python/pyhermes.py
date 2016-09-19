@@ -38,7 +38,7 @@ hermes_client_delete_document.argtypes = [ctypes.POINTER(ctypes.c_int), ctypes.c
 
 hermes_client_create_document_block = hermes_api.hermes_client_create_document_block
 hermes_client_create_document_block.restype = ctypes.c_int
-hermes_client_ucreate_document_block.argtypes = [ctypes.POINTER(ctypes.c_int), ctypes.c_char_p, ctypes.c_int, ctypes.POINTER(ctypes.c_char), ctypes.c_size_t, ctypes.POINTER(ctypes.POINTER(ctypes.c_char))]
+hermes_client_create_document_block.argtypes = [ctypes.POINTER(ctypes.c_int), ctypes.c_char_p, ctypes.c_int, ctypes.POINTER(ctypes.c_char), ctypes.c_size_t, ctypes.POINTER(ctypes.POINTER(ctypes.c_char))]
 
 hermes_client_read_document_block = hermes_api.hermes_client_read_document_block
 hermes_client_read_document_block.restype = ctypes.c_int
@@ -50,7 +50,7 @@ hermes_client_update_document_block.argtypes = [ctypes.POINTER(ctypes.c_int), ct
 
 hermes_client_delete_document_block = hermes_api.hermes_client_update_document_block
 hermes_client_delete_document_block.restype = ctypes.c_int
-hermes_client_update_document_block.argtypes = [ctypes.POINTER(ctypes.c_int), ctypes.c_char_p, ctypes.c_char_p]
+hermes_client_delete_document_block.argtypes = [ctypes.POINTER(ctypes.c_int), ctypes.c_char_p, ctypes.c_char_p]
 
 hermes_client_grant_access = hermes_api.hermes_client_grant_access
 hermes_client_grant_access.restype = ctypes.c_int

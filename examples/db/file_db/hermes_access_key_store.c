@@ -52,6 +52,12 @@ int hermes_access_key_store_read_token(const char* filename, uint8_t** token, si
   return 0;
 }
 
+int hermes_access_key_store_remove_token(const char* filename){
+  HERMES_CHECK(filename, return -1);
+  remove(filename);
+  return 0;
+}
+
 struct hermes_access_key_store_t_{ 
   int a; //unused
 };
@@ -91,5 +97,19 @@ int hermes_access_key_store_get_update_token(hermes_access_key_store_t* store, c
   char token_file_name[1024];
   sprintf(token_file_name, "%s%s_%s_%s_u", ACCESS_KEY_STORE_FOLDER, doc_id, block_id, user_id);
   return hermes_access_key_store_read_token(token_file_name, token, token_length);
+}
+
+int hermes_access_key_store_rem_read_token(hermes_access_key_store_t* store, const char* doc_id, const char* block_id, const char* user_id, const char* user_id_remoing_token_to){
+  HERMES_CHECK(store, return -1);
+  char token_file_name[1024];
+  sprintf(token_file_name, "%s%s_%s_%s_r", ACCESS_KEY_STORE_FOLDER, doc_id, block_id, user_id_remoing_token_to);
+  return hermes_access_key_store_remove_token(token_file_name);
+}
+
+int hermes_access_key_store_rem_update_token(hermes_access_key_store_t* store, const char* doc_id, const char* block_id, const char* user_id, const char* user_id_remoing_token_to){
+  HERMES_CHECK(store, return -1);
+  char token_file_name[1024];
+  sprintf(token_file_name, "%s%s_%s_%s_u", ACCESS_KEY_STORE_FOLDER, doc_id, block_id, user_id_remoing_token_to);
+  return hermes_access_key_store_remove_token(token_file_name);
 }
 

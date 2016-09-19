@@ -32,5 +32,6 @@ void hermes_record_set_store_destroy(hermes_record_set_store_t** store);
 int hermes_record_set_set_block(hermes_record_set_store_t* store, const char* doc_id, const char* block_id, const uint8_t* mac, const size_t mac_length, const uint8_t* blob, const size_t blob_length);
 int hermes_record_set_set_new_block(hermes_record_set_store_t* store, const char* doc_id, const uint8_t* blob, const size_t blob_length, char** new_block_id);
 int hermes_record_set_get_block(hermes_record_set_store_t* store, const char* doc_id, const char* block_id, uint8_t** blob, size_t* blob_length);
+int hermes_record_set_delete_block(hermes_record_set_store_t* store, const char* doc_id, const char* block_id, const uint8_t* mac, const size_t mac_length);
 
 #endif /* HERMES_HERMES_RECORD_SET_STORE_H_ */
