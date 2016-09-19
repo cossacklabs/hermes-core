@@ -32,11 +32,11 @@ include src/protocols/protocols.mk
 include src/services/services.mk
 include src/common/common.mk
 include src/mid_hermes/midHermes.mk
-include src/hermes/hermes.mk
+include src/db/file_db/file_db.mk
 endif
 
 
-all: err srpc_shared protocols_shared common_shared services_shared midHermes_shared
+all: err srpc_shared protocols_shared common_shared services_shared midHermes_shared file_db_shared
 
 test_all: err test
 
@@ -46,11 +46,11 @@ common_static: $(COMMON_OBJ)
 common_shared: $(COMMON_OBJ)
 	$(CC) -shared -o $(BIN_PATH)/lib$(COMMON_BIN).$(SHARED_EXT) $(COMMON_OBJ) $(LDFLAGS)
 
-db_static: $(DB_OBJ)
+file_db_static: $(FILE DB_OBJ)
 	$(AR) rcs $(BIN_PATH)/lib$(DB_BIN).a $(DB_OBJ)
 
-db_shared: $(DB_OBJ)
-	$(CC) -shared -o $(BIN_PATH)/lib$(DB_BIN).$(SHARED_EXT) $(DB_OBJ) $(LDFLAGS)
+file_db_shared: $(FILE_DB_OBJ)
+	$(CC) -shared -o $(BIN_PATH)/lib$(FILE_DB_BIN).$(SHARED_EXT) $(FILE_DB_OBJ) $(LDFLAGS)
 
 srpc_static: $(SRPC_OBJ)
 	$(AR) rcs $(BIN_PATH)/lib$(SRPC_BIN).a $(SRPC_OBJ)
