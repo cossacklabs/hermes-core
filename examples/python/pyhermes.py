@@ -10,7 +10,7 @@ import base64
 
 import ctypes
 import datetime
-hermes_api=ctypes.cdll.LoadLibrary('libs/libmid_hermes.so');
+hermes_api=ctypes.cdll.LoadLibrary('../build/libmid_hermes.so');
 
 
 hermes_client_create = hermes_api.hermes_client_create
@@ -99,7 +99,7 @@ class herles_client:
         new_id = ctypes.c_char_p()
         if 0 != hermes_client_create_document_block(self.hc, doc_id, is_private, ctypes.byref(data_buf), len(data), ctypes.byref(new_id)):
             raise Exception("hermes client creating document block error")
-        rerurn new_id.value
+        return new_id.value
 
     def read_document_block(doc_id, block_id):
         data = ctypes.c_char_p()
@@ -147,28 +147,28 @@ if __name__ == '__main__':
     hermes_client = hermes_client(args.user, args.private_key);
     if args.command == 'cd': #create_document
         print('document created with id: ', hermes_client.create_document(args.context))
-    else if args.command == 'rd': #read_document
+    elif args.command == 'rd': #read_document
         print('readed document context is: ', hermes_client.read_document(args.doc_id))
-    else if args.command == 'ud': #update_document
+    elif args.command == 'ud': #update_document
         hermes_client.update_document(args.doc_id, args.context)
         print('document updated')
-    else if args.command == 'dd': #delete_document
+    elif args.command == 'dd': #delete_document
         hermes_client.delete_document(args.doc_id)
         print('document deleted')
-    else if args.command == 'cb': #create_block
+    elif args.command == 'cb': #create_block
         print('document block created with id: ', hermes_client.create_document_block(args.doc_id, args.context))
-    else if args.command == 'rb': #read_block
+    elif args.command == 'rb': #read_block
         print('readed document block context is: ', hermes_client.read_document_block(args.doc_id, args.block_id))
-    else if args.command == 'ub': #update_block
+    elif args.command == 'ub': #update_block
         hermes_client.update_document_block(args.doc_id, ards.block_id, args.context)
         print('document block updated')
-    else if args.command == 'db': #delete_block
+    elif args.command == 'db': #delete_block
         hermes_client.delete_document_block(args.doc_id, args.block_id)
         print('document block deleted')
-    else if args.command == 'ge': #grand access
+    elif args.command == 'ge': #grand access
         hermes_client.grand_access(args.doc_id, args.block_id, args.peer_user_id, args.access_mask)
         print('access granted')
-    else if args.command == 'de': #grand access
+    elif args.command == 'de': #grand access
         hermes_client.deny_access(args.doc_id, args.block_id, args.peer_user_id)
         print('access denied')
         

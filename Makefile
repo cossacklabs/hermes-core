@@ -74,12 +74,8 @@ midHermes_static: $(MIDHERMES_OBJ)
 	$(AR) rcs $(BIN_PATH)/lib$(MIDHERMES_BIN).a $(MIDHERMES_OBJ)
 
 midHermes_shared: $(MIDHERMES_OBJ)
-	$(CC) -shared -o $(BIN_PATH)/lib$(MIDHERMES_BIN).$(SHARED_EXT) $(MIDHERMES_OBJ) $(LDFLAGS) 
+	$(CC) -shared -o $(BIN_PATH)/lib$(MIDHERMES_BIN).$(SHARED_EXT) $(MIDHERMES_OBJ) $(LDFLAGS) -lcommon -lfile_db
 
-hermes: services_static services_shared $(HERMES_OBJ)
-	$(CC) -o $(BIN_PATH)/$(HERMES_BIN) $(HERMES_OBJ) $(LDFLAGS) `pkg-config --libs libmongoc-1.0` -lzmq -lczmq -lc -lthemis
-
- 
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -96,12 +92,16 @@ clean:
 	rm -rf $(BIN_PATH)
 
 install: err all
-	mkdir -p $(PREFIX)/include/hermes $(PREFIX)/include/hermes/srpc $(PREFIX)/lib
-	install $(SRC_PATH)/srpc/*.h $(PREFIX)/include/hermes/srpc
-	install $(BIN_PATH)/*.a $(PREFIX)/lib
+	mkdir -p $(PREFIX)/include/hermes $(PREFIX)/lib
+	install include/hermes/*.h $(PREFIX)/include/hermes
+#	install $(BIN_PATH)/*.a $(PREFIX)/lib
 	install $(BIN_PATH)/*.$(SHARED_EXT) $(PREFIX)/lib
 
 uninstall: 
 	rm -rf $(PREFIX)/include/hermes
+	rm -f $(PREFIX)/lib/libmid_hermes.a
 	rm -f $(PREFIX)/lib/libsrpc.a
-	rm -f $(PREFIX)/lib/libsrpc.a
+	rm -f $(PREFIX)/lib/libcommon.a
+	rm -f $(PREFIX)/lib/libmid_hermes.so
+	rm -f $(PREFIX)/lib/libsrpc.so
+	rm -f $(PREFIX)/lib/libcommon.so
