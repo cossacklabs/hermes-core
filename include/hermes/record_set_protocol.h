@@ -33,7 +33,7 @@ typedef struct{
 }record_set_t;
 
 record_set_t* record_set_create();
-protocol_status_t record_set_bind(record_set_t* ctx, const char* endpoint, void* call_ctx);
+protocol_status_t record_set_bind(record_set_t* ctx, void* call_ctx);
 protocol_status_t record_set_connect(record_set_t* ctx, const char* endpoint, const char* id);
 protocol_status_t record_set_call(record_set_t* ctx, const char* func_name, const uint8_t* param_buf, const size_t param_buf_length, void (*proxy_handler)(void* ctx, const uint8_t* res_buf, const size_t res_buf_length), void* call_ctx);
 protocol_status_t record_set_sync_call(record_set_t* ctx, const char* func_name, const uint8_t* param_buf, const size_t param_buf_length, uint8_t** res_buf, size_t* res_buf_length);

@@ -30,7 +30,6 @@
 struct credential_store_service_t_{
   credential_store_t* ctx_;
   users_db_t* db_;
-  const config_t* config_;
 };
 
 
@@ -109,27 +108,25 @@ service_status_t credential_store_service_destroy(credential_store_service_t* se
   return SERVICE_SUCCESS;
 }
 
-credential_store_service_t* credential_store_service_create(const config_t* config){
-  HERMES_CHECK(config, return NULL);
+credential_store_service_t* credential_store_service_create(){
   credential_store_service_t* service=malloc(sizeof(credential_store_service_t));
   HERMES_CHECK(service, return NULL);
   service->db_=NULL;
   service->ctx_=credential_store_create();
   HERMES_CHECK(service->ctx_, credential_store_service_destroy(service); return NULL);
-  service->db_=users_db_create(config->credential_store.db_endpoint, config->credential_store.db_name);
+  service->db_=users_db_create();
   HERMES_CHECK(service->db_, credential_store_service_destroy(service); return NULL);
-  service->config_=config;
   return service;
 }
 
 service_status_t credential_store_service_run(credential_store_service_t* service){
-  HERMES_CHECK(service && service->ctx_ && service->db_ && service->config_, return SERVICE_INVALID_PARAM);
-  HERMES_CHECK(PROTOCOL_SUCCESS==credential_store_bind(service->ctx_, service->config_->credential_store.endpoint, (void*)service), return SERVICE_FAIL);
+  HERMES_CHECK(service && service->ctx_ && service->db_, return SERVICE_INVALID_PARAM);
+  HERMES_CHECK(PROTOCOL_SUCCESS==credential_store_bind(service->ctx_, (void*)service), return SERVICE_FAIL);
   return SERVICE_SUCCESS;  
 }
 
 service_status_t credential_store_service_stop(credential_store_service_t* service){
-  HERMES_CHECK(service && service->ctx_ && service->db_ && service->config_, return SERVICE_INVALID_PARAM);
+  HERMES_CHECK(service && service->ctx_ && service->db_, return SERVICE_INVALID_PARAM);
   return SERVICE_FAIL;
 }
 

@@ -21,13 +21,12 @@
 #ifndef DB_USERS_DB_H_
 #define DB_USERS_DB_H_
 
-#include "config.h"
 #include "buffer.h"
 #include "db.h"
 
 typedef struct users_db_t_ users_db_t;
 
-users_db_t* users_db_create(const char* endpoint, const char* db_name);
+users_db_t* users_db_create();
 db_status_t users_db_destroy(users_db_t* db);
 
 db_status_t users_db_get_pub_key(users_db_t* db, const char* user_id, buffer_t* res);

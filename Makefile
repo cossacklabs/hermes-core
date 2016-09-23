@@ -28,11 +28,15 @@ TEST_SRC_PATH = tests
 TEST_OBJ_PATH = build/tests/obj
 TEST_BIN_PATH = build/tests
 
-CFLAGS += -I$(INCLUDE_PATH) -I/usr/local/include -fPIC
-LDFLAGS += -L/usr/local/lib -Lbuild -lzmq -lczmq -lpthread -lthemis -lsoter
+CFLAGS += -I$(INCLUDE_PATH) -fPIC
+LDFLAGS += -Lbuild -lthemis -lsoter
 
 ifeq ($(PREFIX),)
 PREFIX = /usr
+endif
+
+ifneq ($(WITH_FILE_DB),)
+LDFLAGS += -lfile_db
 endif
 
 SHARED_EXT = so
@@ -91,7 +95,7 @@ midHermes_static: $(MIDHERMES_OBJ)
 	$(AR) rcs $(BIN_PATH)/lib$(MIDHERMES_BIN).a $(MIDHERMES_OBJ)
 
 midHermes_shared: $(MIDHERMES_OBJ)
-	$(CC) -shared -o $(BIN_PATH)/lib$(MIDHERMES_BIN).$(SHARED_EXT) $(MIDHERMES_OBJ) $(LDFLAGS) -lcommon -lfile_db
+	$(CC) -shared -o $(BIN_PATH)/lib$(MIDHERMES_BIN).$(SHARED_EXT) $(MIDHERMES_OBJ) $(LDFLAGS) -lcommon
 
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c
 	mkdir -p $(@D)

@@ -33,7 +33,7 @@ typedef struct{
 }key_service_t;
 
 key_service_t* key_service_create();
-protocol_status_t key_service_bind(key_service_t* ctx, const char* endpoint, void* call_ctx);
+protocol_status_t key_service_bind(key_service_t* ctx, void* call_ctx);
 protocol_status_t key_service_connect(key_service_t* ctx, const char* endpoint, const char* id);
 protocol_status_t key_service_sync_connect(key_service_t* ctx, const char* endpoint, const char* id);
 protocol_status_t key_service_call(key_service_t* ctx, const char* func_name, const uint8_t* param_buf, const size_t param_buf_length, void (*proxy_handler)(void* ctx, const uint8_t* res_buf, const size_t res_buf_length), void* call_ctx);

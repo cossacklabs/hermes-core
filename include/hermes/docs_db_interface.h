@@ -21,13 +21,12 @@
 #ifndef DB_DOCS_DB_H_
 #define DB_DOCS_DB_H_
 
-#include "config.h"
 #include "buffer.h"
 #include "db.h"
 
 typedef struct docs_db_t_ docs_db_t;
 
-docs_db_t* docs_db_create(const char* endpoint, const char* db_name);
+docs_db_t* docs_db_create();
 db_status_t docs_db_destroy(docs_db_t* db);
 
 db_status_t docs_db_get_docs(docs_db_t* db, buffer_t* buffer);

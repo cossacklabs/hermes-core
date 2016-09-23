@@ -21,7 +21,6 @@
 #ifndef DB_KEYS_DB_H_
 #define DB_KEYS_DB_H_
 
-#include "config.h"
 #include "db.h"
 
 

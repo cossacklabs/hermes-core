@@ -21,7 +21,6 @@
 #ifndef MIDHERMES_RECORD_SET_H_
 #define MIDHERMES_RECORD_SET_H_
 
-#include "config.h"
 #include "record_set_protocol.h"
 
 typedef struct record_set_client_t_ record_set_client_t;
@@ -39,7 +38,7 @@ int record_set_client_get_private_block(record_set_client_t* rsc, const char* us
 int record_set_client_rm_public_block(record_set_client_t* rsc, const char* user_id, const char* block_id, const char* doc_id, const uint8_t* mac, const size_t mac_length);
 int record_set_client_rm_private_block(record_set_client_t* rsc, const char* user_id, const char* block_id, const char* doc_id, const uint8_t* mac, const size_t mac_length);
 
-record_set_client_t* record_set_client_create(const config_t* config);
+record_set_client_t* record_set_client_create();
 int record_set_client_destroy(record_set_client_t* ctx);
 
 

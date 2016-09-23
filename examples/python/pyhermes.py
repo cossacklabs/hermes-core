@@ -26,7 +26,7 @@ import base64
 
 import ctypes
 import datetime
-hermes_api=ctypes.cdll.LoadLibrary('../build/libmid_hermes.so');
+hermes_api=ctypes.cdll.LoadLibrary('../../build/libmid_hermes.so');
 
 
 hermes_client_create = hermes_api.hermes_client_create
@@ -155,7 +155,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--command', required=true, help='command')
     parser.add_argument('-d', '--doc_id', help='document id')
     parser.add_argument('-b', '--block_id', help='block id')
-    parser.add_argument('-c', '--context', help='context')
+    parser.add_argument('-cc', '--context', help='context')
     parser.add_argument('-uu', '--peer_user_id', help='peer_user_id')
     parser.add_argument('-r',  '--access_mask',  help='access mask')
     args = parser.parse_args()

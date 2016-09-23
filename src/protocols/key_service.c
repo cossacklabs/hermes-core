@@ -35,9 +35,9 @@ key_service_t* key_service_create(){
   return serv;
 }
 
-protocol_status_t key_service_bind(key_service_t* ctx, const char* endpoint, void* call_ctx){
-  HERMES_CHECK(ctx && ctx->srpc_ctx_ && endpoint, return PROTOCOL_INVALID_PARAM);
-  return srpc_ctx_bind(ctx->srpc_ctx_, endpoint, &hermes__key_service_functions_collection, (void*)call_ctx);
+protocol_status_t key_service_bind(key_service_t* ctx, void* call_ctx){
+  HERMES_CHECK(ctx && ctx->srpc_ctx_, return PROTOCOL_INVALID_PARAM);
+  return srpc_ctx_bind(ctx->srpc_ctx_, &hermes__key_service_functions_collection, (void*)call_ctx);
 }
 
 protocol_status_t key_service_connect(key_service_t* ctx, const char* endpoint, const char* id){

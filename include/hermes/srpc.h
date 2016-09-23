@@ -34,7 +34,7 @@ typedef void (*call_handler_t)(void* ctx, const uint8_t* packed_result, const si
 
 
 srpc_ctx_t* srpc_ctx_create();
-srpc_status_t srpc_ctx_bind(srpc_ctx_t* ctx, const char* encpoint, functions_collection_t* coll, void* call_ctx);
+srpc_status_t srpc_ctx_bind(srpc_ctx_t* ctx, functions_collection_t* coll, void* call_ctx);
 srpc_status_t srpc_ctx_connect(srpc_ctx_t* ctx, const char* endpoint, const char* id);
 srpc_status_t srpc_ctx_sync_connect(srpc_ctx_t* ctx, const char* endpoint, const char* id);
 srpc_status_t srpc_ctx_call(srpc_ctx_t* ctx, const uint8_t* packed_params, const size_t packed_params_length, call_handler_t handler, void* call_ctx);

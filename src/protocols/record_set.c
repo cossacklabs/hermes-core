@@ -35,9 +35,9 @@ record_set_t* record_set_create(){
   return serv;
 }
 
-protocol_status_t record_set_bind(record_set_t* ctx, const char* endpoint, void* call_ctx){
-  HERMES_CHECK(ctx && ctx->srpc_ctx_ && endpoint, return PROTOCOL_INVALID_PARAM);
-  return srpc_ctx_bind(ctx->srpc_ctx_, endpoint, &record_set_functions_collection, (void*)call_ctx);
+protocol_status_t record_set_bind(record_set_t* ctx, void* call_ctx){
+  HERMES_CHECK(ctx && ctx->srpc_ctx_, return PROTOCOL_INVALID_PARAM);
+  return srpc_ctx_bind(ctx->srpc_ctx_, &record_set_functions_collection, (void*)call_ctx);
 }
 
 protocol_status_t record_set_connect(record_set_t* ctx, const char* endpoint, const char* id){

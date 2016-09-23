@@ -21,11 +21,9 @@
 #ifndef MIDHERMES_HERMES_H_
 #define MIDHERMES_HERMES_H_
 
-#include "config.h"
-
 typedef struct hermes_client_t_ hermes_client_t;
 
-hermes_client_t* hermes_client_create(const config_t* config);
+hermes_client_t* hermes_client_create();
 void hermes_client_destroy(hermes_client_t** ctx);
 
 //credential store

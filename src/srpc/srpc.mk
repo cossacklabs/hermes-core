@@ -25,4 +25,3 @@ SRPC_OBJ = $(patsubst $(SRC_PATH)/%.c,$(OBJ_PATH)/%.o, $(SRPC_SRC))
 
 SRPC_BIN = srpc
 
-LDFLAGS+= -lpthread

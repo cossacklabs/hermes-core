@@ -33,7 +33,7 @@ typedef struct{
 }credential_store_t;
 
 credential_store_t* credential_store_create();
-protocol_status_t credential_store_bind(credential_store_t* credential_store_ctx, const char* endpoint, void* ctx);
+protocol_status_t credential_store_bind(credential_store_t* credential_store_ctx, void* ctx);
 protocol_status_t credential_store_connect(credential_store_t* ctx, const char* endpoint, const char* id);
 protocol_status_t credential_store_call(credential_store_t* ctx, const char* func_name, const uint8_t* param_buf, const size_t param_buf_length, void (*proxy_handler)(void* ctx, const uint8_t* res_buf, const size_t res_buf_length), void* call_ctx);
 protocol_status_t credential_store_sync_call(credential_store_t* ctx, const char* func_name, const uint8_t* param_buf, const size_t param_buf_length, uint8_t** res_buf, size_t* res_buf_length);

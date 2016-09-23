@@ -287,12 +287,12 @@ connection_manager_t* connection_manager_create(uint64_t threads_count){
   return manager;
 }
 
-connection_manager_status_t connection_manager_bind(connection_manager_t* manager, const char* endpoint, server_function_t server_function, void* user_data){
+connection_manager_status_t connection_manager_bind(connection_manager_t* manager, server_function_t server_function, void* user_data){
   manager->server_function_=server_function;
   manager->server_data_=user_data;  
   char command=COMMAND_BIND;
   HERMES_CHECK(0==zsocket_sendmem(manager->brocker_socket_, &command, 1, ZFRAME_MORE), return CONNECTION_MANAGER_FAIL);
-  HERMES_CHECK(0==zsocket_sendmem(manager->brocker_socket_, endpoint, strlen(endpoint), 0), return CONNECTION_MANAGER_FAIL);
+  HERMES_CHECK(0==zsocket_sendmem(manager->brocker_socket_, "", 0, 0), return CONNECTION_MANAGER_FAIL);
   zmsg_t* msg=zmsg_recv(manager->brocker_socket_);
   return CONNECTION_MANAGER_SUCCESS;  
 }

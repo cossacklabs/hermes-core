@@ -35,7 +35,6 @@
 
 struct record_set_service_t_{
   record_set_t* ctx_;
-  const config_t* config_;
   docs_db_t* docs_db_;
 };
 
@@ -214,7 +213,6 @@ int record_set_add_block_(void* ctx, const char* user_id_, const uint8_t* param,
   const char * user_id, *doc_id, *name;
   const uint8_t *new_block, *mac;
   size_t new_block_length, mac_length;
-  fprintf(stderr, "%i\n", buffer_get_size(param_buf));
   HERMES_CHECK(BUFFER_SUCCESS==buffer_pop_string(param_buf, &user_id), buffer_destroy(param_buf); RETURN_ERROR(res_buf, res_buf_length, 1, "get corrupted data"); return -1);
   HERMES_CHECK(BUFFER_SUCCESS==buffer_pop_string(param_buf, &doc_id), buffer_destroy(param_buf); RETURN_ERROR(res_buf, res_buf_length, 1, "get corrupted data"); return -1);
   HERMES_CHECK(BUFFER_SUCCESS==buffer_pop_data(param_buf, &mac, &mac_length), buffer_destroy(param_buf); RETURN_ERROR(res_buf, res_buf_length, 1, "get corrupted data"); return -1);
@@ -356,26 +354,24 @@ service_status_t record_set_service_destroy(record_set_service_t* service){
   return SERVICE_SUCCESS;
 }
 
-record_set_service_t* record_set_service_create(const config_t* config){
-  HERMES_CHECK(config, return NULL);
+record_set_service_t* record_set_service_create(){
   record_set_service_t* service=calloc(1, sizeof(record_set_service_t));
   HERMES_CHECK(service, return NULL);
   service->ctx_=record_set_create();
   HERMES_CHECK(service->ctx_, record_set_service_destroy(service); return NULL);
-  service->config_=config;
-  service->docs_db_=docs_db_create(config->record_set.db_endpoint, config->record_set.db_name);
+  service->docs_db_=docs_db_create();
   HERMES_CHECK(service->docs_db_, record_set_service_destroy(service); return NULL);
   return service;
 }
 
 service_status_t record_set_service_run(record_set_service_t* service){
-  HERMES_CHECK(service && service->docs_db_ && service->config_, return SERVICE_INVALID_PARAM);
-  HERMES_CHECK(PROTOCOL_SUCCESS==record_set_bind(service->ctx_, service->config_->record_set.endpoint, (void*)service), return SERVICE_FAIL);
+  HERMES_CHECK(service && service->docs_db_, return SERVICE_INVALID_PARAM);
+  HERMES_CHECK(PROTOCOL_SUCCESS==record_set_bind(service->ctx_, (void*)service), return SERVICE_FAIL);
   return SERVICE_SUCCESS;  
 }
 
 service_status_t record_set_service_stop(record_set_service_t* service){
-  HERMES_CHECK(service && service->docs_db_ && service->config_, return SERVICE_INVALID_PARAM);
+  HERMES_CHECK(service && service->docs_db_, return SERVICE_INVALID_PARAM);
   return SERVICE_FAIL;
 }
 

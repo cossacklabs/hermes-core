@@ -35,9 +35,9 @@ credential_store_t* credential_store_create(){
   return serv;
 }
 
-protocol_status_t credential_store_bind(credential_store_t* credential_store_ctx, const char* endpoint, void* ctx){
-  HERMES_CHECK(credential_store_ctx && credential_store_ctx->srpc_ctx_ && endpoint, return PROTOCOL_INVALID_PARAM);
-  return srpc_ctx_bind(credential_store_ctx->srpc_ctx_, endpoint, &hermes__credential_store_functions_collection, ctx);
+protocol_status_t credential_store_bind(credential_store_t* credential_store_ctx, void* ctx){
+  HERMES_CHECK(credential_store_ctx && credential_store_ctx->srpc_ctx_, return PROTOCOL_INVALID_PARAM);
+  return srpc_ctx_bind(credential_store_ctx->srpc_ctx_, &hermes__credential_store_functions_collection, ctx);
 }
 
 protocol_status_t credential_store_connect(credential_store_t* ctx, const char* endpoint, const char* id){

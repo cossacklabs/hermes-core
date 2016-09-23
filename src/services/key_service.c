@@ -31,7 +31,6 @@ struct key_service_service_t_{
   key_service_t* ctx_;
   keys_db_t *db_;
   //  db_ctx_t* db_;
-  const config_t* config_;
 };
 
 
@@ -167,27 +166,23 @@ service_status_t key_service_service_destroy(key_service_service_t* service){
   return SERVICE_SUCCESS;
 }
 
-key_service_service_t* key_service_service_create(const config_t* config){
-  HERMES_CHECK(config, return NULL);
+key_service_service_t* key_service_service_create(){
   key_service_service_t* service=malloc(sizeof(key_service_service_t));
   HERMES_CHECK(service, return NULL);
   service->db_=NULL;
   service->ctx_=key_service_create();
   HERMES_CHECK(service->ctx_, key_service_service_destroy(service); return NULL);
-//  service->db_=db_ctx_create(config->key_service.db_endpoint, config->key_service.db_name, config->key_service.collection);
-//  HERMES_CHECK(service->db_, key_service_service_destroy(service); return NULL);
-  service->config_=config;
   return service;
 }
 
 service_status_t key_service_service_run(key_service_service_t* service){
-  HERMES_CHECK(service && service->ctx_ && service->db_ && service->config_, return SERVICE_INVALID_PARAM);
-  HERMES_CHECK(PROTOCOL_SUCCESS==key_service_bind(service->ctx_, service->config_->key_service.endpoint, (void*)service), return SERVICE_FAIL);
+  HERMES_CHECK(service && service->ctx_ && service->db_, return SERVICE_INVALID_PARAM);
+  HERMES_CHECK(PROTOCOL_SUCCESS==key_service_bind(service->ctx_, (void*)service), return SERVICE_FAIL);
   return SERVICE_SUCCESS;  
 }
 
 service_status_t key_service_service_stop(key_service_service_t* service){
-  HERMES_CHECK(service && service->ctx_ && service->db_ && service->config_, return SERVICE_INVALID_PARAM);
+  HERMES_CHECK(service && service->ctx_ && service->db_, return SERVICE_INVALID_PARAM);
   return SERVICE_FAIL;
 }
 

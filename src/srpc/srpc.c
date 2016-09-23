@@ -65,11 +65,11 @@ void srpc_server_func(void* ctx, const char* id, const uint8_t* request, const s
   HERMES_CHECK(FUNCTIONS_COLLECTION_SUCCESS==functions_collection_exec(((srpc_ctx_t*)(ctx))->server_functions_, id, request, request_length, response, response_length, ((srpc_ctx_t*)(ctx))->call_ctx_), *response_length=0; return);
 }
 
-srpc_status_t srpc_ctx_bind(srpc_ctx_t* ctx, const char* endpoint, functions_collection_t* coll, void* call_ctx){
-  HERMES_CHECK(ctx && endpoint && coll && ctx->conn_manager_, return SRPC_INVALID_PARAM);
+srpc_status_t srpc_ctx_bind(srpc_ctx_t* ctx, functions_collection_t* coll, void* call_ctx){
+  HERMES_CHECK(ctx && coll && ctx->conn_manager_, return SRPC_INVALID_PARAM);
   ctx->server_functions_=coll;
   ctx->call_ctx_=call_ctx;
-  HERMES_CHECK(CONNECTION_MANAGER_SUCCESS==connection_manager_bind(ctx->conn_manager_, endpoint, srpc_server_func, ctx), return SRPC_FAIL);
+  HERMES_CHECK(CONNECTION_MANAGER_SUCCESS==connection_manager_bind(ctx->conn_manager_, srpc_server_func, ctx), return SRPC_FAIL);
   return SRPC_SUCCESS;
 }
 
