@@ -21,11 +21,13 @@
 #ifndef HERMES_CLIENT_H_
 #define HERMES_CLIENT_H_
 
+#include <hermes/hermes_storages.h>
 #include <hermes/hermes_user.h>
+#include <stdbool.h>
 
 typedef struct hermes_client_t_ hermes_client_t;
 
-hermes_client_t* hermes_client_create(const char* user_id, const uint8_t* private_key, const size_t private_key_length);
+hermes_client_t* hermes_client_create(const char* user_id, const uint8_t* private_key, const size_t private_key_length, hermes_storages_t* storages);
 void hermes_client_destroy(hermes_client_t** ctx);
 
 //Document CRUD

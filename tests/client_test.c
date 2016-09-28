@@ -23,6 +23,7 @@
 #include <hermes/utils.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 hermes_storages_t* hermes_storages=NULL;
 
@@ -58,9 +59,9 @@ int main(int argc, char* argv[]){
 
     hermes_storages = hermes_storages_create();
 
-    client1 = hermes_client_create("user1", user1_private_key, user1_private_key_length);
+    client1 = hermes_client_create("user1", user1_private_key, user1_private_key_length, hermes_storages);
     if(!client1){res=-1; goto err;}
-    client2 = hermes_client_create("user2", user2_private_key, user2_private_key_length);
+    client2 = hermes_client_create("user2", user2_private_key, user2_private_key_length, hermes_storages);
     if(!client2){res=-1; goto err;} 
     free(user1_private_key);
     user1_private_key=NULL;

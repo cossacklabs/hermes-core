@@ -71,7 +71,7 @@ file_db_static: $(FILE DB_OBJ)
 	$(AR) rcs $(BIN_PATH)/lib$(DB_BIN).a $(DB_OBJ)
 
 file_db_shared: $(FILE_DB_OBJ)
-	$(CC) -shared -o $(BIN_PATH)/lib$(FILE_DB_BIN).$(SHARED_EXT) $(FILE_DB_OBJ) $(LDFLAGS)
+	$(CC) -shared -o $(BIN_PATH)/lib$(FILE_DB_BIN).$(SHARED_EXT) $(FILE_DB_OBJ)
 
 srpc_static: $(SRPC_OBJ)
 	$(AR) rcs $(BIN_PATH)/lib$(SRPC_BIN).a $(SRPC_OBJ)

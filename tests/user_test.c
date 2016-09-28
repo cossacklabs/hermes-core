@@ -54,8 +54,8 @@ int main(int argc, char* argv[]){
     }
 
     hermes_storages = hermes_storages_create();
-    hermes_user_t* user1 = hermes_user_create("user1", user1_private_key, user1_private_key_length);
-    hermes_user_t* user2 = hermes_user_create("user2", user2_private_key, user2_private_key_length);
+    hermes_user_t* user1 = hermes_user_create("user1", user1_private_key, user1_private_key_length, hermes_storages);
+    hermes_user_t* user2 = hermes_user_create("user2", user2_private_key, user2_private_key_length, hermes_storages);
     free(user1_private_key);
     free(user2_private_key);
     if(!user1 || !user2){

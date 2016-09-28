@@ -28,10 +28,11 @@ struct hermes_client_t_{
   hermes_user_t* user;
 }; 
 
-hermes_client_t* hermes_client_create(const char* user_id, const uint8_t* private_key, const size_t private_key_length){
+hermes_client_t* hermes_client_create(const char* user_id, const uint8_t* private_key, const size_t private_key_length, hermes_storages_t* storages){
+  HERMES_CHECK(user_id && private_key && private_key_length && storages, return NULL);
   hermes_client_t* client = calloc(sizeof(hermes_client_t), 1);
   HERMES_CHECK(client, return NULL);
-  client->user = hermes_user_create(user_id, private_key, private_key_length);
+  client->user = hermes_user_create(user_id, private_key, private_key_length, storages);
   HERMES_CHECK(client->user, hermes_client_destroy(&client); return NULL);
   return client;
 }

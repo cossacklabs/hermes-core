@@ -22,7 +22,10 @@
 #define HERMES_HERMES_USER_H_
 
 #include <hermes/crypt.h>
+#include <hermes/hermes_storages.h>
 #include <hermes/hermes_document_block.h>
+
+#include <stdbool.h>
 
 #define HERMES_UPDATE_ACCESS_MASK 1
 #define HERMES_READ_ACCESS_MASK 2
@@ -30,7 +33,7 @@
 
 typedef struct hermes_user_t_ hermes_user_t;
 
-hermes_user_t* hermes_user_create(const char* user_id, const uint8_t* private_key, const size_t private_key_length);
+hermes_user_t* hermes_user_create(const char* user_id, const uint8_t* private_key, const size_t private_key_length, hermes_storages_t* storages);
 
 void hermes_user_destroy(hermes_user_t** user);
 
