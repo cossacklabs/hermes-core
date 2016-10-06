@@ -43,6 +43,7 @@ For Python users there is a simple example with usage of ctypes wrappers of herm
 
 Pyhermes.py is a simple console application to demonstrate main hermes abilities:
 
+```
 usage: 
 pyhermes.py -[u|p|c|d|b|cc|uu|r] <parameters>
 	-u – user id, used for retrieve user public key from credential store
@@ -63,4 +64,4 @@ pyhermes.py -[u|p|c|d|b|cc|uu|r] <parameters>
 	-cc – context of document/block to insert/update
 	-uu – user id to grant/deny access
 	-r – rights mask (1 for read-only access, 2 for read-write access)
-``` 
+```
