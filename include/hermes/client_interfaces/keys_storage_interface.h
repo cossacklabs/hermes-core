@@ -24,8 +24,11 @@
 typedef struct hm_keys_storage_t_ hm_keys_storage_t;
 
 hm_keys_storage_t* hm_keys_storage_create();
-int hm_keys_storage_destroy(hm_keys_storage_t* ks);
+int hm_keys_storage_destroy(hm_keys_storage_t** ks);
 int hm_keys_storage_get_private_key_by_id(hm_keys_storage_t* ks, const uint8_t* id, const size_t id_kength, uint8_t* key, size_t* key_length);
 int hm_keys_storage_get_public_key_by_id(hm_keys_storage_t* ks, const uint8_t* id, const size_t id_kength, uint8_t* key, size_t* key_length);
+
+int hm_keys_storage_get_private_key_by_id_(hm_keys_storage_t* ks, const uint8_t* id, const size_t id_kength, uint8_t** key, size_t* key_length);
+int hm_keys_storage_get_public_key_by_id_(hm_keys_storage_t* ks, const uint8_t* id, const size_t id_kength, uint8_t** key, size_t* key_length);
 
 #endif /* INCLUDE_KEYS_STORAGE_INTERFACE_H_ */

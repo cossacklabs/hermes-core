@@ -18,11 +18,11 @@
  *
  */
 
+#include <hermes/common/buffer.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include <hermes/utils.h>
-#include <hermes/buffer.h>
+
 
 #define BUFFER_BLOCK_CAPACITY_DEFAULT 1024*10
 

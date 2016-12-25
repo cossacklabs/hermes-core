@@ -24,10 +24,14 @@
 #define HM_SUCCESS 0
 #define HM_FAIL -1
 #define HM_INVALID_PARAMETER -2
-
+#define HM_BUFFER_TOO_SMALL -3
+#define HM_BAD_ALLOC -4
+#define HM_NOT_IMPLEMENTED -100
 
 #ifdef DEBUG
 #defile DEBUGINFO(level, msg) {}while(false)
 #else
 #define DEBUGINFO(level, msg) {}while(false)
+#endif
+
 #endif /* HERMES_ERRORS_H_ */

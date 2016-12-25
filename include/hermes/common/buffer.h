@@ -18,18 +18,14 @@
  *
  */
 
-#ifndef HERMES_BUFFER_H_
-#define HERMES_BUFFER_H_
+#ifndef HERMES_COMMON_BUFFER_H_
+#define HERMES_COMMON_BUFFER_H_
 
 #include <stdint.h>
 #include <stddef.h>
-#include <hermes/errors.h>
+#include <hermes/common/errors.h>
 
 
-#define BUFFER_SUCCESS HM_SUCCESS
-#define BUFFER_FAIL HM_FAIL
-#define BUFFER_INVALID_PARAM HM_INVALID_PARAM
-#define BUFFER_BAD_ALLOC -3
 #define BUFFER_AT_END -4
 #define BUFFER_INCORRECT_BLOCK_TYPE -5
 #define BUFFER_CORRUPTED -6
@@ -42,7 +38,7 @@ buffer_t* buffer_create_with_(void* unused, ...);
 buffer_t* buffer_create_with_data(const uint8_t* data, const size_t data_len);
 int buffer_init_with_data(buffer_t* buffer, const uint8_t* data, const size_t data_len);
 
-int buffer_destroy(buffer_t* buffer);
+int buffer_destroy(buffer_t** buffer);
 
 int buffer_push_status(buffer_t* buffer, const int status);
 int buffer_push_data(buffer_t* buffer, const uint8_t* data, const size_t data_length);
