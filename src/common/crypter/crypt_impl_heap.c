@@ -27,10 +27,14 @@ int hm_crypter_impl_encrypt_(hm_crypter_impl_t* crypter,
                              const size_t public_key_length,
                              const uint8_t* data,
                              const size_t data_length,
+                             const uint8_t* not_used,
+                             const size_t not_used_length,
                              uint8_t** encrypted_data,
-                             size_t* encrypted_data_length){
+                             size_t* encrypted_data_length,
+                             uint8_t** not_used1,
+                             size_t* not_used1_length){
   size_t enc_len=0;
-  int res = hm_crypter_impl_encrypt(crypter, public_key, public_key_length, data, data_length, NULL, &enc_len);
+  int res = hm_crypter_impl_encrypt(crypter, public_key, public_key_length, data, data_length, NULL,0,NULL, &enc_len, NULL,0);
   if(HM_BUFFER_TOO_SMALL!=res){
     return res;
   }
@@ -38,7 +42,7 @@ int hm_crypter_impl_encrypt_(hm_crypter_impl_t* crypter,
   if(!(*encrypted_data)){
     return HM_BAD_ALLOC;
   }
-  res = hm_crypter_impl_encrypt(crypter, public_key, public_key_length, data, data_length, *encrypted_data, &enc_len);
+  res = hm_crypter_impl_encrypt(crypter, public_key, public_key_length, data, data_length, NULL, 0, *encrypted_data, &enc_len, NULL, 0);
   if(HM_SUCCESS!=res){
     free(encrypted_data);
     return res;
@@ -52,10 +56,14 @@ int hm_crypter_impl_decrypt_(hm_crypter_impl_t* crypter,
                              const size_t public_key_length,
                              const uint8_t* encrypted_data,
                              const size_t encrypted_data_length,
+                             const uint8_t* not_used,
+                             const size_t not_used_length,
                              uint8_t** data,
-                             size_t* data_length){
+                             size_t* data_length,
+                             uint8_t** not_used1,
+                             size_t* not_used1_length){
   size_t len=0;
-  int res = hm_crypter_impl_decrypt(crypter, public_key, public_key_length, encrypted_data, encrypted_data_length, NULL, &len);
+  int res = hm_crypter_impl_decrypt(crypter, public_key, public_key_length, encrypted_data, encrypted_data_length, NULL, 0, NULL, &len, NULL, 0);
   if(HM_BUFFER_TOO_SMALL!=res){
     return res;
   }
@@ -63,7 +71,7 @@ int hm_crypter_impl_decrypt_(hm_crypter_impl_t* crypter,
   if(!(*data)){
     return HM_BAD_ALLOC;
   }
-  res = hm_crypter_impl_decrypt(crypter, public_key, public_key_length, encrypted_data, encrypted_data_length, *data, &len);
+  res = hm_crypter_impl_decrypt(crypter, public_key, public_key_length, encrypted_data, encrypted_data_length, NULL, 0, *data, &len, NULL, 0);
   if(HM_SUCCESS!=res){
     free(*data);
     return res;
@@ -80,9 +88,11 @@ int hm_crypter_impl_encrypt_with_token_(hm_crypter_impl_t* crypter,
                                         const uint8_t* data,
                                         const size_t data_length,
                                         uint8_t** encrypted_data,
-                                        size_t* encrypted_data_length){
+                                        size_t* encrypted_data_length,
+                                        uint8_t** not_used1,
+                                        size_t* not_used1_length){
   size_t len=0;
-  int res = hm_crypter_impl_encrypt_with_token(crypter, public_key, public_key_length, token, token_length, data, data_length, NULL, &len);
+  int res = hm_crypter_impl_encrypt_with_token(crypter, public_key, public_key_length, token, token_length, data, data_length, NULL, &len, NULL, 0);
   if(HM_BUFFER_TOO_SMALL!=res){
     return res;
   }
@@ -90,7 +100,7 @@ int hm_crypter_impl_encrypt_with_token_(hm_crypter_impl_t* crypter,
   if(!(*encrypted_data)){
     return HM_BAD_ALLOC;
   }
-  res = hm_crypter_impl_encrypt_with_token(crypter, public_key, public_key_length, token, token_length, data, data_length, *encrypted_data, &len);
+  res = hm_crypter_impl_encrypt_with_token(crypter, public_key, public_key_length, token, token_length, data, data_length, *encrypted_data, &len, NULL, 0);
   if(HM_SUCCESS!=res){
     free(*encrypted_data);
     return res;
@@ -104,12 +114,14 @@ int hm_crypter_impl_encrypt_with_creating_token_(hm_crypter_impl_t* crypter,
                                                  const size_t public_key_length,
                                                  const uint8_t* data,
                                                  const size_t data_length,
+                                                 const uint8_t* not_used,
+                                                 const size_t not_used_length,
                                                  uint8_t** encrypted_data,
                                                  size_t* encrypted_data_length,
                                                  uint8_t** token,
                                                  size_t* token_length){
   size_t len=0, token_len=0;
-  int res = hm_crypter_impl_encrypt_with_creating_token(crypter, public_key, public_key_length, data, data_length, NULL, &len, NULL, &token_len);
+  int res = hm_crypter_impl_encrypt_with_creating_token(crypter, public_key, public_key_length, data, data_length, NULL, 0, NULL, &len, NULL, &token_len);
   if(HM_BUFFER_TOO_SMALL!=res){
     return res;
   }
@@ -118,7 +130,7 @@ int hm_crypter_impl_encrypt_with_creating_token_(hm_crypter_impl_t* crypter,
     return HM_BAD_ALLOC;
   }
   *token=*encrypted_data+len;
-  res = hm_crypter_impl_encrypt_with_creating_token(crypter, public_key, public_key_length, data, data_length, *encrypted_data, &len, *token, &token_len);
+  res = hm_crypter_impl_encrypt_with_creating_token(crypter, public_key, public_key_length, data, data_length, NULL, 0, *encrypted_data, &len, *token, &token_len);
   if(HM_SUCCESS!=res){
     free(*encrypted_data);
     return res;
@@ -136,9 +148,11 @@ int hm_crypter_impl_decrypt_with_token_(hm_crypter_impl_t* crypter,
                                         const uint8_t* encrypted_data,
                                         const size_t encrypted_data_length,
                                         uint8_t** data,
-                                        size_t* data_length){
+                                        size_t* data_length,
+                                        uint8_t** not_used1,
+                                        size_t* not_used1_length){
   size_t len=0;
-  int res = hm_crypter_impl_decrypt_with_token(crypter, public_key, public_key_length, token, token_length, encrypted_data, encrypted_data_length, NULL, &len);
+  int res = hm_crypter_impl_decrypt_with_token(crypter, public_key, public_key_length, token, token_length, encrypted_data, encrypted_data_length, NULL, &len, NULL, 0);
   if(HM_BUFFER_TOO_SMALL!=res){
     return res;
   }
@@ -146,7 +160,7 @@ int hm_crypter_impl_decrypt_with_token_(hm_crypter_impl_t* crypter,
   if(!(*data)){
     return HM_BAD_ALLOC;
   }
-  res = hm_crypter_impl_decrypt_with_token(crypter, public_key, public_key_length, token, token_length, encrypted_data, encrypted_data_length, *data, &len);
+  res = hm_crypter_impl_decrypt_with_token(crypter, public_key, public_key_length, token, token_length, encrypted_data, encrypted_data_length, *data, &len, NULL, 0);
   if(HM_SUCCESS!=res){
     free(*data);
     return res;
@@ -163,9 +177,11 @@ int hm_crypter_impl_mac_with_token_(hm_crypter_impl_t* crypter,
                                     const uint8_t* data,
                                     const size_t data_length,
                                     uint8_t** mac,
-                                    size_t* mac_length){
+                                    size_t* mac_length,
+                                    uint8_t** not_used1,
+                                    size_t* not_used1_length){
   size_t mac_len=0;
-  int res = hm_crypter_impl_mac_with_token(crypter, public_key, public_key_length, token, token_length, data, data_length, NULL, &mac_len);
+  int res = hm_crypter_impl_mac_with_token(crypter, public_key, public_key_length, token, token_length, data, data_length, NULL, &mac_len, NULL, 0);
   if(HM_BUFFER_TOO_SMALL!=res){
     return res;
   }
@@ -173,7 +189,7 @@ int hm_crypter_impl_mac_with_token_(hm_crypter_impl_t* crypter,
   if(!(*mac)){
     return HM_BAD_ALLOC;
   }
-  res = hm_crypter_impl_mac_with_token(crypter, public_key, public_key_length, token, token_length, data, data_length, *mac, &mac_len);
+  res = hm_crypter_impl_mac_with_token(crypter, public_key, public_key_length, token, token_length, data, data_length, *mac, &mac_len, NULL, 0);
   if(HM_SUCCESS!=res){
     return res;
   }
@@ -186,12 +202,14 @@ int hm_crypter_impl_mac_with_creating_token_(hm_crypter_impl_t* crypter,
                                              const size_t public_key_length,
                                              const uint8_t* data,
                                              const size_t data_length,
+                                             const uint8_t* not_used,
+                                             const size_t not_used_length,
                                              uint8_t** mac,
                                              size_t* mac_length,
                                              uint8_t** token,
                                              size_t* token_length){
   size_t len=0, token_len=0;
-  int res = hm_crypter_impl_mac_with_creating_token(crypter, public_key, public_key_length, data, data_length, NULL, &len, NULL, &token_len);
+  int res = hm_crypter_impl_mac_with_creating_token(crypter, public_key, public_key_length, data, data_length, NULL, 0, NULL, &len, NULL, &token_len);
   if(HM_BUFFER_TOO_SMALL!=res){
     return res;
   }
@@ -200,7 +218,7 @@ int hm_crypter_impl_mac_with_creating_token_(hm_crypter_impl_t* crypter,
     return HM_BAD_ALLOC;
   }
   *token=*mac+len;
-  res = hm_crypter_impl_mac_with_creating_token(crypter, public_key, public_key_length, data, data_length, *mac, &len, *token, &token_len);
+  res = hm_crypter_impl_mac_with_creating_token(crypter, public_key, public_key_length, data, data_length, NULL, 0, *mac, &len, *token, &token_len);
   if(HM_SUCCESS!=res){
     free(*mac);
     return res;
@@ -218,9 +236,11 @@ int hm_crypter_impl_create_token_from_token_(hm_crypter_impl_t* crypter,
                                              const uint8_t* token,
                                              const size_t token_length,
                                              uint8_t** new_token,
-                                             size_t* new_token_length){
+                                             size_t* new_token_length,
+                                             uint8_t** not_used1,
+                                             size_t* not_used1_length){
   size_t new_token_len=0;
-  int res=hm_crypter_impl_create_token_from_token(crypter, public_key, public_key_length, new_public_key, new_public_key_length, token, token_length, NULL, &new_token_len);
+  int res=hm_crypter_impl_create_token_from_token(crypter, public_key, public_key_length, new_public_key, new_public_key_length, token, token_length, NULL, &new_token_len, NULL, 0);
   if(HM_BUFFER_TOO_SMALL!=res){
     return res;
   }
@@ -228,7 +248,7 @@ int hm_crypter_impl_create_token_from_token_(hm_crypter_impl_t* crypter,
   if(!(*new_token)){
     return HM_BAD_ALLOC;
   }
-  res=hm_crypter_impl_create_token_from_token(crypter, public_key, public_key_length, new_public_key, new_public_key_length, token, token_length, *new_token, &new_token_len);
+  res=hm_crypter_impl_create_token_from_token(crypter, public_key, public_key_length, new_public_key, new_public_key_length, token, token_length, *new_token, &new_token_len, NULL, 0);
   if(HM_SUCCESS!=res){
     free(*new_token);
     return res;
@@ -239,10 +259,16 @@ int hm_crypter_impl_create_token_from_token_(hm_crypter_impl_t* crypter,
 int hm_crypter_impl_sign_(hm_crypter_impl_t* crypter,
                           const uint8_t* data,
                           const size_t data_length,
+                          const uint8_t* not_used,
+                          const size_t not_used_length,
+                          const uint8_t* not_used1,
+                          const size_t not_used1_length,
                           uint8_t** signed_data,
-                          size_t* signed_data_length){
+                          size_t* signed_data_length,
+                          uint8_t** not_used2,
+                          size_t* not_used2_length){
   size_t len=0;
-  int res=hm_crypter_impl_sign(crypter, data, data_length, NULL, &len);
+  int res=hm_crypter_impl_sign(crypter, data, data_length, NULL, 0, NULL, 0, NULL, &len, NULL, 0);
   if(HM_BUFFER_TOO_SMALL!=res){
     return res;
   }
@@ -250,7 +276,7 @@ int hm_crypter_impl_sign_(hm_crypter_impl_t* crypter,
   if(!(*signed_data)){
     return HM_BAD_ALLOC;
   }
-  res=hm_crypter_impl_sign(crypter, data, data_length, *signed_data, &len);
+  res=hm_crypter_impl_sign(crypter, data, data_length, NULL, 0, NULL, 0, *signed_data, &len, NULL, 0);
   if(HM_SUCCESS!=res){
     free(*signed_data);
     return res;
@@ -264,10 +290,14 @@ int hm_crypter_impl_verify_(hm_crypter_impl_t* crypter,
                             const size_t public_key_length,
                             const uint8_t* signed_data,
                             const size_t signed_data_length,
+                            const uint8_t* not_used,
+                            const size_t not_used_length,
                             uint8_t** data,
-                            size_t* data_length){
+                            size_t* data_length,
+                            uint8_t** not_used1,
+                            size_t* not_used1_length){
   size_t len=0;
-  int res=hm_crypter_impl_verify(crypter, public_key, public_key_length, signed_data, signed_data_length, NULL, &len);
+  int res=hm_crypter_impl_verify(crypter, public_key, public_key_length, signed_data, signed_data_length, NULL, 0, NULL, &len, NULL, 0);
   if(HM_BUFFER_TOO_SMALL!=res){
     return res;
   }
@@ -275,7 +305,7 @@ int hm_crypter_impl_verify_(hm_crypter_impl_t* crypter,
   if(!(*data)){
     return HM_BAD_ALLOC;
   }
-  res=hm_crypter_impl_verify(crypter, public_key, public_key_length, signed_data, signed_data_length, *data, &len);
+  res=hm_crypter_impl_verify(crypter, public_key, public_key_length, signed_data, signed_data_length, NULL, 0, *data, &len, NULL, 0);
   if(HM_SUCCESS!=res){
     free(*data);
     return res;

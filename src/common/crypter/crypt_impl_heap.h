@@ -22,20 +22,28 @@
 #define CRYPTER_CRYPT_IMPL_HEAP_H_
 
 int hm_crypter_impl_encrypt_(hm_crypter_impl_t* crypter,
-                       const uint8_t* public_key,
-                       const size_t public_key_length,
-                       const uint8_t* data,
-                       const size_t data_length,
-                       uint8_t** encrypted_data,
-                       size_t* encrypted_data_length);
+                             const uint8_t* public_key,
+                             const size_t public_key_length,
+                             const uint8_t* data,
+                             const size_ data_length,
+                             const uint8_t* not_used,
+                             const size_t not_used_length,
+                             uint8_t** encrypted_data,
+                             size_t* encrypted_data_length,
+                             uint8_t** not_used1,
+                             size_t* not_used1_length);
 
 int hm_crypter_impl_decrypt_(hm_crypter_impl_t* crypter,
                              const uint8_t* public_key,
                              const size_t public_key_length,
                              const uint8_t* encrypted_data,
                              const size_t encrypted_data_length,
+                             const uint8_t* not_used,
+                             const size_t not_used_length,
                              uint8_t** data,
-                             size_t* data_length);
+                             size_t* data_length,
+                             uint8_t** not_used1,
+                             size_t* not_used1_length);
 
 int hm_crypter_impl_encrypt_with_token_(hm_crypter_impl_t* crypter,
                                         const uint8_t* public_key,
@@ -45,13 +53,18 @@ int hm_crypter_impl_encrypt_with_token_(hm_crypter_impl_t* crypter,
                                         const uint8_t* data,
                                         const size_t data_length,
                                         uint8_t** encrypted_data,
-                                        size_t* encrypted_data_length);
+                                        size_t* encrypted_data_length,
+                                        uint8_t** not_used1,
+                                        size_t* not_used1_length);
+
 
 int hm_crypter_impl_encrypt_with_creating_token_(hm_crypter_impl_t* crypter,
                                                  const uint8_t* public_key,
                                                  const size_t public_key_length,
                                                  const uint8_t* #define ata,
                                                  const size_t data_length,
+                                                 const uint8_t* not_used,
+                                                 const size_t not_used_length,
                                                  uint8_t** encrypted_data,
                                                  size_t* encrypted_data_length,
                                                  uint8_t** token,
@@ -65,7 +78,9 @@ int hm_crypter_impl_decrypt_with_token_(hm_crypter_impl_t* crypter,
                                         const uint8_t* encrypted_data,
                                         const size_t encrypted_data_length,
                                         uint8_t** data,
-                                        size_t* data_length);
+                                        size_t* data_length,
+                                        uint8_t** not_used1,
+                                        size_t* not_used1_length);
 
 int hm_crypter_impl_mac_with_token_(hm_crypter_impl_t* crypter,
                                     const uint8_t* public_key,
@@ -75,40 +90,58 @@ int hm_crypter_impl_mac_with_token_(hm_crypter_impl_t* crypter,
                                     const uint8_t* data,
                                     const size_t data_length,
                                     uint8_t** mac,
-                                    size_t* mac_length);
+                                    size_t* mac_length,
+                                    uint8_t** not_used1,
+                                    size_t* not_used1_length);
 
 int hm_crypter_impl_mac_with_creating_token_(hm_crypter_impl_t* crypter,
-                                            const uint8_t* public_key,
-                                            const size_t public_key_length,
-                                            const uint8_t* #define ata,
-                                            const size_t data_length,
-                                            uint8_t** mac,
-                                            size_t* mac_length,
-                                            uint8_t** token,
-                                            size_t* token_length);
+                                             const uint8_t* public_key,
+                                             const size_t public_key_length,
+                                             const uint8_t* #define ata,
+                                             const size_t data_length,
+                                             const uint8_t* not_used,
+                                             const size_t not_used_length,
+                                             uint8_t** mac,
+                                             size_t* mac_length,
+                                             uint8_t** token,
+                                             size_t* token_length);
 
 int hm_crypter_impl_create_token_from_token_(hm_crypter_impl_t* crypter,
-                                            const uint8_t* public_key,
-                                            const size_t public_key_length,
-                                            const uint8_t* new_public_key,
-                                            const size_t new_public_key_length,
-                                            const uint8_t* token,
-                                            const size_t token_length,
-                                            uint8_t** new_token,
-                                            size_t* new_token_length);
+                                             const uint8_t* public_key,
+                                             const size_t public_key_length,
+                                             const uint8_t* new_public_key,
+                                             const size_t new_public_key_length,
+                                             const uint8_t* token,
+                                             const size_t token_length,
+                                             uint8_t** new_token,
+                                             size_t* new_token_length,
+                                             uint8_t** not_used1,
+                                             size_t* not_used1_length);
 
 int hm_crypter_impl_sign_(hm_crypter_impl_t* crypter,
                           const uint8_t* data,
                           const size_t data_length,
+                          const uint8_t* not_used,
+                          const size_t not_used_length,
+                          const uint8_t* not_used1,
+                          const size_t not_used1_length,
                           uint8_t** signed_data,
-                          size_t* signed_data_length);
+                          size_t* signed_data_length,
+                          uint8_t** not_used2,
+                          size_t* not_used2_length);
+
 
 int hm_crypter_impl_verify_(hm_crypter_impl_t* crypter,
-                           const uint8_t public_key,
-                           const size_t public_key_length,
-                           const uint8_t* signed_data,
-                           const size_t signed_data_length,
-                           uint8_t** data,
-                           size_t* data_length);
+                            const uint8_t public_key,
+                            const size_t public_key_length,
+                            const uint8_t* signed_data,
+                            const size_t signed_data_length,
+                            const uint8_t* not_used,
+                            const size_t not_used_length,
+                            uint8_t** data,
+                            size_t* data_length,
+                            uint8_t** not_used1,
+                            size_t* not_used1_length);
+
 
 #endif /* CRYPTER_CRYPT_IMPL_HEAP_H_ */
