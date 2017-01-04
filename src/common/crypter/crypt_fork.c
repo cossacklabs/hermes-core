@@ -20,8 +20,8 @@
 #include <themis/themis.h>
 #include <hermes/common/errors.h>
 #include <hermes/common/crypt.h>
-#include <hermes/client_interfaces/key_storage_interface.h>
-#include "crypt_impl.h"
+#include <hermes/client_interfaces/keys_storage_interface.h>
+#include "crypt_impl_heap_uni.h"
 #include "utils/pipe.h"
 
 #include <unistd.h>
@@ -30,20 +30,19 @@
 #include <stdlib.h>
 
 
-typedef enum {
-  ENCRYPT = 26040001,
-  ENCRYPT_WITH_TOKEN,
-  ENCRYPT_WITH_CREATING_TOKEN,
-  MAC_WITH_TOKEN,
-  MAC_WITH_CREATING_TOKEN,
-  DECRYPT,
-  DECRYPT_WITH_TOKEN,
-  SIGN,
-  VERIFY,
-  EXIT,
-  EXITED,
-  CREATE_TOKEN_FROM_TOKEN
-}encrypter_command;
+enum{
+  HM_SC_COMMAND_ENCRYPT,
+  HM_SC_COMMAND_ENCRYPT_WITH_TOKEN,
+  HM_SC_COMMAND_ENCRYPT_WITH_CREATING_TOKEN,
+  HM_SC_COMMAND_MAC_WITH_TOKEN,
+  HM_SC_COMMAND_MAC_WITH_CREATING_TOKEN,
+  HM_SC_COMMAND_DECRYPT,
+  HM_SC_COMMAND_DECRYPT_WITH_TOKEN,
+  HM_SC_COMMAND_SIGN,
+  HM_SC_COMMAND_VERIFY,
+  HM_SC_COMMAND_EXIT,
+  HM_SC_COMMAND_CREATE_TOKEN_FROM_TOKEN,
+} crypter_commands;
 
 struct hm_crypter_t_{
   int crypt_reader_pipe[2];
@@ -53,7 +52,7 @@ struct hm_crypter_t_{
 
 int simple_crypter_proccess(const uint8_t* id, const size_t id_length, int read_pipe, int write_pipe){
   if(!read_pipe || !write_pipe){
-    return HM_INVALID_PARAM;
+    return HM_INVALID_PARAMETER;
   }
   hm_keys_storage_t* key_store=hm_keys_storage_create();
   if(!key_store){
@@ -61,7 +60,9 @@ int simple_crypter_proccess(const uint8_t* id, const size_t id_length, int read_
   }
   uint8_t* key=NULL;
   size_t key_length=0;
-  if(HM_SUCCESS!=hm_keys_storage_get_private_key_by_id_(id, id_length, &key, &res_key_length)){
+  int res=hm_keys_storage_get_private_key_by_id_(key_store, id, id_length, &key, &key_length);
+  hm_keys_storage_destroy(&key_store);
+  if(HM_SUCCESS!=res){
     return HM_FAIL;
   }
   hm_crypter_impl_t* crypter = hm_crypter_impl_create(id, id_length, key, key_length);
@@ -70,168 +71,70 @@ int simple_crypter_proccess(const uint8_t* id, const size_t id_length, int read_
     return HM_FAIL;
   }
   uint64_t command=0;
-  int res=HM_SUCCESS;
+  res = HM_SUCCESS;
   while(true){
-    if(HM_SUCCESS==HM_SC_READ(crypter->crypt_reader_pipe[0], HM_SC_INT(&command))){ //read command id
-      res=HM_FAIL;
+    //read command, for simplicity, always contain 3 buffer params
+    uint8_t *param1=NULL, *param2=NULL, *param3=NULL, *out_param1=NULL, *out_param2=NULL;
+    size_t param1_len=0, param2_len=0, param3_len=0, out_param1_len=0, out_param2_len=0;
+    if(HM_SUCCESS==HM_SC_READ(read_pipe, HM_SC_INT(&command), HM_SC_BUF(&param1, &param1_len), HM_SC_BUF(&param2, &param2_len), HM_SC_BUF(&param3, &param3_len))){
+      hm_crypter_impl_destroy(&crypter);
+      return HM_FAIL;
     }
-    if(HM_SUCCESS==res){
-      switch(command){
-      case HM_SC_COMAND_EXIT:
-        hm_crypter_impl_destroy(crypter);
-        if(HM_SUCCESS!=HM_SC_WRITE(crypter->crypt_writer_pipe[1], HM_SC_INT(HM_SC_COMMAND_EXITED))){
-          _exit(EXIT_FAILURE);
-        }
-        _exit(EXIT_SUCCESS);
-      case HM_SC_COMMAND_ENCRYPT:{
-        uint8_t *key=NULL, *data=NULL, *enc_data=NULL;
-        uint32_t key_length=0, data_length=0, enc_data_len=0;
-        if(HM_SUCCESS!=HM_SC_READ(crypter->crypt_reader_pipe[0]), HM_SC_PARAM_BUF(&key, &key_length), HM_SC_PARAM_BUF(&data, &data_length)){
-          res=HM_FAIL;
-        }
-        int res=hm_crypter_impl_encrypt_(crypter, key, key_length, data, data_length, &enc_data, &enc_data_len);
-        free(key);
-        free(data);
-        if(HM_SUCCESS!=res){
-          if(HM_SUCCESS!=HM_SC_WRITE(crypter->crypt_writer_pipe[1], HM_SC_PARAM_INT(res))){
-            res=HM_FAIL;
-          }
-        }else{
-          if(HM_SUCCESS!=HM_SC_WRITE(crypter->crypt_writer_pipe[1], HM_SC_PARAM_INT(HM_SUCCESS), HM_SC_PARAM_BUF(enc_data, enc_data_len))){
-            res=HM_FAIL;
-          }
-          free(enc_data);
-        }
-      }
-        break;
-      case HM_SC_COMMAND_DECRYPT:{
-        uint8_t *key=NULL, *data=NULL, *dec_data=NULL;
-        uint32_t key_length=0, data_length=0, dec_data_len=0;
-        if(HM_SUCCESS!=HM_SC_READ(crypter->crypt_reader_pipe[0]), HM_SC_PARAM_BUF(&key, &key_length), HM_SC_PARAM_BUF(&data, &data_length)){
-          hm_crypter_impl_destroy(crypter);
-          _exit(EXIT_FAILURE);
-        }
-        int res=hm_crypter_impl_decrypt_(crypter, key, key_length, data, data_length, &dec_data, &dec_data_len);
-        free(key);
-        free(data);
-        if(HM_SUCCESS!=res){
-          if(HM_SUCCESS!=HM_SC_WRITE(crypter->crypt_writer_pipe[1], HM_SC_PARAM_INT(res))){
-            hm_crypter_impl_destroy(crypter);
-            _exit(EXIT_FAILURE);            
-          }
-        }else{
-          if(HM_SUCCESS!=HM_SC_WRITE(crypter->crypt_writer_pipe[1], HM_SC_PARAM_INT(HM_SUCCESS), HM_SC_PARAM_BUF(dec_data, dec_data_len))){
-            free(dec_data);
-            hm_crypter_impl_destroy(crypter);
-            _exit(EXIT_FAILURE);            
-          }
-          free(dec_data);
-        }
-      }
-        break;
+    switch(command){
+    case HM_SC_COMMAND_EXIT:
+      free(param1);
+      free(param2);
+      free(param3);
+      hm_crypter_impl_destroy(&crypter);
+      res = HM_SC_WRITE(write_pipe, HM_SC_INT(HM_SUCCESS), HM_SC_BUF(out_param1, out_param1_len), HM_SC_BUF(out_param2, out_param2_len));
+      return res;
+    case HM_SC_COMMAND_ENCRYPT:
+      res = hm_crypter_impl_uni_encrypt(crypter, param1, param1_len, param2, param2_len, param3, param3_len, &out_param1, &out_param1_len, &out_param2, &out_param2_len);
+      break;
+    case HM_SC_COMMAND_ENCRYPT_WITH_TOKEN:
+      res = hm_crypter_impl_uni_encrypt_with_token(crypter, param1, param1_len, param2, param2_len, param3, param3_len, &out_param1, &out_param1_len, &out_param2, &out_param2_len);
+      break;
+    case HM_SC_COMMAND_ENCRYPT_WITH_CREATING_TOKEN:
+      res = hm_crypter_impl_uni_encrypt_with_creating_token(crypter, param1, param1_len, param2, param2_len, param3, param3_len, &out_param1, &out_param1_len, &out_param2, &out_param2_len);
+      break;
+    case HM_SC_COMMAND_MAC_WITH_TOKEN:
+      res = hm_crypter_impl_uni_mac_with_token(crypter, param1, param1_len, param2, param2_len, param3, param3_len, &out_param1, &out_param1_len, &out_param2, &out_param2_len);
+      break;
+    case HM_SC_COMMAND_MAC_WITH_CREATING_TOKEN:
+      res = hm_crypter_impl_uni_mac_with_creating_token(crypter, param1, param1_len, param2, param2_len, param3, param3_len, &out_param1, &out_param1_len, &out_param2, &out_param2_len);
+      break;
+    case HM_SC_COMMAND_DECRYPT:
+      res = hm_crypter_impl_uni_decrypt(crypter, param1, param1_len, param2, param2_len, param3, param3_len, &out_param1, &out_param1_len, &out_param2, &out_param2_len);
+      break;
+    case HM_SC_COMMAND_DECRYPT_WITH_TOKEN:
+      res = hm_crypter_impl_uni_decrypt_with_token(crypter, param1, param1_len, param2, param2_len, param3, param3_len, &out_param1, &out_param1_len, &out_param2, &out_param2_len);
+      break;
+    case HM_SC_COMMAND_SIGN:
+      res = hm_crypter_impl_uni_sign(crypter, param1, param1_len, param2, param2_len, param3, param3_len, &out_param1, &out_param1_len, &out_param2, &out_param2_len);
+      break;
+    case HM_SC_COMMAND_VERIFY:
+      res = hm_crypter_impl_uni_verify(crypter, param1, param1_len, param2, param2_len, param3, param3_len, &out_param1, &out_param1_len, &out_param2, &out_param2_len);
+      break;
+    case HM_SC_COMMAND_CREATE_TOKEN_FROM_TOKEN:
+      res = hm_crypter_impl_uni_verify(crypter, param1, param1_len, param2, param2_len, param3, param3_len, &out_param1, &out_param1_len, &out_param2, &out_param2_len);
+      break;
+    default:
+      res = HM_FAIL;
     }
-    /* case ENCRYPT_WITH_TOKEN: */
-    /*     HM_CHECK(read_data_from_pipe(crypter->crypt_reader_pipe[0], &key, (uint32_t*)(&key_length)), _exit(EXIT_FAILURE)); */
-    /*     HM_CHECK(read_data_from_pipe(crypter->crypt_reader_pipe[0], &data, (uint32_t*)(&data_length)), _exit(EXIT_FAILURE)); */
-    /*     HM_CHECK(read_data_from_pipe(crypter->crypt_reader_pipe[0], &token, (uint32_t*)(&token_length)), _exit(EXIT_FAILURE)); */
-    /*     HM_CHECK(THEMIS_SUCCESS == themis_secure_message_unwrap(private_key, private_key_length, key, key_length, token, token_length, token_key, &token_key_length) && token_key_length == HM_TOKEN_LENGTH, _exit(EXIT_FAILURE)); */
-    /*     free(key); */
-    /*     free(token); */
-    /*     HM_CHECK(THEMIS_BUFFER_TOO_SMALL == themis_secure_cell_encrypt_seal(token_key, token_key_length, NULL, 0, data, data_length, NULL, &res_data_length), _exit(EXIT_FAILURE)); */
-    /*     res_data=malloc(res_data_length); */
-    /*     HM_CHECK(res_data && THEMIS_SUCCESS == themis_secure_cell_encrypt_seal(token_key, token_key_length, NULL, 0, data, data_length, res_data, &res_data_length), _exit(EXIT_FAILURE)); */
-    /*     free(data); */
-    /*     HM_CHECK(write_data_to_pipe(crypter->crypt_writer_pipe[1], res_data, (uint32_t)res_data_length), _exit(EXIT_FAILURE)); */
-    /*     free(res_data); */
-    /*     HM_LOG("encrypter", "encryption with token complete"); */
-    /*     break; */
-    /*   case DECRYPT_WITH_TOKEN: */
-    /*     HM_CHECK(read_data_from_pipe(crypter->crypt_reader_pipe[0], &key, (uint32_t*)(&key_length)), _exit(EXIT_FAILURE)); */
-    /*     HM_CHECK(read_data_from_pipe(crypter->crypt_reader_pipe[0], &data, (uint32_t*)(&data_length)), _exit(EXIT_FAILURE)); */
-    /*     HM_CHECK(read_data_from_pipe(crypter->crypt_reader_pipe[0], &token, (uint32_t*)(&token_length)), _exit(EXIT_FAILURE)); */
-    /*     HM_CHECK(THEMIS_SUCCESS == themis_secure_message_unwrap(private_key, private_key_length, key, key_length, token, token_length, token_key, &token_key_length) && token_key_length == HM_TOKEN_LENGTH, _exit(EXIT_FAILURE)); */
-    /*     free(key); */
-    /*     free(token); */
-    /*     HM_CHECK(THEMIS_BUFFER_TOO_SMALL == themis_secure_cell_decrypt_seal(token_key, token_key_length, NULL, 0, data, data_length, NULL, &res_data_length), _exit(EXIT_FAILURE)); */
-    /*     res_data=malloc(res_data_length); */
-    /*     HM_CHECK(res_data && THEMIS_SUCCESS == themis_secure_cell_decrypt_seal(token_key, token_key_length, NULL, 0, data, data_length, res_data, &res_data_length), _exit(EXIT_FAILURE)); */
-    /*     free(data); */
-    /*     HM_CHECK(write_data_to_pipe(crypter->crypt_writer_pipe[1], res_data, (uint32_t)res_data_length), _exit(EXIT_FAILURE)); */
-    /*     free(res_data); */
-    /*     HM_LOG("encrypter", "decryption with token complete"); */
-    /*     break; */
-    /*   case ENCRYPT_WITH_CREATING_TOKEN: */
-    /*     HM_CHECK(read_data_from_pipe(crypter->crypt_reader_pipe[0], &key, (uint32_t*)(&key_length)), _exit(EXIT_FAILURE)); */
-    /*     HM_CHECK(read_data_from_pipe(crypter->crypt_reader_pipe[0], &data, (uint32_t*)(&data_length)), _exit(EXIT_FAILURE)); */
-    /*     HM_CHECK(THEMIS_SUCCESS == soter_rand(token_key, token_key_length), _exit(EXIT_FAILURE)); */
-    /*     HM_CHECK(THEMIS_BUFFER_TOO_SMALL == themis_secure_cell_encrypt_seal(token_key, token_key_length, NULL, 0, data, data_length, NULL, &res_data_length), _exit(EXIT_FAILURE)); */
-    /*     res_data=malloc(res_data_length); */
-    /*     HM_CHECK(res_data && THEMIS_SUCCESS == themis_secure_cell_encrypt_seal(token_key, token_key_length, NULL, 0, data, data_length, res_data, &res_data_length), _exit(EXIT_FAILURE)); */
-    /*     free(data); */
-    /*     HM_CHECK(THEMIS_BUFFER_TOO_SMALL == themis_secure_message_wrap(private_key, private_key_length, key, key_length, token_key, token_key_length, NULL, &token_length), _exit(EXIT_FAILURE)); */
-    /*     token = malloc(token_length); */
-    /*     HM_CHECK(token && THEMIS_SUCCESS == themis_secure_message_wrap(private_key, private_key_length, key, key_length, token_key, token_key_length, token, &token_length), _exit(EXIT_FAILURE)); */
-    /*     free(key); */
-    /*     HM_CHECK(write_data_to_pipe(crypter->crypt_writer_pipe[1], res_data, (uint32_t)res_data_length), _exit(EXIT_FAILURE)); */
-    /*     free(res_data); */
-    /*     HM_CHECK(write_data_to_pipe(crypter->crypt_writer_pipe[1], token, (uint32_t)token_length), _exit(EXIT_FAILURE)); */
-    /*     free(token); */
-    /*     HM_LOG("encrypter", "encryption with creating token complete"); */
-    /*     break; */
-    /*   case MAC_WITH_TOKEN: */
-    /*     HM_CHECK(read_data_from_pipe(crypter->crypt_reader_pipe[0], &key, (uint32_t*)(&key_length)), _exit(EXIT_FAILURE)); */
-    /*     HM_CHECK(read_data_from_pipe(crypter->crypt_reader_pipe[0], &data, (uint32_t*)(&data_length)), _exit(EXIT_FAILURE)); */
-    /*     HM_CHECK(read_data_from_pipe(crypter->crypt_reader_pipe[0], &token, (uint32_t*)(&token_length)), _exit(EXIT_FAILURE)); */
-    /*     HM_CHECK(THEMIS_SUCCESS == themis_secure_message_unwrap(private_key, private_key_length, key, key_length, token, token_length, token_key, &token_key_length) && token_key_length == HM_TOKEN_LENGTH, _exit(EXIT_FAILURE)); */
-    /*     free(key); */
-    /*     free(token); */
-    /*     HM_CHECK(THEMIS_BUFFER_TOO_SMALL == themis_secure_cell_encrypt_context_imprint(token_key, token_key_length, data, data_length, HM_DEFAULT_CTX, HM_DEFAULT_CTX_LENGTH, NULL, &res_data_length), _exit(EXIT_FAILURE)); */
-    /*     res_data=malloc(res_data_length); */
-    /*     HM_CHECK(res_data && THEMIS_SUCCESS == themis_secure_cell_encrypt_context_imprint(token_key, token_key_length, data, data_length, HM_DEFAULT_CTX, HM_DEFAULT_CTX_LENGTH, res_data, &res_data_length), _exit(EXIT_FAILURE)); */
-    /*     free(data); */
-    /*     HM_CHECK(write_data_to_pipe(crypter->crypt_writer_pipe[1], res_data+res_data_length-HM_MAC_LENGTH, HM_MAC_LENGTH), _exit(EXIT_FAILURE)); */
-    /*     free(res_data); */
-    /*     HM_LOG("encrypter", "mac with token complete"); */
-    /*     break; */
-    /*   case MAC_WITH_CREATING_TOKEN: */
-    /*     HM_CHECK(read_data_from_pipe(crypter->crypt_reader_pipe[0], &key, (uint32_t*)(&key_length)), _exit(EXIT_FAILURE)); */
-    /*     HM_CHECK(read_data_from_pipe(crypter->crypt_reader_pipe[0], &data, (uint32_t*)(&data_length)), _exit(EXIT_FAILURE)); */
-    /*     HM_CHECK(THEMIS_SUCCESS == soter_rand(token_key, token_key_length), _exit(EXIT_FAILURE)); */
-    /*     HM_CHECK(THEMIS_BUFFER_TOO_SMALL == themis_secure_cell_encrypt_context_imprint(token_key, token_key_length, data, data_length, HM_DEFAULT_CTX, HM_DEFAULT_CTX_LENGTH, NULL, &res_data_length), _exit(EXIT_FAILURE)); */
-    /*     res_data=malloc(res_data_length); */
-    /*     HM_CHECK(res_data && THEMIS_SUCCESS == themis_secure_cell_encrypt_context_imprint(token_key, token_key_length, data, data_length, HM_DEFAULT_CTX, HM_DEFAULT_CTX_LENGTH, res_data, &res_data_length), _exit(EXIT_FAILURE)); */
-    /*     free(data); */
-    /*     HM_CHECK(THEMIS_BUFFER_TOO_SMALL == themis_secure_message_wrap(private_key, private_key_length, key, key_length, token_key, token_key_length, NULL, &token_length), _exit(EXIT_FAILURE)); */
-    /*     token = malloc(token_length); */
-    /*     HM_CHECK(token && THEMIS_SUCCESS == themis_secure_message_wrap(private_key, private_key_length, key, key_length, token_key, token_key_length, token, &token_length), _exit(EXIT_FAILURE)); */
-    /*     free(key); */
-    /*     HM_CHECK(write_data_to_pipe(crypter->crypt_writer_pipe[1], res_data+res_data_length-HM_MAC_LENGTH, HM_MAC_LENGTH), _exit(EXIT_FAILURE)); */
-    /*     free(res_data); */
-    /*     HM_CHECK(write_data_to_pipe(crypter->crypt_writer_pipe[1], token, (uint32_t)token_length), _exit(EXIT_FAILURE)); */
-    /*     free(token); */
-    /*     HM_LOG("encrypter", "mac with creating token complete"); */
-    /*     break; */
-    /*   case CREATE_TOKEN_FROM_TOKEN: */
-    /*     HM_CHECK(read_data_from_pipe(crypter->crypt_reader_pipe[0], &key, (uint32_t*)(&key_length)), _exit(EXIT_FAILURE)); */
-    /*     HM_CHECK(read_data_from_pipe(crypter->crypt_reader_pipe[0], &new_key, (uint32_t*)(&new_key_length)), _exit(EXIT_FAILURE)); */
-    /*     HM_CHECK(read_data_from_pipe(crypter->crypt_reader_pipe[0], &token, (uint32_t*)(&token_length)), _exit(EXIT_FAILURE)); */
-    /*     HM_CHECK(THEMIS_SUCCESS == themis_secure_message_unwrap(private_key, private_key_length, key, key_length, token, token_length, token_key, &token_key_length) && token_key_length == HM_TOKEN_LENGTH, _exit(EXIT_FAILURE)); */
-    /*     free(key); */
-    /*     free(token); */
-    /*     HM_CHECK(THEMIS_BUFFER_TOO_SMALL == themis_secure_message_wrap(private_key, private_key_length, new_key, new_key_length, token_key, token_key_length, NULL, &token_length), _exit(EXIT_FAILURE)); */
-    /*     token = malloc(token_length); */
-    /*     HM_CHECK(token && THEMIS_SUCCESS == themis_secure_message_wrap(private_key, private_key_length, new_key, new_key_length, token_key, token_key_length, token, &token_length), _exit(EXIT_FAILURE)); */
-    /*     free(new_key); */
-    /*     HM_CHECK(write_data_to_pipe(crypter->crypt_writer_pipe[1], token, (uint32_t)token_length), _exit(EXIT_FAILURE)); */
-    /*     free(token); */
-    /*     HM_LOG("encrypter", "creating token from token complete");	 */
-    /*     break; */
-    /*   case SIGN: */
-    /*   case VERIFY: */
-    /*   default: */
-    /*     break; */
-    /*   } */
+    free(param1);
+    free(param2);
+    free(param3);
+    res = HM_SC_WRITE(write_pipe, HM_SC_INT(res), HM_SC_BUF(out_param1, out_param1_len), HM_SC_BUF(out_param2, out_param2_len));
+    free(out_param1);
+    free(out_param2);
+    if(HM_SUCCESS!=res){
+      hm_crypter_impl_destroy(&crypter);
+      return res;
     }
+  }
+  hm_crypter_impl_destroy(&crypter);
+  return res;
+}
 
 
 hm_crypter_t* hm_crypter_create(const uint8_t* id, const size_t id_length){
@@ -269,10 +172,21 @@ hm_crypter_t* hm_crypter_create(const uint8_t* id, const size_t id_length){
   return crypter;
 }
 
+int crypter_call(int read_pipe, int write_pipe, uint64_t command, const uint8_t* p1, const size_t p1_l, const uint8_t* p2, const size_t p2_l, const uint8_t* p3, const size_t p3_l, uint8_t** op1, size_t* op1_l, uint8_t** op2, size_t* op2_l){
+  if(HM_SUCCESS!= HM_SC_WRITE(write_pipe, HM_SC_INT(command), HM_SC_BUF(p1, p1_l), HM_SC_BUF(p2, p2_l), HM_SC_BUF(p3, p3_l))){
+    return HM_FAIL;
+  }
+  uint64_t res=0;
+  if(HM_SUCCESS!= HM_SC_READ(read_pipe, HM_SC_INT(&res), HM_SC_BUF(&op1, &op1_l), HM_SC_BUF(op2, op2_l))){
+    return HM_FAIL;
+  }
+  return res;
+}
+
 void hm_crypter_destroy(hm_crypter_t** crypter){
-  uint32_t command = EXIT;
-  HM_CHECK(sizeof(uint32_t)==write((*crypter)->crypt_reader_pipe[1], &command, sizeof(uint32_t)), return);
-  HM_CHECK(sizeof(uint32_t) == read((*crypter)->crypt_writer_pipe[0], &command, sizeof(uint32_t)), return);
+  uint8_t* op1=NULL, *op2=NULL;
+  size_t op1_l=0, op2_l=0;
+  crypter_call((*crypter)->crypt_writer_pipe[0], (*crypter)->crypt_reader_pipe[1], HM_SC_COMMAND_EXIT, NULL, 0, NULL, 0, NULL, 0, &op1, &op1_l, &op2, &op2_l);
   close((*crypter)->crypt_reader_pipe[1]);
   close((*crypter)->crypt_writer_pipe[0]);
   free(*crypter);
@@ -280,87 +194,57 @@ void hm_crypter_destroy(hm_crypter_t** crypter){
 }
 
 int hm_crypter_encrypt(hm_crypter_t* crypter, const uint8_t* public_key, const size_t public_key_length, const uint8_t* data, const size_t data_length, uint8_t** encrypted_data, size_t* encrypted_data_length){
-  uint32_t command = ENCRYPT;
-  HM_CHECK(sizeof(uint32_t)==write(crypter->crypt_reader_pipe[1], &command, sizeof(uint32_t)), return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], public_key, (uint32_t)public_key_length),  return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], data, (uint32_t)data_length),  return -1);
-  HM_CHECK(read_data_from_pipe(crypter->crypt_writer_pipe[0], encrypted_data, (uint32_t*)(encrypted_data_length)), return -1);
-  return 0;
+  uint8_t* op1=NULL;
+  size_t op1_l=0;
+  return crypter_call(crypter->crypt_writer_pipe[0], crypter->crypt_reader_pipe[1], HM_SC_COMMAND_ENCRYPT, public_key, public_key_length, data, data_length, NULL, 0, encrypted_data, encrypted_data_length, &op1, &op1_l);
 }
 
 int hm_crypter_decrypt(hm_crypter_t* crypter, const uint8_t* public_key, const size_t public_key_length, const uint8_t* encrypted_data, const size_t encrypted_data_length, uint8_t** data, size_t* data_length){
-  uint32_t command = DECRYPT;
-  HM_CHECK(sizeof(uint32_t)==write(crypter->crypt_reader_pipe[1], &command, sizeof(uint32_t)), return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], public_key, (uint32_t)public_key_length),  return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], encrypted_data, (uint32_t)encrypted_data_length),  return -1);
-  HM_CHECK(read_data_from_pipe(crypter->crypt_writer_pipe[0], data, (uint32_t*)(data_length)), return -1);
-  return 0;
+  uint8_t* op1=NULL;
+  size_t op1_l=0;
+  return crypter_call(crypter->crypt_writer_pipe[0], crypter->crypt_reader_pipe[1], HM_SC_COMMAND_DECRYPT, public_key, public_key_length, encrypted_data, encrypted_data_length, NULL, 0, data, data_length, &op1, &op1_l);
 }
 
 int hm_crypter_encrypt_with_token(hm_crypter_t* crypter, const uint8_t* public_key, const size_t public_key_length, const uint8_t* token, const size_t token_length, const uint8_t* data, const size_t data_length, uint8_t** encrypted_data, size_t* encrypted_data_length){
-  uint32_t command = ENCRYPT_WITH_TOKEN;
-  HM_CHECK(sizeof(uint32_t)==write(crypter->crypt_reader_pipe[1], &command, sizeof(uint32_t)), return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], public_key, (uint32_t)public_key_length),  return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], data, (uint32_t)data_length),  return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], token, (uint32_t)token_length),  return -1);
-  HM_CHECK(read_data_from_pipe(crypter->crypt_writer_pipe[0], encrypted_data, (uint32_t*)(encrypted_data_length)), return -1);
-  return 0;
+  uint8_t* op1=NULL;
+  size_t op1_l=0;
+  return crypter_call(crypter->crypt_writer_pipe[0], crypter->crypt_reader_pipe[1], HM_SC_COMMAND_ENCRYPT_WITH_TOKEN, public_key, public_key_length, token, token_length, data, data_length, encrypted_data, encrypted_data_length, &op1, &op1_l);
 }
 
 int hm_crypter_encrypt_with_creating_token(hm_crypter_t* crypter, const uint8_t* public_key, const size_t public_key_length, const uint8_t* data, const size_t data_length, uint8_t** encrypted_data, size_t* encrypted_data_length, uint8_t** token, size_t* token_length){
-  uint32_t command = ENCRYPT_WITH_CREATING_TOKEN;
-  HM_CHECK(sizeof(uint32_t)==write(crypter->crypt_reader_pipe[1], &command, sizeof(uint32_t)), return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], public_key, (uint32_t)public_key_length),  return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], data, (uint32_t)data_length),  return -1);
-  HM_CHECK(read_data_from_pipe(crypter->crypt_writer_pipe[0], encrypted_data, (uint32_t*)(encrypted_data_length)), return -1);
-  HM_CHECK(read_data_from_pipe(crypter->crypt_writer_pipe[0], token, (uint32_t*)(token_length)), return -1);
-  return 0;
+  return crypter_call(crypter->crypt_writer_pipe[0], crypter->crypt_reader_pipe[1], HM_SC_COMMAND_ENCRYPT_WITH_CREATING_TOKEN, public_key, public_key_length, data, data_length, NULL, 0, encrypted_data, encrypted_data_length, token, token_length);
 }
 
 int hm_crypter_decrypt_with_token(hm_crypter_t* crypter, const uint8_t* public_key, const size_t public_key_length, const uint8_t* token, const size_t token_length, const uint8_t* encrypted_data, const size_t encrypted_data_length, uint8_t** data, size_t* data_length){
-  uint32_t command = DECRYPT_WITH_TOKEN;
-  HM_CHECK(sizeof(uint32_t)==write(crypter->crypt_reader_pipe[1], &command, sizeof(uint32_t)), return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], public_key, (uint32_t)public_key_length),  return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], encrypted_data, (uint32_t)encrypted_data_length),  return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], token, (uint32_t)token_length),  return -1);
-  HM_CHECK(read_data_from_pipe(crypter->crypt_writer_pipe[0], data, (uint32_t*)(data_length)), return -1);
-  return 0;
+  uint8_t* op1=NULL;
+  size_t op1_l=0;
+  return crypter_call(crypter->crypt_writer_pipe[0], crypter->crypt_reader_pipe[1], HM_SC_COMMAND_DECRYPT_WITH_TOKEN, public_key, public_key_length, token, token_length, encrypted_data, encrypted_data_length, data, data_length, &op1, &op1_l);
 }
 
 int hm_crypter_mac_with_token(hm_crypter_t* crypter, const uint8_t* public_key, const size_t public_key_length, const uint8_t* token, const size_t token_length, const uint8_t* data, const size_t data_length, uint8_t** mac, size_t* mac_length){
-  uint32_t command = MAC_WITH_TOKEN;
-  HM_CHECK(sizeof(uint32_t)==write(crypter->crypt_reader_pipe[1], &command, sizeof(uint32_t)), return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], public_key, (uint32_t)public_key_length),  return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], data, (uint32_t)data_length),  return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], token, (uint32_t)token_length),  return -1);
-  HM_CHECK(read_data_from_pipe(crypter->crypt_writer_pipe[0], mac, (uint32_t*)(mac_length)), return -1);
-  return 0;
+  uint8_t* op1=NULL;
+  size_t op1_l=0;
+  return crypter_call(crypter->crypt_writer_pipe[0], crypter->crypt_reader_pipe[1], HM_SC_COMMAND_MAC_WITH_TOKEN, public_key, public_key_length, token, token_length, data, data_length, mac, mac_length, &op1, &op1_l);
 }
 
 int hm_crypter_mac_with_creating_token(hm_crypter_t* crypter, const uint8_t* public_key, const size_t public_key_length, const uint8_t* data, const size_t data_length, uint8_t** mac, size_t* mac_length, uint8_t** token, size_t* token_length){
-  uint32_t command = MAC_WITH_CREATING_TOKEN;
-  HM_CHECK(sizeof(uint32_t)==write(crypter->crypt_reader_pipe[1], &command, sizeof(uint32_t)), return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], public_key, (uint32_t)public_key_length),  return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], data, (uint32_t)data_length),  return -1);
-  HM_CHECK(read_data_from_pipe(crypter->crypt_writer_pipe[0], mac, (uint32_t*)(mac_length)), return -1);
-  HM_CHECK(read_data_from_pipe(crypter->crypt_writer_pipe[0], token, (uint32_t*)(token_length)), return -1);
-  return 0;
+  return crypter_call(crypter->crypt_writer_pipe[0], crypter->crypt_reader_pipe[1], HM_SC_COMMAND_MAC_WITH_CREATING_TOKEN, public_key, public_key_length, data, data_length, NULL, 0, mac, mac_length, token, token_length);
 }
 
 int hm_crypter_create_token_from_token(hm_crypter_t* crypter, const uint8_t* public_key, const size_t public_key_length, const uint8_t* new_public_key, const size_t new_public_key_length, const uint8_t* token, const size_t token_length, uint8_t** new_token, size_t* new_token_length){
-  uint32_t command = CREATE_TOKEN_FROM_TOKEN;
-  HM_CHECK(sizeof(uint32_t)==write(crypter->crypt_reader_pipe[1], &command, sizeof(uint32_t)), return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], public_key, (uint32_t)public_key_length),  return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], new_public_key, (uint32_t)new_public_key_length),  return -1);
-  HM_CHECK(write_data_to_pipe(crypter->crypt_reader_pipe[1], token, (uint32_t)token_length),  return -1);
-  HM_CHECK(read_data_from_pipe(crypter->crypt_writer_pipe[0], new_token, (uint32_t*)(new_token_length)), return -1);
-  return 0;  
+  uint8_t* op1=NULL;
+  size_t op1_l=0;
+  return crypter_call(crypter->crypt_writer_pipe[0], crypter->crypt_reader_pipe[1], HM_SC_COMMAND_CREATE_TOKEN_FROM_TOKEN, public_key, public_key_length, new_public_key, new_public_key_length, token, token_length, new_token, new_token_length, &op1, &op1_l);
 }
 
 int hm_crypter_sign(hm_crypter_t* crypter, const uint8_t* data, const size_t data_length, uint8_t** signed_data, size_t* signed_data_length){
-  return -1;
+  uint8_t* op1=NULL;
+  size_t op1_l=0;
+  return crypter_call(crypter->crypt_writer_pipe[0], crypter->crypt_reader_pipe[1], HM_SC_COMMAND_SIGN, data, data_length, NULL, 0, NULL, 0, signed_data, signed_data_length, &op1, &op1_l);
 }
 
 int hm_crypter_verify(hm_crypter_t* crypter, const uint8_t* public_key, const size_t public_key_length, const uint8_t* signed_data, const size_t signed_data_length, uint8_t** data, size_t* data_length){
-  return -1;
+  uint8_t* op1=NULL;
+  size_t op1_l=0;
+  return crypter_call(crypter->crypt_writer_pipe[0], crypter->crypt_reader_pipe[1], HM_SC_COMMAND_SIGN, public_key, public_key_length, signed_data, signed_data_length, NULL, 0, data, data_length, &op1, &op1_l);
 }

@@ -47,7 +47,7 @@ int read_data_from_pipe(int pipe, uint8_t* data, uint32_t data_length){
   return data_length;
 }
 
-int read_pipe(int pipe, ...){
+int read_from_pipe(int pipe, ...){
   if(!pipe){
     return HM_INVALID_PARAMETER;
   }
@@ -98,15 +98,17 @@ int read_pipe(int pipe, ...){
         res =HM_FAIL;
         continue;
       }
-      *data = malloc(data_length);
-      if(!(*data)){
-        res = HM_BAD_ALLOC;
-        continue;
-      }      
       count+=2;
-      if((*data_length)!=read_data_from_pipe(pipe, data, (*data_length))){
-        res=HM_FAIL;
-        continue;
+      if(*data_length){
+        *data = malloc(data_length);
+        if(!(*data)){
+          res = HM_BAD_ALLOC;
+          continue;
+        }      
+        if((*data_length)!=read_data_from_pipe(pipe, data, (*data_length))){
+          res=HM_FAIL;
+          continue;
+        }
       }
     }
       break;
@@ -143,7 +145,7 @@ int read_pipe(int pipe, ...){
   return res;
 }
 
-int write_pipe(int pipe, ...){
+int write_to_pipe(int pipe, ...){
   if(!pipe){
     return HM_INVALID_PARAMETER;
   }
@@ -185,9 +187,11 @@ int write_pipe(int pipe, ...){
         va_end(va);
         return HM_FAIL;
       }
-      if(data_length!=write_data_to_pipe(pipe, data, data_length)){
-        va_end(va);
-        return HM_FAIL;
+      if(data_length){
+        if(data_length!=write_data_to_pipe(pipe, data, data_length)){
+          va_end(va);
+          return HM_FAIL;
+        }
       }
     }
       break;
