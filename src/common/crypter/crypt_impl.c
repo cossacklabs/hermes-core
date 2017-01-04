@@ -220,14 +220,14 @@ int hm_crypter_impl_mac_with_token(hm_crypter_impl_t* crypter,
   }
   uint8_t* pre_mac=NULL;
   size_t pre_mac_length=0;
-  if(THEMIS_BUFFER_TOO_SMALL!=themis_secure_cell_encrypt_context_imprint(token_key, token_key_length, data, data_length, HM_DEFAULT_CTX, HM_DEFAULT_CTX_LENGTH, pre_mac, &pre_mac_length)){
+  if(THEMIS_BUFFER_TOO_SMALL!=themis_secure_cell_encrypt_context_imprint(token_key, token_key_length, data, data_length, (uint8_t*)HM_DEFAULT_CTX, HM_DEFAULT_CTX_LENGTH, pre_mac, &pre_mac_length)){
     return HM_FAIL;
   }
   pre_mac=malloc(pre_mac_length);
   if(!pre_mac){
     return HM_BAD_ALLOC;
   }
-  if(THEMIS_SUCCESS!=themis_secure_cell_encrypt_context_imprint(token_key, token_key_length, data, data_length, HM_DEFAULT_CTX, HM_DEFAULT_CTX_LENGTH, pre_mac, &pre_mac_length)){
+  if(THEMIS_SUCCESS!=themis_secure_cell_encrypt_context_imprint(token_key, token_key_length, data, data_length, (uint8_t*)HM_DEFAULT_CTX, HM_DEFAULT_CTX_LENGTH, pre_mac, &pre_mac_length)){
     free(pre_mac);
     return HM_FAIL;
   }

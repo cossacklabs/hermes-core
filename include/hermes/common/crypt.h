@@ -22,7 +22,7 @@
 #define HERMES_CRYPT_H_
 
 #include <stdint.h>
-
+#include <string.h>
 typedef struct hm_crypter_t_ hm_crypter_t;
 
 hm_crypter_t* hm_crypter_create(const uint8_t* id, const size_t id_length);

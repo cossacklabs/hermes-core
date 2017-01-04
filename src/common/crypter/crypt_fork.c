@@ -156,18 +156,15 @@ hm_crypter_t* hm_crypter_create(const uint8_t* id, const size_t id_length){
     return NULL;
   }
   if(0 == crypter->crypter_pid){
-    HM_LOG("encrypter", "process started");
     close(crypter->crypt_reader_pipe[1]);
     close(crypter->crypt_writer_pipe[0]);
-    if(HM_SUCCESS!=simple_crypter_proccess(id, id_length, crypter->crypt_reader_pipe[0], crypter->crypt_writer_pipe[1])){
-      HM_LOG_INFO("encrypter", "process stoped");      
-    }
+    simple_crypter_proccess(id, id_length, crypter->crypt_reader_pipe[0], crypter->crypt_writer_pipe[1]);
     close(crypter->crypt_reader_pipe[0]);
     close(crypter->crypt_writer_pipe[1]);
     _exit(EXIT_SUCCESS);
   }else{
-    close(crypter->crypt_reader_pipe[0]);
-    close(crypter->crypt_writer_pipe[1]);
+    close(crypter->crypt_reader_pipe[1]);
+    close(crypter->crypt_writer_pipe[0]);
   }
   return crypter;
 }

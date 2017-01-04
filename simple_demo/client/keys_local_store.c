@@ -20,7 +20,10 @@
 
 
 #include <hermes/client_interfaces/keys_storage_interface.h>
-#include <hermes/errors.h>
+#include <hermes/common/errors.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #define HM_SIMPLE_KEY_STORAGE_ID_LENGTH 8
 #define HM_SIMPLE_KEY_STORAGE_PRIVATE_KEY_LENGTH 45
@@ -55,19 +58,19 @@ hm_keys_storage_t* hm_keys_storage_create(){
   while(!feof(file) && !ferror(file) && (store->count_<HM_SIMPLE_KEY_STORAGE_CAPACITY)){
     size_t readed = fread(store->nodes_[store->count_].id, 1, HM_SIMPLE_KEY_STORAGE_ID_LENGTH, file);
     if(readed < HM_SIMPLE_KEY_STORAGE_ID_LENGTH){
-      free(storage);
+      free(store);
       DEBUGINFO(error, "reading id error");
       return NULL;
     }
     readed = fread(store->nodes_[store->count_].private_key, 1, HM_SIMPLE_KEY_STORAGE_PRIVATE_KEY_LENGTH, file);
     if(readed < HM_SIMPLE_KEY_STORAGE_PRIVATE_KEY_LENGTH){
-      free(storage);
+      free(store);
       DEBUGINFO(error, "reading private key error");
       return NULL;
     }
     readed = fread(store->nodes_[store->count_].public_key, 1, HM_SIMPLE_KEY_STORAGE_PUBLIC_KEY_LENGTH, file);
     if(readed < HM_SIMPLE_KEY_STORAGE_PUBLIC_KEY_LENGTH){
-      free(storage);
+      free(store);
       DEBUGINFO(error, "reading public key error");
       return NULL;
     }    
@@ -76,36 +79,65 @@ hm_keys_storage_t* hm_keys_storage_create(){
   return store;
 }
 
-int hm_keys_storage_destroy(hm_keys_storage_t* ks){
-  free(ks);
+int hm_keys_storage_destroy(hm_keys_storage_t** ks){
+  free(*ks);
+  *ks=NULL;
   return HM_SUCCESS;
 }
 
-int hm_keys_storage_get_key(hm_keys_storage_t* ks, const uint8_t* id, const size_t id_kength, uint8_t* key, size_t* key_length, bool is_private){
+int hm_keys_storage_get_key(hm_keys_storage_t* ks, const uint8_t* id, const size_t id_length, uint8_t* key, size_t* key_length, bool is_private){
   if(!ks || !id || (id_length != HM_SIMPLE_KEY_STORAGE_ID_LENGTH)){
     return HM_INVALID_PARAMETER;
   }
   int i;
   for(i=0;i<HM_SIMPLE_KEY_STORAGE_CAPACITY;++i){
-    if(0==memcmp(id, ks->nodes_[i], HM_SIMPLE_KEY_STORAGE_ID_LENGTH)){
+    if(0==memcmp(id, ks->nodes_[i].id, HM_SIMPLE_KEY_STORAGE_ID_LENGTH)){
       break;
     }
   }
-  if(HM_SIMPLE_KEY_STORAGE_CAPACITY==i || (0 == is_private?(ks->nodes_[i].private_key_[0]):(ks->nodes_[i].public_key_[0]))){
+  if(HM_SIMPLE_KEY_STORAGE_CAPACITY==i || (0 == is_private?(ks->nodes_[i].private_key[0]):(ks->nodes_[i].public_key[0]))){
     return HM_FAIL;
   }
   if(!key || ((*key_length)<(is_private?HM_SIMPLE_KEY_STORAGE_PRIVATE_KEY_LENGTH:HM_SIMPLE_KEY_STORAGE_PUBLIC_KEY_LENGTH))){
     *key_length = is_private?HM_SIMPLE_KEY_STORAGE_PRIVATE_KEY_LENGTH:HM_SIMPLE_KEY_STORAGE_PUBLIC_KEY_LENGTH;
     return HM_BUFFER_TOO_SMALL;
   }
-  memcpy(key, is_private?(ks->node[i].private_key):(ks->node[i].private_key), is_private?HM_SIMPLE_KEY_STORAGE_PRIVATE_KEY_LENGTH:HM_SIMPLE_KEY_STORAGE_PUBLIC_KEY_LENGTH);
+  memcpy(key, is_private?(ks->nodes_[i].private_key):(ks->nodes_[i].public_key), is_private?HM_SIMPLE_KEY_STORAGE_PRIVATE_KEY_LENGTH:HM_SIMPLE_KEY_STORAGE_PUBLIC_KEY_LENGTH);
   return HM_SUCCESS;
 }
 
-int hm_keys_storage_get_private_key_by_id(hm_keys_storage_t* ks, const uint8_t* id, const size_t id_kength, uint8_t* key, size_t* key_length){
+int hm_keys_storage_get_key_(hm_keys_storage_t* ks, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length, bool is_private){
+  size_t kl=0;
+  if(HM_BUFFER_TOO_SMALL!=hm_keys_storage_get_key(ks, id, id_length, NULL, &kl, is_private)){
+    return HM_FAIL;
+  }
+  *key=malloc(kl);
+  if(!(*key)){
+    return HM_BAD_ALLOC;
+  }
+  if(HM_SUCCESS!=hm_keys_storage_get_key(ks, id, id_length, *key, &kl, is_private)){
+    free(*key);
+    *key=NULL;
+    return HM_FAIL;
+  }
+  *key_length=kl;
+  return HM_SUCCESS;
+}
+
+int hm_keys_storage_get_private_key_by_id(hm_keys_storage_t* ks, const uint8_t* id, const size_t id_length, uint8_t* key, size_t* key_length){
   return hm_keys_storage_get_key(ks, id, id_length, key, key_length, true);
 }
 
-int hm_keys_storage_get_public_key_by_id(hm_keys_storage_t* ks, const uint8_t* id, const size_t id_kength, uint8_t* key, size_t* key_length){
+int hm_keys_storage_get_public_key_by_id(hm_keys_storage_t* ks, const uint8_t* id, const size_t id_length, uint8_t* key, size_t* key_length){
   return hm_keys_storage_get_key(ks, id, id_length, key, key_length, false);
 }
+
+int hm_keys_storage_get_private_key_by_id_(hm_keys_storage_t* ks, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length){
+  return hm_keys_storage_get_key_(ks, id, id_length, key, key_length, true);
+}
+
+int hm_keys_storage_get_public_key_by_id_(hm_keys_storage_t* ks, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length){
+  return hm_keys_storage_get_key_(ks, id, id_length, key, key_length, false);
+}
+
+

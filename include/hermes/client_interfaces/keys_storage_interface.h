@@ -20,6 +20,8 @@
 
 #ifndef INCLUDE_KEYS_STORAGE_INTERFACE_H_
 #define INCLUDE_KEYS_STORAGE_INTERFACE_H_
+#include <string.h>
+#include <stdint.h>
 
 typedef struct hm_keys_storage_t_ hm_keys_storage_t;
 

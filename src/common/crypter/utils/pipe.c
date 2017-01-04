@@ -19,11 +19,14 @@
  */
 
 #include <hermes/common/errors.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "pipe.h"
 
 int write_data_to_pipe(int pipe, const uint8_t* data, uint32_t data_length){
   if(!pipe || !data || !data_length){
-    return HM_INALID_PARAMETER;
+    return HM_INVALID_PARAMETER;
   }
   if(sizeof(uint32_t)!=write(pipe, &data_length, sizeof(uint32_t))){
     return HM_FAIL;
@@ -36,7 +39,7 @@ int write_data_to_pipe(int pipe, const uint8_t* data, uint32_t data_length){
 
 int read_data_from_pipe(int pipe, uint8_t* data, uint32_t data_length){
   if(!pipe || !data || !data_length){
-    return HM_INVALID_PARMETER;
+    return HM_INVALID_PARAMETER;
   }
   if(sizeof(uint32_t) != read(pipe, &data_length, sizeof(uint32_t))){
     return HM_FAIL;
@@ -66,7 +69,7 @@ int read_from_pipe(int pipe, ...){
     case HM_SC_PARAM_INT:{
       int64_t* data=va_arg(va, int64_t*);
       ++count;
-      if(sizeof(uint64_t)!=read_data_from_pipe(pipe, data, sizeof(uint64_t))){
+      if(sizeof(uint64_t)!=read_data_from_pipe(pipe, (uint8_t*)data, sizeof(uint64_t))){
         res=HM_FAIL;
         continue;
       }
@@ -75,7 +78,7 @@ int read_from_pipe(int pipe, ...){
     case HM_SC_PARAM_STR:{
       char** data=va_arg(va, char**);
       uint32_t data_length;
-      if(sizeof(uint32_t)!=read_data_from_pipe(pipe, &data_length, sizeof(uint32_t))){
+      if(sizeof(uint32_t)!=read_data_from_pipe(pipe, (uint8_t*)(&data_length), sizeof(uint32_t))){
         res=HM_FAIL;
         continue;
       }
@@ -85,7 +88,7 @@ int read_from_pipe(int pipe, ...){
         continue;
       }
       count+=2;
-      if(!data_length || data_length!=read_data_from_pipe(pipe, data, data_length)){
+      if(!data_length || data_length!=read_data_from_pipe(pipe, (uint8_t*)(*data), data_length)){
         res=HM_FAIL;
         continue;
       }
@@ -94,49 +97,53 @@ int read_from_pipe(int pipe, ...){
     case HM_SC_PARAM_BUF:{
       uint8_t** data=va_arg(va, uint8_t**);
       uint32_t* data_length=va_arg(va, uint32_t*);
-      if(sizeof(uint32_t)!=read_data_from_pipe(pipe, data_length, sizeof(uint32_t))){
+      uint32_t dl;
+      if(sizeof(uint32_t)!=read_data_from_pipe(pipe, (uint8_t*)(&dl), sizeof(uint32_t))){
         res =HM_FAIL;
         continue;
       }
       count+=2;
-      if(*data_length){
-        *data = malloc(data_length);
+      if(dl){
+        *data = malloc(dl);
         if(!(*data)){
           res = HM_BAD_ALLOC;
           continue;
         }      
-        if((*data_length)!=read_data_from_pipe(pipe, data, (*data_length))){
+        if(dl!=read_data_from_pipe(pipe, *data, dl)){
           res=HM_FAIL;
           continue;
         }
+        *data_length=dl;
       }
     }
       break;
     default:
-      res=HM_INVALID_PARAM;
+      res=HM_INVALID_PARAMETER;
       continue;
     }
   }
   va_end(va);
   if(res){
-    for(;count>=0;){
+    while(count>=0){
       va_start(va, pipe);
       char* mark = va_arg(va, char*);
       if(--count){
-        mark = a_arg(va, char*);
+        mark = va_arg(va, char*);
       }
       if(--count){
         switch((int64_t)mark){
-        case HM_SC_PARAM_BUF:
+        case HM_SC_PARAM_BUF:{
           uint8_t** data=va_arg(va, uint8_t**);
           uint32_t* data_length=va_arg(va, uint32_t*);
           free(*data);
           count-=2;
+        }
           break;
-        case HM_SC_PARAM_STR:
+        case HM_SC_PARAM_STR:{
           char** data=va_arg(va, char**);
           free(*data);
           --count;
+        }
           break;
         }
       }
@@ -161,7 +168,7 @@ int write_to_pipe(int pipe, ...){
     switch(type){
     case HM_SC_PARAM_INT:{
       int64_t data=va_arg(va, int64_t);
-      if(sizeof(uint64_t)!=write_data_to_pipe(pipe, &data, sizeof(uint64_t))){
+      if(sizeof(uint64_t)!=write_data_to_pipe(pipe, (uint8_t*)&data, sizeof(uint64_t))){
         va_end(va);
         return HM_FAIL;
       }
@@ -170,11 +177,11 @@ int write_to_pipe(int pipe, ...){
     case HM_SC_PARAM_STR:{
       char* data=va_arg(va, char*);
       uint32_t data_length = strlen(data);
-      if(sizeof(uint32_t)!=write_data_to_pipe(pipe, &data_length, sizeof(uint32_t))){
+      if(sizeof(uint32_t)!=write_data_to_pipe(pipe, (uint8_t*)(&data_length), sizeof(uint32_t))){
         va_end(va);
         return HM_FAIL;
       }
-      if(data_length!=write_data_to_pipe(pipe, data, data_length)){
+      if(data_length!=write_data_to_pipe(pipe, (uint8_t*)data, data_length)){
         va_end(va);
         return HM_FAIL;
       }
@@ -183,7 +190,7 @@ int write_to_pipe(int pipe, ...){
     case HM_SC_PARAM_BUF:{
       uint8_t* data=va_arg(va, uint8_t*);
       uint32_t data_length=va_arg(va, uint32_t);
-      if(sizeof(uint32_t)!=write_data_to_pipe(pipe, &data_length, sizeof(uint32_t))){
+      if(sizeof(uint32_t)!=write_data_to_pipe(pipe, (uint8_t*)(&data_length), sizeof(uint32_t))){
         va_end(va);
         return HM_FAIL;
       }
@@ -197,7 +204,7 @@ int write_to_pipe(int pipe, ...){
       break;
     default:
       va_end(va);
-      return HM_INVALID_PARAM;      
+      return HM_INVALID_PARAMETER;      
     }    
   }
   va_end(va);
