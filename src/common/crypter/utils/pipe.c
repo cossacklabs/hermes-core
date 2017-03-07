@@ -26,11 +26,10 @@
 #include "pipe.h"
 
 int write_data_to_pipe(int pipe, const uint8_t* data, uint32_t data_length){
-  if(!pipe || !data || !data_length){ 
+  if(!pipe || !data || !data_length){
     return HM_INVALID_PARAMETER;
   }
-  ssize_t res=write(pipe, &data_length, sizeof(uint32_t));
-  if(sizeof(uint32_t)!=res){
+  if(sizeof(uint32_t)!=write(pipe, &data_length, sizeof(uint32_t))){
     return HM_FAIL;
   }
   if(!data_length || data_length!=write(pipe, data, data_length)){

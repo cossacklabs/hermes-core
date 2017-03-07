@@ -52,7 +52,6 @@ struct hm_crypter_t_{
 };
 
 int simple_crypter_proccess(const uint8_t* id, const size_t id_length, int read_pipe, int write_pipe){
-  fprintf(stderr, "crypter process started\n");
   if(!read_pipe || !write_pipe){
     return HM_INVALID_PARAMETER;
   }
@@ -79,11 +78,9 @@ int simple_crypter_proccess(const uint8_t* id, const size_t id_length, int read_
     uint8_t *param1=NULL, *param2=NULL, *param3=NULL, *out_param1=NULL, *out_param2=NULL;
     size_t param1_len=0, param2_len=0, param3_len=0, out_param1_len=0, out_param2_len=0;
     if(HM_SUCCESS==HM_SC_READ(read_pipe, HM_SC_INT(&command), HM_SC_BUF(&param1, &param1_len), HM_SC_BUF(&param2, &param2_len), HM_SC_BUF(&param3, &param3_len))){
-      fprintf(stderr, "read command error\n");
       hm_crypter_impl_destroy(&crypter);
       return HM_FAIL;
     }
-    HM_LOG(HM_INFO, "crypter: command %i readed\n", command);
     switch(command){
     case HM_SC_COMMAND_EXIT:
       free(param1);
@@ -91,7 +88,6 @@ int simple_crypter_proccess(const uint8_t* id, const size_t id_length, int read_
       free(param3);
       hm_crypter_impl_destroy(&crypter);
       res = HM_SC_WRITE(write_pipe, HM_SC_INT(HM_SUCCESS), HM_SC_BUF(out_param1, out_param1_len), HM_SC_BUF(out_param2, out_param2_len));
-      HM_LOG(HM_INFO, "crypter process stoped %i\n", res);
       return res;
     case HM_SC_COMMAND_ENCRYPT:
       res = hm_crypter_impl_uni_encrypt(crypter, param1, param1_len, param2, param2_len, param3, param3_len, &out_param1, &out_param1_len, &out_param2, &out_param2_len);
@@ -129,7 +125,6 @@ int simple_crypter_proccess(const uint8_t* id, const size_t id_length, int read_
     free(param1);
     free(param2);
     free(param3);
-    HM_LOG(HM_INFO, "crypter: command %i completed (%i)\n", command, res);
     res = HM_SC_WRITE(write_pipe, HM_SC_INT(res), HM_SC_BUF(out_param1, out_param1_len), HM_SC_BUF(out_param2, out_param2_len));
     free(out_param1);
     free(out_param2);
@@ -139,7 +134,6 @@ int simple_crypter_proccess(const uint8_t* id, const size_t id_length, int read_
     }
   }
   hm_crypter_impl_destroy(&crypter);
-  HM_LOG(HM_ERROR, "crypter process halted\n", 0);
   return res;
 }
 
@@ -169,21 +163,21 @@ hm_crypter_t* hm_crypter_create(const uint8_t* id, const size_t id_length){
     close(crypter->crypt_reader_pipe[0]);
     close(crypter->crypt_writer_pipe[1]);
     _exit(EXIT_SUCCESS);
+  }else{
+    close(crypter->crypt_reader_pipe[1]);
+    close(crypter->crypt_writer_pipe[0]);
   }
   return crypter;
 }
 
 int crypter_call(int read_pipe, int write_pipe, uint64_t command, const uint8_t* p1, const size_t p1_l, const uint8_t* p2, const size_t p2_l, const uint8_t* p3, const size_t p3_l, uint8_t** op1, size_t* op1_l, uint8_t** op2, size_t* op2_l){
-  int res1 = HM_SC_WRITE(write_pipe, HM_SC_INT(command), HM_SC_BUF(p1, p1_l), HM_SC_BUF(p2, p2_l), HM_SC_BUF(p3, p3_l));
-  if(HM_SUCCESS!= res1){
+  if(HM_SUCCESS!= HM_SC_WRITE(write_pipe, HM_SC_INT(command), HM_SC_BUF(p1, p1_l), HM_SC_BUF(p2, p2_l), HM_SC_BUF(p3, p3_l))){
     return HM_FAIL;
   }
   uint64_t res=0;
-  if(HM_SUCCESS!= HM_SC_READ(read_pipe, HM_SC_INT(&res), HM_SC_BUF(op1, op1_l), HM_SC_BUF(op2, op2_l))){
-    fprintf(stderr, "as");
+  if(HM_SUCCESS!= HM_SC_READ(read_pipe, HM_SC_INT(&res), HM_SC_BUF(&op1, &op1_l), HM_SC_BUF(op2, op2_l))){
     return HM_FAIL;
   }
-  fprintf(stderr, "as1");
   return res;
 }
 
