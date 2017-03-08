@@ -18,10 +18,12 @@
  *
  */
 
-#include <hermes/common/buffer.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <assert.h>
+
+#include <hermes/common/buffer.h>
 
 
 #define BUFFER_BLOCK_CAPACITY_DEFAULT 1024*10
@@ -39,9 +41,7 @@ struct buffer_t_{
 
 buffer_t* buffer_create(){
   buffer_t* buffer=malloc(sizeof *buffer);
-  if(!buffer){
-    return NULL;
-  }
+  assert(buffer);
   buffer->capacity_=1;
   buffer->length_=0;
   buffer->data_.data=malloc(buffer->capacity_*BUFFER_BLOCK_CAPACITY_DEFAULT);
@@ -56,11 +56,9 @@ buffer_t* buffer_create(){
 
 buffer_t* buffer_create_with_data(const uint8_t* data, const size_t data_len){
   buffer_t* res=buffer_create();
-  if(!res){
-    return NULL;
-  }
+  assert(res);
   if(BUFFER_SUCCESS!=buffer_realloc_(res, data_len)){
-    buffer_destroy(buffer);
+    buffer_destroy(&res);
     return NULL;
   }
   res->currpos_=res->data_.cdata;
@@ -71,15 +69,13 @@ buffer_t* buffer_create_with_data(const uint8_t* data, const size_t data_len){
 
 buffer_t* buffer_create_with_(void* unused, ...){
   buffer_t* res=buffer_create();
-  if(!res){
-    return NULL;
-  }
+  assert(res);
   va_list va;
   va_start(va, unused);
   char* mark = va_arg(va, char*);
   while(mark!=NULL){
     if(HERMES_BUFFER_MAGIC!=(int64_t)mark){
-      buffer_destroy(res);
+      buffer_destroy(&res);
       va_end(va);
       return NULL;
     }
@@ -91,7 +87,7 @@ buffer_t* buffer_create_with_(void* unused, ...){
     case HERMES_BUFFER_NODE_TYPE_STR:
       str=va_arg(va, char*);
       if(BUFFER_SUCCESS!=buffer_push_string(res, str)){
-        buffer_destroy(res);
+        buffer_destroy(&res);
         va_end(va);
         return NULL;
       }
@@ -100,13 +96,13 @@ buffer_t* buffer_create_with_(void* unused, ...){
       data=va_arg(va, uint8_t*);
       data_len=va_arg(va, size_t);
       if(BUFFER_SUCCESS!=buffer_push_data(res, data, data_len)){
-        buffer_destroy(res);
+        buffer_destroy(&res);
         va_end(va);
         return NULL;
       }
       break;
     default:
-      buffer_destroy(res);
+      buffer_destroy(&res);
       va_end(va);
       return NULL;
     }
@@ -165,15 +161,15 @@ int buffer_init_with_data(buffer_t* buffer, const uint8_t* data, const size_t da
   return BUFFER_SUCCESS;
 }
 
-int buffer_destroy(buffer_t* buffer){
-  if(!buffer){
+int buffer_destroy(buffer_t** buffer){
+  if((!buffer) || !(*buffer)){
     return BUFFER_INVALID_PARAM;
   }
-  if(!(buffer->read_only_) && buffer->data_.data){
-    free(buffer->data_.data);
-    buffer->data_.data = NULL;
+  if(!((*buffer)->read_only_) && (*buffer)->data_.data){
+    free((*buffer)->data_.data);
+    (*buffer)->data_.data = NULL;
   }
-  free(buffer);
+  free(*buffer);
   return BUFFER_SUCCESS;
 }
 
