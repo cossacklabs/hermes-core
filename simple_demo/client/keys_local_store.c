@@ -140,5 +140,3 @@ int hm_keys_storage_get_private_key_by_id_(hm_keys_storage_t* ks, const uint8_t*
 int hm_keys_storage_get_public_key_by_id_(hm_keys_storage_t* ks, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length){
   return hm_keys_storage_get_key_(ks, id, id_length, key, key_length, false);
 }
-
-
