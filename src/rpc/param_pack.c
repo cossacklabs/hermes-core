@@ -20,7 +20,7 @@
 
 
 #include <hermes/common/errors.h>
-#include "param_pack.h"
+#include <hermes/rpc/param_pack.h>
 
 
 #include <stdarg.h>
