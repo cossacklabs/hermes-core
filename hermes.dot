@@ -1,0 +1,49 @@
+digraph hermes_core{
+    node [shape=box];
+
+    subgraph cluster_0 {
+	subgraph cluster_2 {
+	    label="crypter process";
+	    crypter [shape=circle, style=filled];
+	    private_key_store [shape=circle, style=dotted, label="keyring"]
+	}
+	subgraph cluster_3{
+	    label="client process";
+	    client;
+            credential_store_client [label="Credential store client"];
+    	    access_keys_store_client [label="Key store client"];
+    	    data_store_client [label="Data store client"];
+	}
+    	crypter_transport [shape=circle, style=dotted, label="Crypter\ntransport"];
+
+	client -> crypter_transport -> crypter -> private_key_store;
+	client -> credential_store_client -> crypter_transport;
+        client -> access_keys_store_client -> crypter_transport;
+        client -> data_store_client -> crypter_transport;
+
+        access_keys_store_client -> credential_store_client;
+        data_store_client -> credential_store_client;
+	label="client";
+    }
+
+    transport [shape=circle, style=dotted];
+
+    subgraph cluster_1 {
+	label="server";
+	db1 [shape=record, style=dotted, label="pki|X509"];
+	db2 [shape=record, style=dotted, label="JSON|BD"];
+	db3 [shape=record, style=dotted, label="BD|FS"];
+	credential_store -> db1;
+	access_key_store -> db2;
+	data_store -> db3;
+    }
+
+        credential_store_client -> transport;
+	access_keys_store_client -> transport;
+	data_store_client -> transport;
+
+        transport -> credential_store;
+	transport -> access_key_store;
+	transport -> data_store;
+
+}
