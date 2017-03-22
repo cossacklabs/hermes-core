@@ -19,3 +19,31 @@
  */
 
 
+#include <hermes/rpc/client.h>
+
+struct hm_rpc_client_sync_type{
+  hm_rpc_client_transport_t* transport;
+};
+
+hm_rpc_client_sync_t* hm_rpc_client_sync_create(hm_rpc_transport_t* transport){
+  if(!transport){
+    return NULL;
+  }
+  hm_rpc_client_sync_t* res = calloc(sizeof(hm_rpc_client_sync_t), 1);
+  assert(res);
+  res->transport=transport;
+  return res;
+}
+
+uint32_t hm_rpc_client_sync_destroy(hm_rpc_client_sync_t** c){
+  if(!c || !(*c)){
+    return HM_INVALID_PARAM;
+  }
+  free(*c);
+  *c=NULL;
+  return HM_SUCCESS;
+}
+
+uint32_t hm_rpc_client_sync_call(hm_rpc_client_sync_t* c, const uint8_t* func_name, const size_t func_name_length, hm_param_pack_t* in_params, uint32_t *error, hm_param_pack_t** out_params){
+  
+}

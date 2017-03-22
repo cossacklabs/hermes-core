@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include <hermes/rpc/transport_h>
+
 typedef struct hm_param_pack_type hm_param_pack_t;
 
 typedef uint32_t (*send_rouitine_t)(void* user_data, const uint8_t* buffer_to_send, const size_t buffer_to_send_length);
@@ -44,8 +46,8 @@ uint32_t hm_param_pack_destroy(hm_param_pack_t** p);
 uint32_t hm_param_pack_write(hm_param_pack_t* p, uint8_t* buffer, size_t *buffer_length);
 hm_param_pack_t* hm_param_pack_read(uint8_t* buffer, size_t buffer_length);
 
-uint32_t hm_param_pack_send(hm_param_pack_t* p, send_rouitine_t* send_rouitine, void* user_data);
-hm_param_pack_t* hm_param_pack_receive(recv_rouitine_t* receive_rouitine, void* user_data);
+uint32_t hm_param_pack_send(hm_param_pack_t* p, hm_rpc_transport_t* transport);
+hm_param_pack_t* hm_param_pack_receive(hm_rpc_transport_t* transport);
 
 #define HM_PARAM_PACK_MAGIC 0x26048026
 #define HM_PARAM_TYPE_INT32 0x26048027      //int32

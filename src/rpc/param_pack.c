@@ -21,7 +21,7 @@
 
 #include <hermes/common/errors.h>
 #include <hermes/rpc/param_pack.h>
-
+#include <hermes/rpc/transport.h>
 
 #include <stdarg.h>
 #include <string.h>
@@ -214,6 +214,19 @@ uint32_t hm_param_pack_write(hm_param_pack_t* p, uint8_t* buffer, size_t *buffer
     ++curr_node;
   }
   (*buffer_length)=curr_pos;
+  return HM_SUCCESS;
+}
+
+uint32_t hm_param_pack_send(hm_param_pack_t* p, hm_rpc_transport_t* transport){
+  if(!p || !(p->param_count)){
+    return HM_INVALID_PARAMETER;
+  }
+  size_t needed_length = hm_param_pack_get_whole_length_(p);
+  if(!needed_length){
+    return HM_INVALID_PARAMETER;
+  }
+
+  hm_
   return HM_SUCCESS;
 }
 
