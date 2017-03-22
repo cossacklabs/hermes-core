@@ -29,14 +29,10 @@ TEST_OBJ_PATH = build/tests/obj
 TEST_BIN_PATH = build/tests
 
 CFLAGS += -I$(INCLUDE_PATH) -fPIC
-LDFLAGS += -Lbuild -lthemis -lsoter
+LDFLAGS += -Lbuild -Llibs/themis/build
 
 ifeq ($(PREFIX),)
 PREFIX = /usr
-endif
-
-ifneq ($(WITH_FILE_DB),)
-LDFLAGS += -lfile_db
 endif
 
 SHARED_EXT = so
@@ -47,82 +43,76 @@ ifdef DEBUG
 endif
 
 CFLAGS += -Werror -Wno-switch
+
+NO_COLOR=\033[0m
+OK_COLOR=\033[32;01m
+ERROR_COLOR=\033[31;01m
+WARN_COLOR=\033[33;01m
+
+OK_STRING=$(OK_COLOR)[OK]$(NO_COLOR)
+ERROR_STRING=$(ERROR_COLOR)[ERRORS]$(NO_COLOR)
+WARN_STRING=$(WARN_COLOR)[WARNINGS]$(NO_COLOR)
+
+AWK_CMD = awk '{ printf "%-30s %-10s\n",$$1, $$2; }'
+PRINT_OK = printf "$@ $(OK_STRING)\n" | $(AWK_CMD)
+PRINT_OK_ = printf "$(OK_STRING)\n" | $(AWK_CMD)
+PRINT_ERROR = printf "$@ $(ERROR_STRING)\n" | $(AWK_CMD) && printf "$(CMD)\n$$LOG\n" && false
+PRINT_ERROR_ = printf "$(ERROR_STRING)\n" | $(AWK_CMD) && printf "$(CMD)\n$$LOG\n" && false
+PRINT_WARNING = printf "$@ $(WARN_STRING)\n" | $(AWK_CMD) && printf "$(CMD)\n$$LOG\n"
+PRINT_WARNING_ = printf "$(WARN_STRING)\n" | $(AWK_CMD) && printf "$(CMD)\n$$LOG\n"
+BUILD_CMD = LOG=$$($(CMD) 2>&1) ; if [ $$? -eq 1 ]; then $(PRINT_ERROR); elif [ "$$LOG" != "" ] ; then $(PRINT_WARNING); else $(PRINT_OK); fi;
+BUILD_CMD_ = LOG=$$($(CMD) 2>&1) ; if [ $$? -eq 1 ]; then $(PRINT_ERROR_); elif [ "$$LOG" != "" ] ; then $(PRINT_WARNING_); else $(PRINT_OK_); fi;
+
 ifndef ERROR
-include src/srpc/srpc.mk
-include src/protocols/protocols.mk
-include src/services/services.mk
 include src/common/common.mk
-include src/mid_hermes/midHermes.mk
-include src/db/file_db/file_db.mk
+include src/rpc/rpc.mk
 endif
 
 
-all: err srpc_shared protocols_shared common_shared services_shared midHermes_shared file_db_shared
+all: err core
 
 test_all: err test
 
+core: rpc_shared
+
+common_static: CMD = $(AR) rcs $(BIN_PATH)/lib$(COMMON_BIN).a $(COMMON_OBJ)
+
 common_static: $(COMMON_OBJ)
-	$(AR) rcs $(BIN_PATH)/lib$(COMMON_BIN).a $(COMMON_OBJ)
+	@echo -n "link "
+	@$(BUILD_CMD)
 
-common_shared: $(COMMON_OBJ)
-	$(CC) -shared -o $(BIN_PATH)/lib$(COMMON_BIN).$(SHARED_EXT) $(COMMON_OBJ) $(LDFLAGS)
 
-file_db_static: $(FILE DB_OBJ)
-	$(AR) rcs $(BIN_PATH)/lib$(DB_BIN).a $(DB_OBJ)
+rpc_static: CMD = $(AR) rcs $(BIN_PATH)/lib$(RPC_BIN).a $(RPC_OBJ)
 
-file_db_shared: $(FILE_DB_OBJ)
-	$(CC) -shared -o $(BIN_PATH)/lib$(FILE_DB_BIN).$(SHARED_EXT) $(FILE_DB_OBJ)
+rpc_static: common_static $(RPC_OBJ) 
+	@echo -n "link "
+	@$(BUILD_CMD)
 
-srpc_static: $(SRPC_OBJ)
-	$(AR) rcs $(BIN_PATH)/lib$(SRPC_BIN).a $(SRPC_OBJ)
+rpc_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(RPC_BIN).$(SHARED_EXT) $(RPC_OBJ) $(LDFLAGS) -lcommon
 
-srpc_shared: $(SRPC_OBJ)
-	$(CC) -shared -o $(BIN_PATH)/lib$(SRPC_BIN).$(SHARED_EXT) $(SRPC_OBJ) $(LDFLAGS)
+rpc_shared: $(RPC_OBJ)
+	@echo -n "link "
+	@$(BUILD_CMD)
 
-protocols_static: $(PROTOCOLS_OBJ)
-	$(AR) rcs $(BIN_PATH)/lib$(PROTOCOLS_BIN).a $(PROTOCOLS_OBJ)
-
-protocols_shared: $(PROTOCOLS_OBJ)
-	$(CC) -shared -o $(BIN_PATH)/lib$(PROTOCOLS_BIN).$(SHARED_EXT) $(PROTOCOLS_OBJ) $(LDFLAGS)
-
-services_static: $(SERVICES_OBJ)
-	$(AR) rcs $(BIN_PATH)/lib$(SERVICES_BIN).a $(SERVICES_OBJ)
-
-services_shared: $(SERVICES_OBJ)
-	$(CC) -shared -o $(BIN_PATH)/lib$(SERVICES_BIN).$(SHARED_EXT) $(SERVICES_OBJ) $(LDFLAGS)
-
-midHermes_static: $(MIDHERMES_OBJ)
-	$(AR) rcs $(BIN_PATH)/lib$(MIDHERMES_BIN).a $(MIDHERMES_OBJ)
-
-midHermes_shared: $(MIDHERMES_OBJ)
-	$(CC) -shared -o $(BIN_PATH)/lib$(MIDHERMES_BIN).$(SHARED_EXT) $(MIDHERMES_OBJ) $(LDFLAGS) -lcommon
+$(OBJ_PATH)/%.o: CMD = $(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c
-	mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c $< -o $@
+	@mkdir -p $(@D)
+	@echo -n "compile "
+	@$(BUILD_CMD)
+
+$(TEST_OBJ_PATH)/%.o: CMD = $(CC) $(CFLAGS) -I$(TEST_SRC_PATH) -c $< -o $@
 
 $(TEST_OBJ_PATH)/%.o: $(TEST_SRC_PATH)/%.c
-	mkdir -p $(@D)
-	$(CC) $(CFLAGS) -I$(TEST_SRC_PATH) -c $< -o $@
+	@mkdir -p $(@D)
+	@echo -n "compile "
+	@$(BUILD_CMD)
 
 include tests/test.mk
 
 err: ; $(ERROR)
 
+clean: CMD = rm -rf $(BIN_PATH)
+
 clean:
-	rm -rf $(BIN_PATH)
-
-install: err all
-	mkdir -p $(PREFIX)/include/hermes $(PREFIX)/lib
-	install include/hermes/*.h $(PREFIX)/include/hermes
-#	install $(BIN_PATH)/*.a $(PREFIX)/lib
-	install $(BIN_PATH)/*.$(SHARED_EXT) $(PREFIX)/lib
-
-uninstall: 
-	rm -rf $(PREFIX)/include/hermes
-	rm -f $(PREFIX)/lib/libmid_hermes.a
-	rm -f $(PREFIX)/lib/libsrpc.a
-	rm -f $(PREFIX)/lib/libcommon.a
-	rm -f $(PREFIX)/lib/libmid_hermes.so
-	rm -f $(PREFIX)/lib/libsrpc.so
-	rm -f $(PREFIX)/lib/libcommon.so
+	@$(BUILD_CMD)

@@ -18,19 +18,18 @@
  *
  */
 
-#ifndef COMMON_BUFFER_H_
-#define COMMON_BUFFER_H_
+#ifndef HERMES_COMMON_BUFFER_H_
+#define HERMES_COMMON_BUFFER_H_
 
 #include <stdint.h>
 #include <stddef.h>
-#include "error.h"
+#include <hermes/common/errors.h>
 
-typedef int buffer_status_t;
 
-#define BUFFER_SUCCESS 0
-#define BUFFER_FAIL -1
-#define BUFFER_INVALID_PARAM -2
-#define BUFFER_BAD_ALLOC -3
+#define BUFFER_FAIL HM_FAIL
+#define BUFFER_SUCCESS HM_SUCCESS
+#define BUFFER_INVALID_PARAM HM_INVALID_PARAMETER
+#define BUFFER_BAD_ALLOC HM_BAD_ALLOC
 #define BUFFER_AT_END -4
 #define BUFFER_INCORRECT_BLOCK_TYPE -5
 #define BUFFER_CORRUPTED -6
@@ -41,17 +40,17 @@ typedef struct buffer_t_ buffer_t;
 buffer_t* buffer_create();
 buffer_t* buffer_create_with_(void* unused, ...);
 buffer_t* buffer_create_with_data(const uint8_t* data, const size_t data_len);
-buffer_status_t buffer_init_with_data(buffer_t* buffer, const uint8_t* data, const size_t data_len);
+int buffer_init_with_data(buffer_t* buffer, const uint8_t* data, const size_t data_len);
 
-buffer_status_t buffer_destroy(buffer_t* buffer);
+int buffer_destroy(buffer_t** buffer);
 
-buffer_status_t buffer_push_status(buffer_t* buffer, const int status);
-buffer_status_t buffer_push_data(buffer_t* buffer, const uint8_t* data, const size_t data_length);
-buffer_status_t buffer_push_string(buffer_t* buffer, const char* str);
+int buffer_push_status(buffer_t* buffer, const int status);
+int buffer_push_data(buffer_t* buffer, const uint8_t* data, const size_t data_length);
+int buffer_push_string(buffer_t* buffer, const char* str);
 
-buffer_status_t buffer_pop_status(buffer_t* buffer, int* status);
-buffer_status_t buffer_pop_data(buffer_t* buffer, const uint8_t** data, size_t* data_length);
-buffer_status_t buffer_pop_string(buffer_t* buffer, const char** str);
+int buffer_pop_status(buffer_t* buffer, int* status);
+int buffer_pop_data(buffer_t* buffer, const uint8_t** data, size_t* data_length);
+int buffer_pop_string(buffer_t* buffer, const char** str);
 
 size_t buffer_get_size(buffer_t* buffer);
 const uint8_t* buffer_get_data(buffer_t* buffer);

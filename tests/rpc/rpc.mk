@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Cossack Labs Limited
+# Copyright (c) 2017 Cossack Labs Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,18 +14,5 @@
 # limitations under the License.
 #
 
-COMMON_TEST_SRC = $(wildcard tests/common/*.c)
-COMMON_TEST_OBJ = $(patsubst $(TEST_SRC_PATH)/%.c,$(TEST_OBJ_PATH)/%.o, $(COMMON_TEST_SRC))
-
-include tests/rpc/rpc.mk
-
-rpc_test: CMD = $(CC) -o $(TEST_BIN_PATH)/rpc_test $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lrpc -lsoter $(COVERLDFLAGS)
-
-rpc_test: rpc_static $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ)
-	@echo -n "link "
-	@$(BUILD_CMD)
-
-test: rpc_test
-
-check: 
-	$(TEST_BIN_PATH)/rpc_test
+RPC_TEST_SRC = $(wildcard tests/rpc/*.c)
+RPC_TEST_OBJ = $(patsubst $(TEST_SRC_PATH)/%.c,$(TEST_OBJ_PATH)/%.o, $(RPC_TEST_SRC))

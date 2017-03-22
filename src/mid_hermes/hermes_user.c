@@ -55,7 +55,6 @@ struct hermes_user_t_{
 hermes_user_t* hermes_user_create(const char* user_id, const uint8_t* private_key, const size_t private_key_length, hermes_storages_t* storages){
   HERMES_CHECK(user_id && private_key && storages, return NULL);
   hermes_user_t* user = calloc(sizeof(hermes_user_t), 1);
-  fprintf(stderr, "%s\n", user_id);
   HERMES_CHECK(user, return NULL);
   HERMES_CHECK(user->id = str_(user_id), hermes_user_destroy(&user); return NULL);
   user->crypter = hermes_crypter_create(private_key, private_key_length);
