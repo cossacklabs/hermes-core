@@ -17,14 +17,15 @@
 COMMON_TEST_SRC = $(wildcard tests/common/*.c)
 COMMON_TEST_OBJ = $(patsubst $(TEST_SRC_PATH)/%.c,$(TEST_OBJ_PATH)/%.o, $(COMMON_TEST_SRC))
 
-NIST_STS_DIR = tests/soter/nist-sts
-
 include tests/rpc/rpc.mk
 
-rpc_test: BUILD_CMD = $(CC) -o $(TEST_BIN_PATH)/rpc_test $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lrpc -lsoter $(COVERLDFLAGS)
+rpc_test: CMD = $(CC) -o $(TEST_BIN_PATH)/rpc_test $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lrpc -lsoter $(COVERLDFLAGS)
 
 rpc_test: rpc_static $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
 test: rpc_test
+
+check: 
+	$(TEST_BIN_PATH)/rpc_test

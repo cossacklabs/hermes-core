@@ -74,6 +74,7 @@ hm_param_pack_t* hm_param_pack_create_(void* unused, ...){
       res->nodes[res->param_count].data_length=0;
       break;
     case HM_PARAM_TYPE_BUFFER:
+    case HM_PARAM_TYPE_BUFFER_C:
       res->nodes[res->param_count].type=type;
       res->nodes[res->param_count].data.buf_val=va_arg(va, uint8_t*);
       res->nodes[res->param_count].data_length=va_arg(va, size_t);
@@ -134,6 +135,7 @@ uint32_t hm_param_pack_extract_(hm_param_pack_t* p, ...){
       (*(va_arg(va, int32_t*)))=p->nodes[curr_node].data.int_val;
       break;
     case HM_PARAM_TYPE_BUFFER:
+    case HM_PARAM_TYPE_BUFFER_C:
       *(va_arg(va, uint8_t**))=p->nodes[curr_node].data.buf_val;
       *(va_arg(va, size_t*))=p->nodes[curr_node].data_length;
       break;
@@ -162,6 +164,7 @@ size_t hm_param_pack_get_whole_length_(hm_param_pack_t* p){
       whole_length+=2*sizeof(uint32_t);
       break;
     case HM_PARAM_TYPE_BUFFER:
+    case HM_PARAM_TYPE_BUFFER_C:
       whole_length+=2*sizeof(uint32_t);
       whole_length+=p->nodes[curr_node].data_length;
       break;
@@ -197,10 +200,13 @@ uint32_t hm_param_pack_write(hm_param_pack_t* p, uint8_t* buffer, size_t *buffer
       curr_pos+=2*sizeof(uint32_t);
       break;
     case HM_PARAM_TYPE_BUFFER:
-      memcpy(buffer+curr_pos, (uint8_t*)&(p->nodes[curr_node].type), sizeof(uint32_t));      //type
+    case HM_PARAM_TYPE_BUFFER_C:{
+      uint32_t t=HM_PARAM_TYPE_BUFFER;
+      memcpy(buffer+curr_pos, (uint8_t*)&t, sizeof(uint32_t));      //type
       memcpy(buffer+curr_pos+sizeof(uint32_t), (uint8_t*)&(p->nodes[curr_node].data_length), sizeof(uint32_t));//length
       memcpy(buffer+curr_pos+2*sizeof(uint32_t), p->nodes[curr_node].data.buf_val, p->nodes[curr_node].data_length);//value
       curr_pos+=2*sizeof(uint32_t)+(p->nodes[curr_node].data_length);
+    }
       break;
     default:
       return HM_FAIL;
@@ -231,6 +237,7 @@ bool hm_param_pack_check_buf_(const uint8_t* buffer, size_t buffer_length){
       }
       buffer+=sizeof(int32_t);
       break;
+    case HM_PARAM_TYPE_BUFFER_C:
     case HM_PARAM_TYPE_BUFFER:{
       if((buffer+sizeof(uint32_t))>buffer_end){
         return false;
@@ -274,6 +281,7 @@ hm_param_pack_t* hm_param_pack_read(uint8_t* buffer, size_t buffer_length){
       buf+=sizeof(int32_t);
       break;
     case HM_PARAM_TYPE_BUFFER:
+    case HM_PARAM_TYPE_BUFFER_C:
       res->nodes[curr_param].data_length=*((uint32_t*)buf);
       buf+=sizeof(uint32_t);
       res->nodes[curr_param].data.buf_val=buf;

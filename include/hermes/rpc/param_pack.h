@@ -48,11 +48,16 @@ uint32_t hm_param_pack_send(hm_param_pack_t* p, send_rouitine_t* send_rouitine, 
 hm_param_pack_t* hm_param_pack_receive(recv_rouitine_t* receive_rouitine, void* user_data);
 
 #define HM_PARAM_PACK_MAGIC 0x26048026
-#define HM_PARAM_TYPE_INT32 0x26048027
-#define HM_PARAM_TYPE_BUFFER 0x26048028
+#define HM_PARAM_TYPE_INT32 0x26048027      //int32
+#define HM_PARAM_TYPE_BUFFER 0x26048028     //buffer with putting ownership to param_pack
+                                            //buffer will be freed with hm_param_pack_destroy() calling
+
+#define HM_PARAM_TYPE_BUFFER_C 0x26048029   //buffer without putting ownership to param_pack
+                                            //buffer must be destroyed separately with param_pack
 
 #define HM_PARAM_INT32(p) HM_PARAM_PACK_MAGIC, HM_PARAM_TYPE_INT32, p
 #define HM_PARAM_BUFFER(p, p_len) HM_PARAM_PACK_MAGIC, HM_PARAM_TYPE_BUFFER, p, p_len
+#define HM_PARAM_BUFFER_C(p, p_len) HM_PARAM_PACK_MAGIC, HM_PARAM_TYPE_BUFFER_C, p, p_len
 
 #define HM_PARAM_PACK(...) hm_param_pack_create_((void*)NULL, __VA_ARGS__, (void*)NULL)
 #define HM_PARAM_EXTRACT(p, ...) hm_param_pack_extract_(p, __VA_ARGS__, (void*)NULL)
