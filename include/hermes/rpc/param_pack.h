@@ -45,7 +45,7 @@ hm_param_pack_t* hm_param_pack_receive(hm_rpc_transport_t* transport);
 
 
 /* constant definitions
- * all constatnt alues is random? but need to be unique
+ * all constant values is random? but need to be unique
  */
 #define HM_PARAM_PACK_MAGIC 0x26048026
 #define HM_PARAM_TYPE_INT32 0x26048027      //int32
