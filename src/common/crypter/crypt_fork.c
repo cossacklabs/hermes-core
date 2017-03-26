@@ -32,7 +32,7 @@
 
 
 enum{
-  HM_SC_COMMAND_ENCRYPT = 2604,
+  HM_SC_COMMAND_ENCRYPT = 2604,   //not start from 0 or 1 for debug reasons (better to see in stream of data)
   HM_SC_COMMAND_ENCRYPT_WITH_TOKEN,
   HM_SC_COMMAND_ENCRYPT_WITH_CREATING_TOKEN,
   HM_SC_COMMAND_MAC_WITH_TOKEN,

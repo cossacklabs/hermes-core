@@ -19,9 +19,9 @@
  */
 
 
+#include <hermes/rpc/transport.h>
 #include <hermes/common/errors.h>
 #include <hermes/rpc/param_pack.h>
-
 
 #include <stdarg.h>
 #include <string.h>
@@ -59,14 +59,14 @@ hm_param_pack_t* hm_param_pack_create_(void* unused, ...){
   assert(res);
   va_list va;
   va_start(va, unused);
-  char* mark = va_arg(va, char*);
-  while(mark !=NULL){
-    if(HM_PARAM_PACK_MAX_PARAMS==(res->param_count) || HM_PARAM_PACK_MAGIC!=(uint64_t)mark){
+  uint32_t mark = va_arg(va, uint32_t);
+  while(mark){
+    if(HM_PARAM_PACK_MAX_PARAMS==(res->param_count) || HM_PARAM_PACK_MAGIC!=mark){
       hm_param_pack_destroy(&res);
       va_end(va);
       return NULL;
     }
-    uint64_t type=va_arg(va, int64_t);
+    uint32_t type=va_arg(va, int32_t);
     switch(type){
     case HM_PARAM_TYPE_INT32:
       res->nodes[res->param_count].type=type;
@@ -85,7 +85,7 @@ hm_param_pack_t* hm_param_pack_create_(void* unused, ...){
       return NULL;      
     }
     ++(res->param_count);
-    mark = va_arg(va, char*);
+    mark = va_arg(va, uint32_t);
   }
   return res;
 }
@@ -119,13 +119,13 @@ uint32_t hm_param_pack_extract_(hm_param_pack_t* p, ...){
   size_t curr_node=0;
   va_list va;
   va_start(va, p);
-  char* mark = va_arg(va, char*);
-  while(mark !=NULL){
-    if(curr_node>=(p->param_count) || HM_PARAM_PACK_MAGIC!=(uint64_t)mark){
+  uint32_t mark = va_arg(va, uint32_t);
+  while(mark){
+    if(curr_node>=(p->param_count) || HM_PARAM_PACK_MAGIC!=mark){
       va_end(va);
       return HM_FAIL;
     }
-    uint64_t type=va_arg(va, int64_t);
+    uint32_t type=va_arg(va, int32_t);
     if(type != p->nodes[curr_node].type){
       va_end(va);
       return HM_FAIL;      
@@ -144,20 +144,20 @@ uint32_t hm_param_pack_extract_(hm_param_pack_t* p, ...){
       return HM_FAIL;
     }
     ++curr_node;
-    mark = va_arg(va, char*);
+    mark = va_arg(va, uint32_t);
   }
   va_end(va); 
   return HM_SUCCESS;
 }
 
-size_t hm_param_pack_get_whole_length_(hm_param_pack_t* p){
+uint32_t hm_param_pack_get_whole_length_(const hm_param_pack_t* p){
   if(!p){
     return HM_INVALID_PARAMETER;
   }
   if(p->readed){
     return p->whole_data_length;
   }
-  size_t whole_length=sizeof(uint32_t), curr_node=0;
+  uint32_t whole_length=sizeof(uint32_t), curr_node=0;
   while(curr_node < p->param_count){
     switch(p->nodes[curr_node].type){
     case HM_PARAM_TYPE_INT32:
@@ -214,6 +214,54 @@ uint32_t hm_param_pack_write(hm_param_pack_t* p, uint8_t* buffer, size_t *buffer
     ++curr_node;
   }
   (*buffer_length)=curr_pos;
+  return HM_SUCCESS;
+}
+
+uint32_t hm_param_pack_send(const hm_param_pack_t* p, hm_rpc_transport_t* transport){
+  if(!p || !(p->param_count)){
+    return HM_INVALID_PARAMETER;
+  }
+  uint32_t needed_length = hm_param_pack_get_whole_length_(p);
+  if(!needed_length){
+    return HM_INVALID_PARAMETER;
+  }
+  uint32_t res = HM_SUCCESS;
+  if(HM_SUCCESS!=(res=hm_rpc_transport_send(transport, (uint8_t*)&needed_length, sizeof(uint32_t)))){
+    return res;
+  }
+  if(HM_SUCCESS!=(res=hm_rpc_transport_send(transport, (uint8_t*)&(p->param_count), sizeof(uint32_t)))){
+    return res;
+  }
+  size_t curr_node=0;
+  while(curr_node<(p->param_count)){
+    switch(p->nodes[curr_node].type){
+    case HM_PARAM_TYPE_INT32://int32
+      if(HM_SUCCESS!=(res=hm_rpc_transport_send(transport, (uint8_t*)&(p->nodes[curr_node].type), sizeof(uint32_t)))){
+        return res;
+      }
+      if(HM_SUCCESS!=(res=hm_rpc_transport_send(transport, (uint8_t*)&(p->nodes[curr_node].data.int_val), sizeof(uint32_t)))){
+        return res;
+      }
+      break;
+    case HM_PARAM_TYPE_BUFFER:
+    case HM_PARAM_TYPE_BUFFER_C:{
+      uint32_t t=HM_PARAM_TYPE_BUFFER;
+      if(HM_SUCCESS!=(res=hm_rpc_transport_send(transport, (uint8_t*)&t, sizeof(uint32_t)))){
+        return res;
+      }
+      if(HM_SUCCESS!=(res=hm_rpc_transport_send(transport, (uint8_t*)&(p->nodes[curr_node].data_length), sizeof(uint32_t)))){
+        return res;
+      }
+      if(HM_SUCCESS!=(res=hm_rpc_transport_send(transport, (uint8_t*)&(p->nodes[curr_node].data.buf_val), p->nodes[curr_node].data_length))){
+        return res;
+      }
+    }
+      break;
+    default:
+      return HM_INVALID_PARAMETER;
+    }
+    ++curr_node;    
+  }
   return HM_SUCCESS;
 }
 
@@ -295,4 +343,26 @@ hm_param_pack_t* hm_param_pack_read(uint8_t* buffer, size_t buffer_length){
   res->whole_data_length=buffer_length;
   res->readed=true;
   return res;
+}
+
+hm_param_pack_t* hm_param_pack_receive(hm_rpc_transport_t* transport){
+  if(!transport){
+    return NULL;
+  }
+  uint32_t length_to_read=0;
+  uint32_t res=HM_SUCCESS;
+  if(HM_SUCCESS!=(res=hm_rpc_transport_recv(transport, (uint8_t*)&length_to_read, sizeof(uint32_t)))){
+    return NULL;
+  }
+  uint8_t *buffer=malloc(length_to_read);
+  assert(buffer);
+  if(HM_SUCCESS!=(res=hm_rpc_transport_recv(transport, buffer, length_to_read))){
+    free(buffer);
+    return NULL;
+  }
+  hm_param_pack_t* pack=hm_param_pack_read(buffer, length_to_read);
+  if(!pack){
+    free(buffer);
+  }
+  return pack;
 }

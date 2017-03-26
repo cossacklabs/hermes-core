@@ -19,7 +19,7 @@ COMMON_TEST_OBJ = $(patsubst $(TEST_SRC_PATH)/%.c,$(TEST_OBJ_PATH)/%.o, $(COMMON
 
 include tests/rpc/rpc.mk
 
-rpc_test: CMD = $(CC) -o $(TEST_BIN_PATH)/rpc_test $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lrpc -lsoter $(COVERLDFLAGS)
+rpc_test: CMD = $(CC) -o $(TEST_BIN_PATH)/rpc_test $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lrpc -lsoter $(COVERLDFLAGS) -lpthread
 
 rpc_test: rpc_static $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ)
 	@echo -n "link "

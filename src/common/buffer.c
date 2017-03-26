@@ -24,6 +24,7 @@
 #include <assert.h>
 
 #include <hermes/common/buffer.h>
+#include <hermes/common/errors.h>
 
 
 #define BUFFER_BLOCK_CAPACITY_DEFAULT 1024*10
@@ -38,6 +39,24 @@ struct buffer_t_{
   const uint8_t* currpos_;
   int read_only_;
 };
+
+int buffer_realloc_(buffer_t* buffer, const size_t size){
+  if(!buffer){
+    return BUFFER_INVALID_PARAM;
+  }
+  if(buffer->read_only_){
+    return BUFFER_WRITE_READ_ONLY;
+  }
+  if(size > (buffer->capacity_*BUFFER_BLOCK_CAPACITY_DEFAULT)){
+    size_t new_capacity_=((size)/BUFFER_BLOCK_CAPACITY_DEFAULT);
+    new_capacity_+=(size%BUFFER_BLOCK_CAPACITY_DEFAULT)?1:0;
+    uint8_t* a=realloc(buffer->data_.data, new_capacity_*BUFFER_BLOCK_CAPACITY_DEFAULT);
+    assert(a);
+    buffer->data_.data=a;
+    buffer->capacity_=new_capacity_;
+  }
+  return BUFFER_SUCCESS; 
+}
 
 buffer_t* buffer_create(){
   buffer_t* buffer=malloc(sizeof *buffer);
@@ -173,24 +192,6 @@ int buffer_destroy(buffer_t** buffer){
   return BUFFER_SUCCESS;
 }
 
-int buffer_realloc_(buffer_t* buffer, const size_t size){
-  if(!buffer){
-    return BUFFER_INVALID_PARAM;
-  }
-  if(buffer->read_only_){
-    return BUFFER_WRITE_READ_ONLY;
-  }
-  if(size > (buffer->capacity_*BUFFER_BLOCK_CAPACITY_DEFAULT)){
-    size_t new_capacity_=((size)/BUFFER_BLOCK_CAPACITY_DEFAULT);
-    new_capacity_+=(size%BUFFER_BLOCK_CAPACITY_DEFAULT)?1:0;
-    uint8_t* a=realloc(buffer->data_.data, new_capacity_*BUFFER_BLOCK_CAPACITY_DEFAULT);
-    HERMES_CHECK(a!=NULL, BUFFER_BAD_ALLOC);
-    buffer->data_.data=a;
-    buffer->capacity_=new_capacity_;
-  }
-  return BUFFER_SUCCESS; 
-}
-
 int buffer_push_status(buffer_t* buffer, const int status){
   if(!buffer || 0!=buffer_realloc_(buffer, buffer->length_ + 5)){
     return BUFFER_BAD_ALLOC;
@@ -283,10 +284,10 @@ int buffer_pop_string(buffer_t* buffer, const char** str){
   }
   size_t str_len=0;
   memcpy(&str_len, buffer->currpos_+1, 4);
-  if(strlen(buffer->currpos_+5)!=str_len && (buffer->currpos_+6+str_len)<=(buffer->data_.cdata+buffer->length_)){
+  if(strlen((const char*)(buffer->currpos_)+5)!=str_len && (buffer->currpos_+6+str_len)<=(buffer->data_.cdata+buffer->length_)){
     return BUFFER_CORRUPTED;
   }
-  *str=buffer->currpos_+5;
+  *str=(char*)(buffer->currpos_)+5;
   buffer->currpos_+=str_len+6;
   return BUFFER_SUCCESS;
 }

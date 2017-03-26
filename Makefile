@@ -19,7 +19,7 @@
 #
 
 
-#CC = clang
+CC = clang
 INCLUDE_PATH = include
 SRC_PATH = src
 BIN_PATH = build
@@ -90,7 +90,7 @@ rpc_static: common_static $(RPC_OBJ)
 
 rpc_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(RPC_BIN).$(SHARED_EXT) $(RPC_OBJ) $(LDFLAGS) -lcommon
 
-rpc_shared: $(RPC_OBJ)
+rpc_shared: common_static $(RPC_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 

@@ -19,17 +19,14 @@
  */
 
 
-#ifndef HERMES_RPC_SYNC_CLIENT_H
-#define HERMES_RPC_SYNC_CLIENT_H
+#ifndef HERMES_TEST_TRANSPORT_H
+#define HERMES_TEST_TRANSPORT_H
 
-#include <hermes/rpc/param_pack.h>
 #include <hermes/rpc/transport.h>
 
-typedef struct hm_rpc_client_sync_type hm_rpc_client_sync_t;
+#include <stdbool.h>
 
-hm_rpc_client_sync_t* hm_rpc_client_sync_create(hm_rpc_transport_t* transport);
-uint32_t hm_rpc_client_sync_destroy(hm_rpc_client_sync_t** c);
+hm_rpc_transport_t* hm_test_transport_create(const char* write_pipe_name, const char* read_pipe_name, bool is_server);
+uint32_t hm_test_transport_destroy(hm_rpc_transport_t* t);
 
-uint32_t hm_rpc_client_sync_call(hm_rpc_client_sync_t* c, const uint8_t* func_name, const size_t func_name_length, hm_param_pack_t* in_params, uint32_t *error, hm_param_pack_t** out_params);
-
-#endif //HERMES_RPC_SYNC_CLIENT_H
+#endif //HERMES_TEST_TRANSPORT_H
