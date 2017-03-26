@@ -26,10 +26,7 @@
 
 #include <stdbool.h>
 
-#define CS_PIPE_NAME "/tmp/hermes_core_test_cs_pipe" 
-#define SC_PIPE_NAME "/tmp/hermes_core_test_sc_pipe"
-
-hm_rpc_transport_t* hm_test_transport_create(bool is_server);
+hm_rpc_transport_t* hm_test_transport_create(const char* write_pipe_name, const char* read_pipe_name, bool is_server);
 uint32_t hm_test_transport_destroy(hm_rpc_transport_t* t);
 
 #endif //HERMES_TEST_TRANSPORT_H

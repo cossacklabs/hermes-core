@@ -32,19 +32,17 @@
 struct hm_rpc_transport_type{
   int read_pipe;
   int write_pipe;
-  bool is_server;
 };
 
-hm_rpc_transport_t* hm_test_transport_create(bool is_server){
+hm_rpc_transport_t* hm_test_transport_create(const char* write_pipe_name, const char* read_pipe_name, bool is_server){
   hm_rpc_transport_t* t = calloc(sizeof(hm_rpc_transport_t), 1);
   assert(t);
-  t->is_server=is_server;
   if(is_server){
-    t->write_pipe=open(SC_PIPE_NAME, O_WRONLY);
-    t->read_pipe=open(CS_PIPE_NAME, O_RDONLY); 
-  } else {
-    t->write_pipe=open(CS_PIPE_NAME, O_WRONLY);
-    t->read_pipe=open(SC_PIPE_NAME, O_RDONLY); 
+    t->write_pipe=open(write_pipe_name, O_WRONLY);
+    t->read_pipe=open(read_pipe_name, O_RDONLY); 
+  }else{
+    t->read_pipe=open(read_pipe_name, O_RDONLY); 
+    t->write_pipe=open(write_pipe_name, O_WRONLY);
   }
   if(!(t->write_pipe) || !(t->read_pipe)){
     hm_test_transport_destroy(t);
@@ -71,8 +69,13 @@ uint32_t hm_rpc_transport_send(hm_rpc_transport_t* transport, const uint8_t* buf
   if(!transport || !buffer || !buffer_length){
     return HM_INVALID_PARAMETER;
   }
-  ssize_t sended_bytes=write(transport->write_pipe, buffer, buffer_length);
-  if(sended_bytes!=buffer_length){
+  size_t curr_pos=0;
+  ssize_t sended_bytes=0;
+  while(curr_pos<buffer_length){
+    sended_bytes=write(transport->write_pipe, buffer+curr_pos, buffer_length-curr_pos);
+    curr_pos+=sended_bytes;
+  }
+  if(curr_pos!=buffer_length){
     return HM_FAIL;
   }
   return HM_SUCCESS;
@@ -81,8 +84,13 @@ uint32_t hm_rpc_transport_recv(hm_rpc_transport_t* transport, uint8_t* buffer, s
   if(!transport || !buffer || !buffer_length){
     return HM_INVALID_PARAMETER;
   }
-  ssize_t readed_bytes=read(transport->write_pipe, buffer, buffer_length);
-  if(readed_bytes!=buffer_length){
+  size_t curr_pos=0;
+  ssize_t readed_bytes=0;
+  while(curr_pos<buffer_length){
+    readed_bytes=read(transport->read_pipe, buffer+curr_pos, buffer_length-curr_pos);
+    curr_pos+=readed_bytes;
+  }
+  if(curr_pos!=buffer_length){
     return HM_FAIL;
   }
   return HM_SUCCESS;
