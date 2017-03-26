@@ -27,7 +27,7 @@
 
 typedef struct hm_rpc_transport_type hm_rpc_transport_t;
 
-uint32_t hm_rpc_transport_send(hm_rpc_transport_t* transport, const uint8_t* buffer, const size_t buffer_length);
-uint32_t hm_rpc_transport_recv(hm_rpc_transport_t* transport, uint8_t* buffer, size_t buffer_length);
+uint32_t hm_rpc_transport_send(void* transport, const uint8_t* buffer, const size_t buffer_length);
+uint32_t hm_rpc_transport_recv(void* transport, uint8_t* buffer, size_t buffer_length);
 
 #endif //HERMES_RPC_TRANSPORT_H

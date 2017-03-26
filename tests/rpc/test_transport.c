@@ -65,14 +65,14 @@ uint32_t hm_test_transport_destroy(hm_rpc_transport_t* t){
   return HM_SUCCESS;
 }
 
-uint32_t hm_rpc_transport_send(hm_rpc_transport_t* transport, const uint8_t* buffer, const size_t buffer_length){
+uint32_t hm_rpc_transport_send(void* transport, const uint8_t* buffer, const size_t buffer_length){
   if(!transport || !buffer || !buffer_length){
     return HM_INVALID_PARAMETER;
   }
   size_t curr_pos=0;
   ssize_t sended_bytes=0;
   while(curr_pos<buffer_length){
-    sended_bytes=write(transport->write_pipe, buffer+curr_pos, buffer_length-curr_pos);
+    sended_bytes=write(((hm_rpc_transport_t*)(transport))->write_pipe, buffer+curr_pos, buffer_length-curr_pos);
     curr_pos+=sended_bytes;
   }
   if(curr_pos!=buffer_length){
@@ -80,14 +80,14 @@ uint32_t hm_rpc_transport_send(hm_rpc_transport_t* transport, const uint8_t* buf
   }
   return HM_SUCCESS;
 }
-uint32_t hm_rpc_transport_recv(hm_rpc_transport_t* transport, uint8_t* buffer, size_t buffer_length){
+uint32_t hm_rpc_transport_recv(void* transport, uint8_t* buffer, size_t buffer_length){
   if(!transport || !buffer || !buffer_length){
     return HM_INVALID_PARAMETER;
   }
   size_t curr_pos=0;
   ssize_t readed_bytes=0;
   while(curr_pos<buffer_length){
-    readed_bytes=read(transport->read_pipe, buffer+curr_pos, buffer_length-curr_pos);
+    readed_bytes=read(((hm_rpc_transport_t*)(transport))->read_pipe, buffer+curr_pos, buffer_length-curr_pos);
     curr_pos+=readed_bytes;
   }
   if(curr_pos!=buffer_length){
