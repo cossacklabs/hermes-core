@@ -18,16 +18,17 @@
  *
  */
 
+#include <common/test_utils.h>
 
-#ifndef HERMES_RPC_TRANSPORT_H
-#define HERMES_RPC_TRANSPORT_H
+void rpc_tests();
 
-#include <stdint.h>
-#include <stdlib.h>
+int main(int argc, char *argv[]){
+  testsuite_start_testing();
+  testsuite_enter_suite("rpc test");
 
-typedef struct hm_rpc_transport_type hm_rpc_transport_t;
+  testsuite_run_test(rpc_tests);
 
-uint32_t hm_rpc_transport_send(hm_rpc_transport_t* transport, const uint8_t* buffer, const size_t buffer_length);
-uint32_t hm_rpc_transport_recv(hm_rpc_transport_t* transport, uint8_t* buffer, size_t buffer_length);
+  testsuite_finish_testing();
+  return testsuite_get_return_value();
+}
 
-#endif //HERMES_RPC_TRANSPORT_H

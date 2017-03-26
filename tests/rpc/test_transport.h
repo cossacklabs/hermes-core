@@ -19,15 +19,17 @@
  */
 
 
-#ifndef HERMES_RPC_TRANSPORT_H
-#define HERMES_RPC_TRANSPORT_H
+#ifndef HERMES_TEST_TRANSPORT_H
+#define HERMES_TEST_TRANSPORT_H
 
-#include <stdint.h>
-#include <stdlib.h>
+#include <hermes/rpc/transport.h>
 
-typedef struct hm_rpc_transport_type hm_rpc_transport_t;
+#include <stdbool.h>
 
-uint32_t hm_rpc_transport_send(hm_rpc_transport_t* transport, const uint8_t* buffer, const size_t buffer_length);
-uint32_t hm_rpc_transport_recv(hm_rpc_transport_t* transport, uint8_t* buffer, size_t buffer_length);
+#define CS_PIPE_NAME "/tmp/hermes_core_test_cs_pipe" 
+#define SC_PIPE_NAME "/tmp/hermes_core_test_sc_pipe"
 
-#endif //HERMES_RPC_TRANSPORT_H
+hm_rpc_transport_t* hm_test_transport_create(bool is_server);
+uint32_t hm_test_transport_destroy(hm_rpc_transport_t* t);
+
+#endif //HERMES_TEST_TRANSPORT_H

@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include <hermes/rpc/transport_h>
+#include <hermes/rpc/transport.h>
 
 typedef struct hm_param_pack_type hm_param_pack_t;
 
@@ -34,12 +34,13 @@ typedef uint32_t (*recv_rouitine_t)(void* user_data, uint8_t* buffer_to_receive,
 
 hm_param_pack_t* hm_param_pack_create();
 hm_param_pack_t* hm_param_pack_create_(void* unused, ...);
+uint32_t hm_param_pack_extract_(hm_param_pack_t* p, ...);
 uint32_t hm_param_pack_destroy(hm_param_pack_t** p);
 
 uint32_t hm_param_pack_write(hm_param_pack_t* p, uint8_t* buffer, size_t *buffer_length);
 hm_param_pack_t* hm_param_pack_read(uint8_t* buffer, size_t buffer_length);
 
-uint32_t hm_param_pack_send(hm_param_pack_t* p, hm_rpc_transport_t* transport);
+uint32_t hm_param_pack_send(const hm_param_pack_t* p, hm_rpc_transport_t* transport);
 hm_param_pack_t* hm_param_pack_receive(hm_rpc_transport_t* transport);
 
 
@@ -56,11 +57,11 @@ hm_param_pack_t* hm_param_pack_receive(hm_rpc_transport_t* transport);
 
 /* end of constatnt definitions*/
 
-#define HM_PARAM_INT32(p) HM_PARAM_PACK_MAGIC, HM_PARAM_TYPE_INT32, p
-#define HM_PARAM_BUFFER(p, p_len) HM_PARAM_PACK_MAGIC, HM_PARAM_TYPE_BUFFER, p, p_len
-#define HM_PARAM_BUFFER_C(p, p_len) HM_PARAM_PACK_MAGIC, HM_PARAM_TYPE_BUFFER_C, p, p_len
+#define HM_PARAM_INT32(p) (uint32_t)HM_PARAM_PACK_MAGIC, (uint32_t)HM_PARAM_TYPE_INT32, p
+#define HM_PARAM_BUFFER(p, p_len) (uint32_t)HM_PARAM_PACK_MAGIC, (uint32_t)HM_PARAM_TYPE_BUFFER, p, p_len
+#define HM_PARAM_BUFFER_C(p, p_len) (uint32_t)HM_PARAM_PACK_MAGIC, (uint32_t)HM_PARAM_TYPE_BUFFER_C, p, p_len
 
-#define HM_PARAM_PACK(...) hm_param_pack_create_((void*)NULL, __VA_ARGS__, (void*)NULL)
-#define HM_PARAM_EXTRACT(p, ...) hm_param_pack_extract_(p, __VA_ARGS__, (void*)NULL)
+#define HM_PARAM_PACK(...) hm_param_pack_create_((void*)NULL, __VA_ARGS__, (uint32_t)0)
+#define HM_PARAM_EXTRACT(p, ...) hm_param_pack_extract_(p, __VA_ARGS__, (uint32_t)0)
 
 #endif //HERMES_RPC_PARAM_PACK_H
