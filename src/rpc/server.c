@@ -23,7 +23,7 @@
 
 struct hm_rpc_server_type{
   
-}
+};
 
 hm_rpc_server_t* hm_rpc_server_create(hm_rpc_transport_t* transport);
 uint32_t hm_rpc_server_destroy(hm_rpc_server_t** s);

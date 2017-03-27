@@ -22,18 +22,23 @@
 #include <hermes/common/errors.h>
 
 #include <assert.h>
+#include <stdint.h>
+#include <string.h>
 
 #define HM_HASH_TABLE_CAP 1024  //2^10
 
-struct hw_hash_table_entry_type{
+typedef struct hm_hash_table_entry_type hm_hash_table_entry_t;
+
+struct hm_hash_table_entry_type{
   uint8_t* key;
   size_t key_length;
   uint8_t* val;
   size_t val_length;
-  hw_hash_table_entry_t* next;
+  hm_hash_table_entry_t* next;
 };
 
-hm_hash_table_entry_t* hm_hash_table_entry_create(const uint_8* key, const size_y key_length, const uint8_t* val, const size_t val_length){
+
+hm_hash_table_entry_t* hm_hash_table_entry_create(const uint8_t* key, const size_t key_length, const uint8_t* val, const size_t val_length){
   hm_hash_table_entry_t *e = calloc(sizeof(hm_hash_table_entry_t), 1);
   assert(e);
   e->key=malloc(key_length);
@@ -49,7 +54,7 @@ hm_hash_table_entry_t* hm_hash_table_entry_create(const uint_8* key, const size_
 
 uint32_t hm_hash_table_entry_destroy(hm_hash_table_entry_t* e){
   if(!e){
-    return HM_INVALID_PARAM;
+    return HM_INVALID_PARAMETER;
   }
   if(e->next){
     hm_hash_table_entry_destroy(e->next);
@@ -69,37 +74,35 @@ int hm_hash_(const uint8_t *key, const size_t key_length) {
   return hash%HM_HASH_TABLE_CAP;
 }
 
-typedef struct hw_hash_table_entry hw_hash_table_entry_t;
-  
-struct hw_hash_table_type{
-  hw_hash_table_entry_t* t[HM_HASH_TABLE_CAP];
+struct hm_hash_table_type{
+  hm_hash_table_entry_t* t[HM_HASH_TABLE_CAP];
 };
 
-hw_hash_table_t* hw_hash_table_create(){
+hm_hash_table_t* hw_hash_table_create(){
   hm_hash_table_t* t = calloc(sizeof(hm_hash_table_t),1);
   assert(t);
   return t;
 }
 
-uint32_t hw_hash_table_destroy(hw_hash_table_t** t){
+uint32_t hw_hash_table_destroy(hm_hash_table_t** t){
   if(!t || !(*t)){
     return HM_INVALID_PARAMETER;
   }
   uint32_t i=0;
   for(;i<HM_HASH_TABLE_CAP;++i){
-    hm_hash_table_entry_destroy(&((*t)->t[i]));
+    hm_hash_table_entry_destroy((*t)->t[i]);
   }
   free(*t);
   *t=NULL;
   return HM_SUCCESS;
 }
 
-uint32_t hw_hash_table_set(hw_hash_table_t* t, const uint32_t* key, const size_t key_length, const uint8_t* val, const size_t val_length){
+uint32_t hw_hash_table_set(hm_hash_table_t* t, const uint8_t* key, const size_t key_length, const uint8_t* val, const size_t val_length){
   if(!t || !key || !key_length || !val || !val_length){
-    return HM_INVALID_PARAM;
+    return HM_INVALID_PARAMETER;
   }
   int hash=hm_hash_(key, key_length); 
-  hm_hash_table_entry_t* last=NULL, next = hashtable->table[ bin ];
+  hm_hash_table_entry_t *last=NULL, *next = t->t[hash];
   while(next && next->key && memcmp(key, next->key, key_length)>0){
     last = next;
     next = next->next;
@@ -114,23 +117,23 @@ uint32_t hw_hash_table_set(hw_hash_table_t* t, const uint32_t* key, const size_t
     }else if(next==NULL){
       last->next=e;
     }else{
-      newpair->next = next;
+      e->next = next;
       last->next = e;
     }
   }
   return HM_SUCCESS;
 }
 
-uint32_t hw_hash_table_get(hw_hash_table_t* t, const uint32_t* key, const size_t key_length, uint8_t** val, size_t* val_length){
+uint32_t hw_hash_table_get(hm_hash_table_t* t, const uint8_t* key, const size_t key_length, uint8_t** val, size_t* val_length){
   if(!t || !key || !key_length || !val || !val_length){
-    return HM_INVALID_PARAM;
+    return HM_INVALID_PARAMETER;
   }
-  int hash = =hm_hash_(key, key_length);
+  int hash=hm_hash_(key, key_length);
   hm_hash_table_entry_t* e = t->t[hash];
   while(e && e->key && memcmp(key, e->key, key_length)>0){
     e = e->next;
   }
-  if(!e || !(e->key) || 0!=memcmp(key, pair->key, key_length)) {
+  if(!e || !(e->key) || 0!=memcmp(key, e->key, key_length)) {
     return HM_FAIL;
   }
   *val=e->val;
