@@ -19,14 +19,18 @@
  */
 
 
-#include <hermes/rpc/server.h>
+#ifndef HM_COMMON_HASH_TABLE_H
+#define HM_COMMON_HASH_TABLE_H
 
-struct hm_rpc_server_type{
-  
-}
+#include <stdint.h>
+#include <stdlib.h>
 
-hm_rpc_server_t* hm_rpc_server_create(hm_rpc_transport_t* transport);
-uint32_t hm_rpc_server_destroy(hm_rpc_server_t** s);
+typedef struct hw_hash_table_type hw_hash_table_t;
 
-uint32_t hm_rpc_server_reg_func(hm_rpc_server_t* s, const uint8_t* func_signature, const size_t func_signature_length);
-uint32_t hm_rpc_server_call(hm_rpc_server_t* s, const uint8_t* func_signature, const size_t func_signature_length);
+hw_hash_table_t* hw_hash_table_create();
+uint32_t hw_hash_table_destroy(hw_hash_table_t** t);
+
+uint32_t hw_hash_table_set(hw_hash_table_t* t, const uint32_t* key, const size_t key_length, const uint8_t* val, const size_t val_length);
+uint32_t hw_hash_table_get(hw_hash_table_t* t, const uint32_t* key, const size_t key_length, uint8_t** val, size_t* val_length);
+
+#endif //HM_COMMON_HASH_TABLE_H
