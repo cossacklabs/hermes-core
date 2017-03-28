@@ -21,12 +21,14 @@
 #include <common/test_utils.h>
 
 void rpc_tests();
+void client_server_tests();
 
 int main(int argc, char *argv[]){
   testsuite_start_testing();
   testsuite_enter_suite("rpc test");
 
   testsuite_run_test(rpc_tests);
+  testsuite_run_test(client_server_tests);
 
   testsuite_finish_testing();
   return testsuite_get_return_value();

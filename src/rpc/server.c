@@ -55,10 +55,10 @@ uint32_t hm_rpc_server_destroy(hm_rpc_server_t** s){
 }
 
 uint32_t hm_rpc_server_reg_func(hm_rpc_server_t* s, const uint8_t* func_signature, const size_t func_signature_length, hm_server_func_t func){
-  if(!s || !func_signature || func_signature_length || !func){
+  if(!s || !func_signature || !func_signature_length || !func){
     return HM_INVALID_PARAMETER;
   }
-  return hm_hash_table_set(s->func_table, func_signature, func_signature_length, (const uint8_t*)func, sizeof(hm_server_func_t));
+  return hm_hash_table_set(s->func_table, func_signature, func_signature_length, (const uint8_t*)(&func), sizeof(hm_server_func_t));
 }
 
 uint32_t hm_rpc_server_send_error(hm_rpc_server_t* s, uint32_t error){
@@ -80,11 +80,11 @@ uint32_t hm_rpc_server_send(hm_rpc_server_t* s, hm_param_pack_t* pack){
 }
 
 
-uint32_t hm_rpc_server_call(hm_rpc_server_t* s, const uint8_t* func_signature, const size_t func_signature_length){
+uint32_t hm_rpc_server_call_func(hm_rpc_server_t* s, const uint8_t* func_signature, const size_t func_signature_length){
   if(!s || !func_signature || !func_signature_length){
     return HM_INVALID_PARAMETER;
   }
-  hm_server_func_t func=NULL;
+  hm_server_func_t* func=NULL;
   size_t func_length=sizeof(hm_server_func_t);
   if(HM_SUCCESS!=hm_hash_table_get(s->func_table, func_signature, func_signature_length, (uint8_t**)&func, &func_length)){
     hm_rpc_server_send_error(s, HM_FAIL);
@@ -96,6 +96,22 @@ uint32_t hm_rpc_server_call(hm_rpc_server_t* s, const uint8_t* func_signature, c
     return HM_FAIL;
   }
   hm_param_pack_t* out_pack=NULL;
-  uint32_t res=func(pack, &out_pack);
+  uint32_t res=(*func)(pack, &out_pack);
   return hm_rpc_server_send(s, out_pack);
+}
+
+uint32_t hm_rpc_server_call(hm_rpc_server_t* s){
+  if(!s){
+    return HM_INVALID_PARAMETER;
+  }
+  uint32_t func_signature_length=0;
+  if(HM_SUCCESS!=hm_rpc_transport_recv(s->transport, (uint8_t*)&func_signature_length, sizeof(uint32_t))){
+    return HM_FAIL;    
+  }
+  uint8_t* func_signature=malloc(func_signature_length);
+  assert(func_signature);
+  if(HM_SUCCESS!=hm_rpc_transport_recv(s->transport, func_signature, func_signature_length)){
+    return HM_FAIL;    
+  }
+  return hm_rpc_server_call_func(s, func_signature, func_signature_length);
 }

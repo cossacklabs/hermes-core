@@ -33,7 +33,7 @@ hm_rpc_server_t* hm_rpc_server_create(hm_rpc_transport_t* transport);
 uint32_t hm_rpc_server_destroy(hm_rpc_server_t** s);
 
 uint32_t hm_rpc_server_reg_func(hm_rpc_server_t* s, const uint8_t* func_signature, const size_t func_signature_length, hm_server_func_t func);
-uint32_t hm_rpc_server_call(hm_rpc_server_t* s, const uint8_t* func_signature, const size_t func_signature_length);
-
+uint32_t hm_rpc_server_call_func(hm_rpc_server_t* s, const uint8_t* func_signature, const size_t func_signature_length);
+uint32_t hm_rpc_server_call(hm_rpc_server_t* s);
 
 #endif //HERMES_RPC_SERVER_H
