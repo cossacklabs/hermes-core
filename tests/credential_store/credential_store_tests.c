@@ -34,6 +34,7 @@
 
 #define CS_PIPE_NAME "/tmp/hermes_core_test_cs_pipe" 
 #define SC_PIPE_NAME "/tmp/hermes_core_test_sc_pipe"
+#define CS_TEST_DB_FILE_NAME "cs_test_db"
 
 void* server(void* param){
   hm_rpc_transport_t* transport = hm_test_transport_create(SC_PIPE_NAME, CS_PIPE_NAME, true);
@@ -41,6 +42,14 @@ void* server(void* param){
     testsuite_fail_if(true, "server transport initializing");
     return (void*)1;
   }
+  hm_cs_db_t* db=hm_test_cs_db_create(CS_TEST_DB_FILE_NAME);
+  if(!db){
+    hm_test_transport_destroy(transport);
+    return (void*)1;
+  }
+
+  
+  hm_test_cs_db_destroy(&db);
   hm_test_transport_destroy(transport);
   return NULL;
 }

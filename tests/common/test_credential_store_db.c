@@ -46,7 +46,8 @@ hm_cs_db_t* hm_test_cs_db_create(const char* filename){
   while(fscanf(file, "%s %s", db->name[db->count], db->key[db->count])==2){
     ++(db->count);
   }
-  fclose(file);  
+  fclose(file);
+  fprintf(stderr, "%u\n", db->count);
   return db;
 }
 
