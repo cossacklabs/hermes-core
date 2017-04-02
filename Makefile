@@ -66,6 +66,7 @@ BUILD_CMD_ = LOG=$$($(CMD) 2>&1) ; if [ $$? -eq 1 ]; then $(PRINT_ERROR_); elif 
 ifndef ERROR
 include src/common/common.mk
 include src/rpc/rpc.mk
+include src/credential_store/credential_store.mk
 endif
 
 
@@ -73,7 +74,7 @@ all: err core
 
 test_all: err test
 
-core: rpc_shared
+core: rpc_shared credential_store_shared
 
 common_static: CMD = $(AR) rcs $(BIN_PATH)/lib$(COMMON_BIN).a $(COMMON_OBJ)
 
@@ -91,6 +92,18 @@ rpc_static: common_static $(RPC_OBJ)
 rpc_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(RPC_BIN).$(SHARED_EXT) $(RPC_OBJ) $(LDFLAGS) -lcommon
 
 rpc_shared: common_static $(RPC_OBJ)
+	@echo -n "link "
+	@$(BUILD_CMD)
+
+credential_store_static: CMD = $(AR) rcs $(BIN_PATH)/lib$(CREDENTIAL_STORE_BIN).a $(CREDENTIAL_STORE_OBJ)
+
+credential_store_static: common_static rpc_static $(CREDENTIAL_STORE_OBJ) 
+	@echo -n "link "
+	@$(BUILD_CMD)
+
+credential_store_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(CREDENTIAL_STORE_BIN).$(SHARED_EXT) $(CREDENTIAL_STORE_OBJ) $(LDFLAGS) -lcommon -lrpc
+
+credential_store_shared: common_static rpc_shared $(CREDENTIAL_STORE_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 

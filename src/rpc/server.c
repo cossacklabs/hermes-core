@@ -80,7 +80,7 @@ uint32_t hm_rpc_server_send(hm_rpc_server_t* s, hm_param_pack_t* pack){
 }
 
 
-uint32_t hm_rpc_server_call_func(hm_rpc_server_t* s, const uint8_t* func_signature, const size_t func_signature_length){
+uint32_t hm_rpc_server_call_func(hm_rpc_server_t* s, const uint8_t* func_signature, const size_t func_signature_length, void* user_data){
   if(!s || !func_signature || !func_signature_length){
     return HM_INVALID_PARAMETER;
   }
@@ -96,11 +96,11 @@ uint32_t hm_rpc_server_call_func(hm_rpc_server_t* s, const uint8_t* func_signatu
     return HM_FAIL;
   }
   hm_param_pack_t* out_pack=NULL;
-  uint32_t res=(*func)(pack, &out_pack);
+  uint32_t res=(*func)(pack, &out_pack, user_data);
   return hm_rpc_server_send(s, out_pack);
 }
 
-uint32_t hm_rpc_server_call(hm_rpc_server_t* s){
+uint32_t hm_rpc_server_call(hm_rpc_server_t* s, void* user_data){
   if(!s){
     return HM_INVALID_PARAMETER;
   }
@@ -113,5 +113,5 @@ uint32_t hm_rpc_server_call(hm_rpc_server_t* s){
   if(HM_SUCCESS!=hm_rpc_transport_recv(s->transport, func_signature, func_signature_length)){
     return HM_FAIL;    
   }
-  return hm_rpc_server_call_func(s, func_signature, func_signature_length);
+  return hm_rpc_server_call_func(s, func_signature, func_signature_length, user_data);
 }

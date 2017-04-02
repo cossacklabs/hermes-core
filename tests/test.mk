@@ -18,6 +18,7 @@ COMMON_TEST_SRC = $(wildcard tests/common/*.c)
 COMMON_TEST_OBJ = $(patsubst $(TEST_SRC_PATH)/%.c,$(TEST_OBJ_PATH)/%.o, $(COMMON_TEST_SRC))
 
 include tests/rpc/rpc.mk
+include tests/credential_store/credential_store.mk
 
 rpc_test: CMD = $(CC) -o $(TEST_BIN_PATH)/rpc_test $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lrpc -lcommon -lsoter $(COVERLDFLAGS) -lpthread
 
@@ -25,7 +26,13 @@ rpc_test: rpc_static $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-test: rpc_test
+credential_store_test: CMD = $(CC) -o $(TEST_BIN_PATH)/credential_store_test $(CREDENTIAL_STORE_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lcredential_store -lrpc -lcommon -lsoter $(COVERLDFLAGS) -lpthread
+
+credential_store_test: credential_store_static rpc_static $(CREDENTIAL_STORE_TEST_OBJ) $(COMMON_TEST_OBJ)
+	@echo -n "link "
+	@$(BUILD_CMD)
+
+test: rpc_test credential_store_test
 
 check: 
 	$(TEST_BIN_PATH)/rpc_test

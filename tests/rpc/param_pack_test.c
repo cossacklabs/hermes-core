@@ -23,7 +23,7 @@
 #include <themis/themis.h>
 #include <common/test_utils.h>
 
-#include "test_transport.h"
+#include "../common/test_transport.h"
 
 #include <string.h>
 

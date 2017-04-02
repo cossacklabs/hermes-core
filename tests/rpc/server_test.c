@@ -29,7 +29,7 @@
 
 #include <pthread.h>
 
-#include "test_transport.h"
+#include "../common/test_transport.h"
 
 
 #define CS_PIPE_NAME "/tmp/hermes_core_test_cs_pipe" 
@@ -51,7 +51,7 @@ uint32_t func1_proxy(hm_rpc_client_sync_t* c, uint32_t a, uint32_t b, uint32_t* 
   hm_param_pack_destroy(&in);
   if(HM_SUCCESS!=status){
     return status;
-  }  
+  }
   *res=0;
   if(HM_SUCCESS!=HM_PARAM_EXTRACT(out, HM_PARAM_INT32(res))){
     hm_param_pack_destroy(&out);
@@ -60,7 +60,7 @@ uint32_t func1_proxy(hm_rpc_client_sync_t* c, uint32_t a, uint32_t b, uint32_t* 
   return HM_SUCCESS;
 }
 
-uint32_t func1_stub(hm_param_pack_t* in, hm_param_pack_t** out){
+uint32_t func1_stub(hm_param_pack_t* in, hm_param_pack_t** out, void* user_data){
   uint32_t a,b, res;
   if(HM_SUCCESS!=HM_PARAM_EXTRACT(in, HM_PARAM_INT32(&a), HM_PARAM_INT32(&b))){
     return HM_FAIL;
@@ -119,7 +119,7 @@ void* server(void *param){
     hm_test_transport_destroy(transport);
     return (void*)1;
   }
-  if(HM_SUCCESS!=hm_rpc_server_call(s)){
+  if(HM_SUCCESS!=hm_rpc_server_call(s, NULL)){
     testsuite_fail_if(true, "server func calling");
     hm_rpc_server_destroy(&s);
     hm_test_transport_destroy(transport);
@@ -156,6 +156,6 @@ static int server_general_flow(){
 }
 
 void client_server_tests(){
-  testsuite_fail_if(server_general_flow(), "client-server general flow");
+  testsuite_fail_if(0!=server_general_flow(), "client-server general flow");
 }
 

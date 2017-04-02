@@ -19,16 +19,15 @@
  */
 
 
-#ifndef HERMES_RPC_TRANSPORT_H
-#define HERMES_RPC_TRANSPORT_H
+#ifndef HERMES_TESTS_TEST_CREDENTIAL_STORE_DB_H
+#define HERMES_TESTS_TEST_CREDENTIAL_STORE_DB_H
+
+#include <hermes/credential_store/db.h>
 
 #include <stdint.h>
-#include <stdlib.h>
 
-typedef struct hm_rpc_transport_type hm_rpc_transport_t;
+hm_cs_db_t* hm_test_cs_db_create(const char* filename);
+uint32_t hm_test_cs_db_destroy(hm_cs_db_t** db);
 
-uint32_t hm_rpc_transport_send(void* transport, const uint8_t* buffer, const size_t buffer_length);
-uint32_t hm_rpc_transport_recv(void* transport, uint8_t* buffer, size_t buffer_length);
-uint32_t hm_rpc_transport_get_remote_id(void* transport, uint8_t** id, size_t* id_length);
 
-#endif //HERMES_RPC_TRANSPORT_H
+#endif //HERMES_TESTS_TEST_CREDENTIAL_STORE_DB_H

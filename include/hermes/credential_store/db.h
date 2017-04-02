@@ -19,16 +19,15 @@
  */
 
 
-#ifndef HERMES_RPC_TRANSPORT_H
-#define HERMES_RPC_TRANSPORT_H
+#ifndef HERMES_CREDENTIAL_STORE_DB_H
+#define HERMES_CREDENTIAL_STORE_DB_H
+
 
 #include <stdint.h>
 #include <stdlib.h>
 
-typedef struct hm_rpc_transport_type hm_rpc_transport_t;
+typedef struct hm_cs_db_type hm_cs_db_t;
 
-uint32_t hm_rpc_transport_send(void* transport, const uint8_t* buffer, const size_t buffer_length);
-uint32_t hm_rpc_transport_recv(void* transport, uint8_t* buffer, size_t buffer_length);
-uint32_t hm_rpc_transport_get_remote_id(void* transport, uint8_t** id, size_t* id_length);
+uint32_t hm_cs_db_get_pub_by_id(hm_cs_db_t* db, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length);
 
-#endif //HERMES_RPC_TRANSPORT_H
+#endif //HERMES_CREDENTIAL_STORE_DB_H

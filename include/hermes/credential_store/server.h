@@ -19,16 +19,19 @@
  */
 
 
-#ifndef HERMES_RPC_TRANSPORT_H
-#define HERMES_RPC_TRANSPORT_H
+#ifndef HERMES_SERVER_CREDENTIAL_STORE_H
+#define HERMES_SERVER_CREDENTIAL_STORE_H
+
+#include <hermes/rpc/transport.h>
+#include <hermes/credential_store/db.h>
 
 #include <stdint.h>
 #include <stdlib.h>
 
-typedef struct hm_rpc_transport_type hm_rpc_transport_t;
+typedef struct hm_credential_store_server_type hm_credential_store_server_t;
 
-uint32_t hm_rpc_transport_send(void* transport, const uint8_t* buffer, const size_t buffer_length);
-uint32_t hm_rpc_transport_recv(void* transport, uint8_t* buffer, size_t buffer_length);
-uint32_t hm_rpc_transport_get_remote_id(void* transport, uint8_t** id, size_t* id_length);
+hm_credential_store_server_t* hm_server_credential_store_create(hm_rpc_transport_t* transport, hm_cs_db_t* db);
+uint32_t hm_server_credential_store_destroy(hm_credential_store_server_t** s);
+uint32_t hm_server_credential_store_call(hm_credential_store_server_t* s);
 
-#endif //HERMES_RPC_TRANSPORT_H
+#endif //HERMES_SERVER_CREDENTIAL_STORE_H
