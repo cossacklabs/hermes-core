@@ -32,7 +32,7 @@ struct hm_credential_store_server_type{
   hm_cs_db_t* db;
 };
 
-hm_credential_store_server_t* hm_server_credential_store_create(hm_rpc_transport_t* transport, hm_cs_db_t* db){
+hm_credential_store_server_t* hm_credential_store_server_create(hm_rpc_transport_t* transport, hm_cs_db_t* db){
   if(!transport || !db){
     return NULL;
   }
@@ -40,19 +40,19 @@ hm_credential_store_server_t* hm_server_credential_store_create(hm_rpc_transport
   assert(s);
   s->s=hm_rpc_server_create(transport);
   if(!(s->s)){
-    hm_server_credential_store_destroy(&s);
+    hm_credential_store_server_destroy(&s);
     return NULL;
   }
   uint32_t res=hm_rpc_server_reg_func(s->s, (const uint8_t*)hm_credential_store_get_pub_key_by_id_NAME, sizeof(hm_credential_store_get_pub_key_by_id_NAME), hm_credential_store_get_pub_key_by_id_stub);
   if(HM_SUCCESS!=res){
-    hm_server_credential_store_destroy(&s);
+    hm_credential_store_server_destroy(&s);
     return NULL;
   }
   s->db=db;
   return s;
 }
 
-uint32_t hm_server_credential_store_destroy(hm_credential_store_server_t** s){
+uint32_t hm_credential_store_server_destroy(hm_credential_store_server_t** s){
   if(!s || !(*s)){
     return HM_INVALID_PARAMETER;
   }
@@ -62,7 +62,7 @@ uint32_t hm_server_credential_store_destroy(hm_credential_store_server_t** s){
   return HM_SUCCESS; 
 }
 
-uint32_t hm_server_credential_store_call(hm_credential_store_server_t* s){
+uint32_t hm_credential_store_server_call(hm_credential_store_server_t* s){
   if(!s){
     return HM_INVALID_PARAMETER;
   }

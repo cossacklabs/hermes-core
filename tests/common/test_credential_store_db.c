@@ -47,7 +47,6 @@ hm_cs_db_t* hm_test_cs_db_create(const char* filename){
     ++(db->count);
   }
   fclose(file);
-  fprintf(stderr, "%u\n", db->count);
   return db;
 }
 

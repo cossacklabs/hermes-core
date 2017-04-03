@@ -23,18 +23,29 @@
 #include <common/test_utils.h>
 #include <hermes/common/errors.h>
 
+#include <hermes/credential_store/server.h>
+#include <hermes/credential_store/client.h>
+
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <string.h>
 
 #include <pthread.h>
 
 #include "../common/test_transport.h"
-#include "../common/test_credential_store_db.h"
+#include "../common/test_credential_store_db.h"  
 
 #define CS_PIPE_NAME "/tmp/hermes_core_test_cs_pipe" 
 #define SC_PIPE_NAME "/tmp/hermes_core_test_sc_pipe"
-#define CS_TEST_DB_FILE_NAME "cs_test_db"
+#define CS_TEST_DB_FILE_NAME "tests/cs_test_db"
+#define CS_TEST_CORRECT_ID1 "user1"
+#define CS_TEST_CORRECT_ID1_KEY "user1_public_key_data"
+#define CS_TEST_CORRECT_ID2 "user2"
+#define CS_TEST_CORRECT_ID2_KEY "user2_public_key_data"
+#define CS_TEST_CORRECT_ID3 "user3"
+#define CS_TEST_CORRECT_ID3_KEY "user3_public_key_data"
+#define CS_TEST_INCORRECT_ID "user4"
 
 void* server(void* param){
   hm_rpc_transport_t* transport = hm_test_transport_create(SC_PIPE_NAME, CS_PIPE_NAME, true);
@@ -47,8 +58,24 @@ void* server(void* param){
     hm_test_transport_destroy(transport);
     return (void*)1;
   }
-
-  
+  hm_credential_store_server_t* s=hm_credential_store_server_create(transport, db);
+  if(!s){
+    hm_test_cs_db_destroy(&db);
+    hm_test_transport_destroy(transport);
+    testsuite_fail_if(true, "credential store server creation");
+    return (void*)1;
+  }
+  int i=0;
+  for(;i<4;++i){
+    if(HM_SUCCESS!=hm_credential_store_server_call(s)){
+      hm_credential_store_server_destroy(&s);
+      hm_test_cs_db_destroy(&db);
+      hm_test_transport_destroy(transport);
+      testsuite_fail_if(true, "credential store server calling");
+      return (void*)1;
+    }
+  }
+  hm_credential_store_server_destroy(&s);
   hm_test_cs_db_destroy(&db);
   hm_test_transport_destroy(transport);
   return NULL;
@@ -60,6 +87,49 @@ void* client(void* param){
     testsuite_fail_if(true, "client transport initializing");
     return (void*)1;
   }
+  hm_credential_store_client_sync_t* c=hm_credential_store_client_sync_create(transport);
+  if(!c){
+    hm_test_transport_destroy(transport);
+    testsuite_fail_if(true, "credential store client sync creation");
+    return (void*)1;
+  }
+  uint8_t* key=NULL;
+  size_t key_length=0;
+  if(HM_SUCCESS!=hm_crerential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)CS_TEST_CORRECT_ID1, sizeof(CS_TEST_CORRECT_ID1), &key, &key_length)){
+    hm_credential_store_client_sync_destroy(&c);
+    hm_test_transport_destroy(transport);
+    testsuite_fail_if(true, "credential store client sync calling");
+    return (void*)1;
+  }
+  if(0!=strcmp(CS_TEST_CORRECT_ID1_KEY, (const char*)key)){
+    testsuite_fail_if(true, "credential store client sync res");    
+  }
+  if(HM_SUCCESS!=hm_crerential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)CS_TEST_CORRECT_ID2, sizeof(CS_TEST_CORRECT_ID2), &key, &key_length)){
+    hm_credential_store_client_sync_destroy(&c);
+    hm_test_transport_destroy(transport);
+    testsuite_fail_if(true, "credential store client sync calling");
+    return (void*)1;
+  }
+  if(0!=strcmp(CS_TEST_CORRECT_ID2_KEY, (const char*)key)){
+    testsuite_fail_if(true, "credential store client sync res");    
+  }
+  if(HM_SUCCESS==hm_crerential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)CS_TEST_INCORRECT_ID, sizeof(CS_TEST_INCORRECT_ID), &key, &key_length)){
+    hm_credential_store_client_sync_destroy(&c);
+    hm_test_transport_destroy(transport);
+    testsuite_fail_if(true, "credential store client sync calling with incorrect id");
+    return (void*)1;
+  }
+  if(HM_SUCCESS!=hm_crerential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)CS_TEST_CORRECT_ID3, sizeof(CS_TEST_CORRECT_ID3), &key, &key_length)){
+    hm_credential_store_client_sync_destroy(&c);
+    hm_test_transport_destroy(transport);
+    testsuite_fail_if(true, "credential store client sync calling");
+    return (void*)1;
+  }
+  if(0!=strcmp(CS_TEST_CORRECT_ID3_KEY, (const char*)key)){
+    testsuite_fail_if(true, "credential store client sync res");    
+  }
+  //  free(key);
+  hm_credential_store_client_sync_destroy(&c);
   hm_test_transport_destroy(transport);
   return NULL;
 }

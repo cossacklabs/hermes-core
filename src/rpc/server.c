@@ -97,6 +97,9 @@ uint32_t hm_rpc_server_call_func(hm_rpc_server_t* s, const uint8_t* func_signatu
   }
   hm_param_pack_t* out_pack=NULL;
   uint32_t res=(*func)(pack, &out_pack, user_data);
+  if(HM_SUCCESS!=res){
+    return hm_rpc_server_send_error(s, res);
+  }
   return hm_rpc_server_send(s, out_pack);
 }
 

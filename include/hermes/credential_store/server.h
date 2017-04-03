@@ -30,8 +30,8 @@
 
 typedef struct hm_credential_store_server_type hm_credential_store_server_t;
 
-hm_credential_store_server_t* hm_server_credential_store_create(hm_rpc_transport_t* transport, hm_cs_db_t* db);
-uint32_t hm_server_credential_store_destroy(hm_credential_store_server_t** s);
-uint32_t hm_server_credential_store_call(hm_credential_store_server_t* s);
+hm_credential_store_server_t* hm_credential_store_server_create(hm_rpc_transport_t* transport, hm_cs_db_t* db);
+uint32_t hm_credential_store_server_destroy(hm_credential_store_server_t** s);
+uint32_t hm_credential_store_server_call(hm_credential_store_server_t* s);
 
 #endif //HERMES_SERVER_CREDENTIAL_STORE_H
