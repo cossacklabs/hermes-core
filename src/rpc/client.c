@@ -72,4 +72,3 @@ uint32_t hm_rpc_client_sync_call(hm_rpc_client_sync_t* c, const uint8_t* func_na
   }
   return HM_SUCCESS;
 }
-

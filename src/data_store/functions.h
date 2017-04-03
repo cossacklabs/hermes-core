@@ -19,19 +19,24 @@
  */
 
 
-#ifndef HERMES_CREDENTIAL_STORE_SERVER_H
-#define HERMES_CREDENTIAL_STORE_SERVER_H
+#ifndef HERMES_DATA_STORE_FUNCTION_H
+#define HERMES_DATA_STORE_FUNCTION_H
 
-#include <hermes/rpc/transport.h>
-#include <hermes/credential_store/db.h>
+#include <hermes/rpc/param_pack.h>
+#include <hermes/rpc/client.h>
+#include <hermes/data_store/db.h>
 
 #include <stdint.h>
 #include <stdlib.h>
 
-typedef struct hm_credential_store_server_type hm_credential_store_server_t;
+#define hm_data_store_get_pub_key_by_id_NAME "hm_data_store_get_pub_key_by_id"
 
-hm_credential_store_server_t* hm_credential_store_server_create(hm_rpc_transport_t* transport, hm_cs_db_t* db);
-uint32_t hm_credential_store_server_destroy(hm_credential_store_server_t** s);
-uint32_t hm_credential_store_server_call(hm_credential_store_server_t* s);
+uint32_t hm_data_store_get_pub_key_by_id(hm_ds_db_t* db, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length);
 
-#endif //HERMES_CREDENTIAL_STORE_SERVER_H
+//proxies
+uint32_t hm_data_store_get_pub_key_by_id_sync_proxy(hm_rpc_client_sync_t* c, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length);
+
+//stubs
+uint32_t hm_data_store_get_pub_key_by_id_stub(hm_param_pack_t* in, hm_param_pack_t** out, void* user_data);
+
+#endif //HERMES_DATA_STORE_FUNCTION_H

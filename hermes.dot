@@ -29,21 +29,38 @@ digraph hermes_core{
     transport [shape=circle, style=dotted];
 
     subgraph cluster_1 {
-	label="server";
+	label="credential store\nserver";
+	credential_store [shape=record, label="{<t> transport server | <s> credential store}"];
 	db1 [shape=record, style=dotted, label="pki|X509"];
-	db2 [shape=record, style=dotted, label="JSON|BD"];
-	db3 [shape=record, style=dotted, label="BD|FS"];
-	credential_store -> db1;
-	access_key_store -> db2;
-	data_store -> db3;
+	credential_store_crypter [label="crypter"];
+	credential_store:t -> credential_store_crypter;
+	credential_store:s -> db1;
+    }
+    
+    subgraph cluster_4 {
+	label="access key store\nserver";
+        db2 [shape=record, style=dotted, label="JSON|BD"];
+	access_key_store [shape=record, label="{<t> transport server | <s> access key store}"];
+	access_key_store_crypter [label="crypter"];
+	access_key_store:s -> db2;
+	access_key_store:t -> access_key_store_crypter;
+    }
+
+    subgraph cluster_5 {
+	label="data store\nserver";
+        db3 [shape=record, style=dotted, label="BD|FS"];
+	data_store [shape=record, label="{<t> transport server | <s> data store}"];
+	data_store_crypter [label="crypter"];
+	data_store:s -> db3;
+	data_store:t -> data_store_crypter;
     }
 
         credential_store_client -> transport;
 	access_keys_store_client -> transport;
 	data_store_client -> transport;
 
-        transport -> credential_store;
-	transport -> access_key_store;
-	transport -> data_store;
+        transport -> credential_store:t;
+	transport -> access_key_store:t;
+	transport -> data_store:t;
 
 }

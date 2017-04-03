@@ -19,19 +19,15 @@
  */
 
 
-#ifndef HERMES_CREDENTIAL_STORE_SERVER_H
-#define HERMES_CREDENTIAL_STORE_SERVER_H
+#ifndef HERMES_TESTS_TEST_DATA_STORE_DB_H
+#define HERMES_TESTS_TEST_DATA_STORE_DB_H
 
-#include <hermes/rpc/transport.h>
-#include <hermes/credential_store/db.h>
+#include <hermes/data_store/db.h>
 
 #include <stdint.h>
-#include <stdlib.h>
 
-typedef struct hm_credential_store_server_type hm_credential_store_server_t;
+hm_ds_db_t* hm_test_ds_db_create(const char* filename);
+uint32_t hm_test_ds_db_destroy(hm_ds_db_t** db);
 
-hm_credential_store_server_t* hm_credential_store_server_create(hm_rpc_transport_t* transport, hm_cs_db_t* db);
-uint32_t hm_credential_store_server_destroy(hm_credential_store_server_t** s);
-uint32_t hm_credential_store_server_call(hm_credential_store_server_t* s);
 
-#endif //HERMES_CREDENTIAL_STORE_SERVER_H
+#endif //HERMES_TESTS_TEST_DATA_STORE_DB_H

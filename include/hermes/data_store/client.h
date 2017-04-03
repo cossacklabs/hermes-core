@@ -19,19 +19,17 @@
  */
 
 
-#ifndef HERMES_CREDENTIAL_STORE_SERVER_H
-#define HERMES_CREDENTIAL_STORE_SERVER_H
+#ifndef HERMES_DATA_STORE_CLIENT_H
+#define HERMES_DATA_STORE_CLIENT_H
 
 #include <hermes/rpc/transport.h>
-#include <hermes/credential_store/db.h>
 
 #include <stdint.h>
 #include <stdlib.h>
 
-typedef struct hm_credential_store_server_type hm_credential_store_server_t;
+typedef struct hm_data_store_client_sync_type hm_data_store_client_sync_t;
 
-hm_credential_store_server_t* hm_credential_store_server_create(hm_rpc_transport_t* transport, hm_cs_db_t* db);
-uint32_t hm_credential_store_server_destroy(hm_credential_store_server_t** s);
-uint32_t hm_credential_store_server_call(hm_credential_store_server_t* s);
-
-#endif //HERMES_CREDENTIAL_STORE_SERVER_H
+hm_data_store_client_sync_t* hm_data_store_client_sync_create(hm_rpc_transport_t* transport);
+uint32_t hm_data_store_client_sync_destroy(hm_data_store_client_sync_t** c);
+uint32_t hm_crerential_store_client_sync_call_get_pub_key_by_id(hm_data_store_client_sync_t* c, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length);
+#endif //HERMES_DATA_STORE_CLIENT_H
