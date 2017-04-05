@@ -40,10 +40,11 @@ uint32_t hm_credential_store_get_pub_key_by_id_sync_proxy(hm_rpc_client_sync_t* 
   }
   hm_param_pack_t* out=NULL;
   uint32_t status, res;
-  if(HM_SUCCESS!=(res=hm_rpc_client_sync_call(c, (const uint8_t*)hm_credential_store_get_pub_key_by_id_NAME, sizeof(hm_credential_store_get_pub_key_by_id_NAME), in, & status, &out))){
+  if(HM_SUCCESS!=(res=hm_rpc_client_sync_call(c, (const uint8_t*)hm_credential_store_get_pub_key_by_id_NAME, sizeof(hm_credential_store_get_pub_key_by_id_NAME), in, &status, &(out)))){
     hm_param_pack_destroy(&in);
     return res;
   }
+  hm_param_pack_destroy(&in);
   if(HM_SUCCESS!=status){
     return status;
   }

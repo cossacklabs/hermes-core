@@ -39,13 +39,6 @@
 #define CS_PIPE_NAME "/tmp/hermes_core_test_ds_pipe" 
 #define SC_PIPE_NAME "/tmp/hermes_core_test_sc_pipe"
 #define DS_TEST_DB_FILE_NAME "tests/ds_test_db"
-#define DS_TEST_CORRECT_ID1 "user1"
-#define DS_TEST_CORRECT_ID1_KEY "user1_public_key_data"
-#define DS_TEST_CORRECT_ID2 "user2"
-#define DS_TEST_CORRECT_ID2_KEY "user2_public_key_data"
-#define DS_TEST_CORRECT_ID3 "user3"
-#define DS_TEST_CORRECT_ID3_KEY "user3_public_key_data"
-#define DS_TEST_INCORRECT_ID "user4"
 
 void* server(void* param){
   hm_rpc_transport_t* transport = hm_test_transport_create(SC_PIPE_NAME, CS_PIPE_NAME, true);
@@ -81,6 +74,10 @@ void* server(void* param){
   return NULL;
 }
 
+uint32_t gen_new_block(uint8_t** block, size_t* block_length, uint8_t** mac, size_t* mac_length){
+  return 1;
+}
+
 void* client(void* param){
   hm_rpc_transport_t* transport = hm_test_transport_create(CS_PIPE_NAME, SC_PIPE_NAME, false);
   if(!transport){
@@ -95,39 +92,18 @@ void* client(void* param){
   }
   uint8_t* key=NULL;
   size_t key_length=0;
-  if(HM_SUCCESS!=hm_crerential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)DS_TEST_CORRECT_ID1, sizeof(DS_TEST_CORRECT_ID1), &key, &key_length)){
+  uint8_t* block=NULL, *mac=NULL, *id=NULL;
+  size_t block_length=0, mac_length=0, id_length=0;
+  if(gen_new_block(&block, &block_length, &mac, &mac_length) || HM_SUCCESS!=hm_data_store_client_sync_call_create_block(c, block, block_length, mac, mac_length, &id, &id_length)){
+    free(block);
+    free(mac);
     hm_data_store_client_sync_destroy(&c);
     hm_test_transport_destroy(transport);
     testsuite_fail_if(true, "data store client sync calling");
     return (void*)1;
   }
-  if(0!=strcmp(DS_TEST_CORRECT_ID1_KEY, (const char*)key)){
-    testsuite_fail_if(true, "data store client sync res");    
-  }
-  if(HM_SUCCESS!=hm_crerential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)DS_TEST_CORRECT_ID2, sizeof(DS_TEST_CORRECT_ID2), &key, &key_length)){
-    hm_data_store_client_sync_destroy(&c);
-    hm_test_transport_destroy(transport);
-    testsuite_fail_if(true, "data store client sync calling");
-    return (void*)1;
-  }
-  if(0!=strcmp(DS_TEST_CORRECT_ID2_KEY, (const char*)key)){
-    testsuite_fail_if(true, "data store client sync res");    
-  }
-  if(HM_SUCCESS==hm_crerential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)DS_TEST_INCORRECT_ID, sizeof(DS_TEST_INCORRECT_ID), &key, &key_length)){
-    hm_data_store_client_sync_destroy(&c);
-    hm_test_transport_destroy(transport);
-    testsuite_fail_if(true, "data store client sync calling with incorrect id");
-    return (void*)1;
-  }
-  if(HM_SUCCESS!=hm_crerential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)DS_TEST_CORRECT_ID3, sizeof(DS_TEST_CORRECT_ID3), &key, &key_length)){
-    hm_data_store_client_sync_destroy(&c);
-    hm_test_transport_destroy(transport);
-    testsuite_fail_if(true, "data store client sync calling");
-    return (void*)1;
-  }
-  if(0!=strcmp(DS_TEST_CORRECT_ID3_KEY, (const char*)key)){
-    testsuite_fail_if(true, "data store client sync res");    
-  }
+  free(block);
+  free(mac);
   //  free(key);
   hm_data_store_client_sync_destroy(&c);
   hm_test_transport_destroy(transport);

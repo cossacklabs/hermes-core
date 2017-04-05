@@ -57,6 +57,7 @@ uint32_t func1_proxy(hm_rpc_client_sync_t* c, uint32_t a, uint32_t b, uint32_t* 
     hm_param_pack_destroy(&out);
     return HM_FAIL;    
   }
+  hm_param_pack_destroy(&out);
   return HM_SUCCESS;
 }
 

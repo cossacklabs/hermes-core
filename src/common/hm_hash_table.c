@@ -62,6 +62,7 @@ uint32_t hm_hash_table_entry_destroy(hm_hash_table_entry_t* e){
   }
   free(e->key);
   free(e->val);
+  free(e);
   return HM_SUCCESS;
 }
 

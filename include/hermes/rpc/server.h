@@ -36,4 +36,8 @@ uint32_t hm_rpc_server_reg_func(hm_rpc_server_t* s, const uint8_t* func_signatur
 uint32_t hm_rpc_server_call_func(hm_rpc_server_t* s, const uint8_t* func_signature, const size_t func_signature_length, void* user_data);
 uint32_t hm_rpc_server_call(hm_rpc_server_t* s, void* user_data);
 
+#define HM_RPC_SERVER_REG_FUNC(s, func) hm_rpc_server_reg_func(s, (const uint8_t*)func##_NAME, sizeof(func##_NAME), func##_stub)
+
+//TODO: add rouitine for registration of many functions in one call like HM_RPC_SERVER_REG_FUNCS(s, ...)
+
 #endif //HERMES_RPC_SERVER_H

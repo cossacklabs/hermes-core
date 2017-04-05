@@ -43,11 +43,23 @@ hm_data_store_server_t* hm_data_store_server_create(hm_rpc_transport_t* transpor
     hm_data_store_server_destroy(&s);
     return NULL;
   }
-  uint32_t res=hm_rpc_server_reg_func(s->s, (const uint8_t*)hm_data_store_get_pub_key_by_id_NAME, sizeof(hm_data_store_get_pub_key_by_id_NAME), hm_data_store_get_pub_key_by_id_stub);
+  uint32_t res=HM_RPC_SERVER_REG_FUNC(s->s, hm_data_store_create_block);
   if(HM_SUCCESS!=res){
     hm_data_store_server_destroy(&s);
     return NULL;
   }
+  if(HM_SUCCESS!=(res=HM_RPC_SERVER_REG_FUNC(s->s, hm_data_store_read_block))){
+    hm_data_store_server_destroy(&s);
+    return NULL;
+  }
+  if(HM_SUCCESS!=(res=HM_RPC_SERVER_REG_FUNC(s->s, hm_data_store_update_block))){
+    hm_data_store_server_destroy(&s);
+    return NULL;
+  }
+  if(HM_SUCCESS!=(res=HM_RPC_SERVER_REG_FUNC(s->s, hm_data_store_delete_block))){
+    hm_data_store_server_destroy(&s);
+    return NULL;
+  }  
   s->db=db;
   return s;
 }

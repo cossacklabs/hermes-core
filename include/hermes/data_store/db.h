@@ -28,6 +28,10 @@
 
 typedef struct hm_ds_db_type hm_ds_db_t;
 
-uint32_t hm_ds_db_get_pub_by_id(hm_ds_db_t* db, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length);
+uint32_t hm_ds_db_insert_block(hm_ds_db_t* db, const uint8_t* block, const size_t block_length, const uint8_t* mac, const size_t mac_length, uint8_t** id, size_t* id_length);
+uint32_t hm_ds_db_read_block(hm_ds_db_t* db, const uint8_t* id, const size_t id_length, uint8_t** block, size_t*  block_length);
+uint32_t hm_ds_db_read_block_mac(hm_ds_db_t* db, const uint8_t* id, const size_t id_length, uint8_t** mac, size_t*  mac_length);
+uint32_t hm_ds_db_update_block(hm_ds_db_t* db, const uint8_t* id, const size_t id_length, const uint8_t* block, const size_t block_length, const uint8_t* mac, const size_t mac_length);
+uint32_t hm_ds_db_delete_block(hm_ds_db_t* db, const uint8_t* id, const size_t id_length);
 
 #endif //HERMES_DATA_STORE_DB_H

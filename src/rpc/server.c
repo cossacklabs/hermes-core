@@ -97,10 +97,13 @@ uint32_t hm_rpc_server_call_func(hm_rpc_server_t* s, const uint8_t* func_signatu
   }
   hm_param_pack_t* out_pack=NULL;
   uint32_t res=(*func)(pack, &out_pack, user_data);
+  hm_param_pack_destroy(&pack);
   if(HM_SUCCESS!=res){
     return hm_rpc_server_send_error(s, res);
   }
-  return hm_rpc_server_send(s, out_pack);
+  res=hm_rpc_server_send(s, out_pack);
+  hm_param_pack_destroy(&out_pack);
+  return res;
 }
 
 uint32_t hm_rpc_server_call(hm_rpc_server_t* s, void* user_data){
@@ -116,5 +119,7 @@ uint32_t hm_rpc_server_call(hm_rpc_server_t* s, void* user_data){
   if(HM_SUCCESS!=hm_rpc_transport_recv(s->transport, func_signature, func_signature_length)){
     return HM_FAIL;    
   }
-  return hm_rpc_server_call_func(s, func_signature, func_signature_length, user_data);
+  uint32_t res=hm_rpc_server_call_func(s, func_signature, func_signature_length, user_data);
+  free(func_signature);
+  return res;
 }
