@@ -39,17 +39,19 @@ void gen_id(char **id) {
     "abcdefghijklmnopqrstuvwxyz"
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   *id=malloc(ID_LENGTH);
+  assert(*id);
+  char* iid=*id;
   int length=ID_LENGTH;
   while (length-- > 0) {
     size_t index = (double) rand() / RAND_MAX * (sizeof charset - 1);
-    *(*id)++ = charset[index];
+    *(iid)++ = charset[index];
   }
-  **id = '\0';
+  *iid = '\0';
 }
 
 bool is_file_exists(const char* file_name){
   struct stat sb;
-  if(stat(file_name, &sb) != 0){
+  if(stat(file_name, &sb) == 0){
     return true;
   }
   return false;
@@ -60,7 +62,7 @@ uint32_t write_file(const char* file_name, const uint8_t* data, const size_t dat
   if(!file){
     return HM_FAIL;
   }
-  if(data_length!=fwrite(data, data_length, 1, file)){
+  if(data_length!=fwrite(data, 1, data_length,  file)){
     fclose(file);
     return HM_FAIL;
   }
@@ -78,7 +80,7 @@ uint32_t read_file(const char* file_name, uint8_t** data, size_t* data_length){
   fseek(file, 0L, SEEK_SET);
   *data=malloc(*data_length);
   assert(*data);
-  if((*data_length)!=fread(*data, *data_length, 1, file)){
+  if((*data_length)!=fread(*data, 1, *data_length, file)){
     free(*data);
     fclose(file);
     return HM_FAIL;

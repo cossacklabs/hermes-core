@@ -19,19 +19,15 @@
  */
 
 
-#ifndef HERMES_DATA_STORE_SERVER_H
-#define HERMES_DATA_STORE_SERVER_H
+#ifndef HERMES_TESTS_TEST_KEY_STORE_DB_H
+#define HERMES_TESTS_TEST_KEY_STORE_DB_H
 
-#include <hermes/rpc/transport.h>
-#include <hermes/data_store/db.h>
+#include <hermes/key_store/db.h>
 
 #include <stdint.h>
-#include <stdlib.h>
 
-typedef struct hm_data_store_server_type hm_data_store_server_t;
+hm_ks_db_t* hm_test_ks_db_create(const char* filename);
+uint32_t hm_test_ks_db_destroy(hm_ks_db_t** db);
 
-hm_data_store_server_t* hm_data_store_server_create(hm_rpc_transport_t* transport, hm_ds_db_t* db);
-uint32_t hm_data_store_server_destroy(hm_data_store_server_t** s);
-uint32_t hm_data_store_server_call(hm_data_store_server_t* s);
 
-#endif //HERMES_DATA_STORE_SERVER_H
+#endif //HERMES_TESTS_TEST_KEY_STORE_DB_H
