@@ -252,7 +252,7 @@ uint32_t hm_param_pack_send(const hm_param_pack_t* p, hm_rpc_transport_t* transp
       if(HM_SUCCESS!=(res=hm_rpc_transport_send(transport, (uint8_t*)&(p->nodes[curr_node].data_length), sizeof(uint32_t)))){
         return res;
       }
-      if(HM_SUCCESS!=(res=hm_rpc_transport_send(transport, (uint8_t*)&(p->nodes[curr_node].data.buf_val), p->nodes[curr_node].data_length))){
+      if(HM_SUCCESS!=(res=hm_rpc_transport_send(transport, (uint8_t*)(p->nodes[curr_node].data.buf_val), p->nodes[curr_node].data_length))){
         return res;
       }
     }

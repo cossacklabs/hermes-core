@@ -18,19 +18,18 @@
  *
  */
 
-#include <common/test_utils.h>
 
-void rpc_tests();
-void client_server_tests();
+#ifndef HERMES_CREDENTIAL_STORE_CLIENT_H
+#define HERMES_CREDENTIAL_STORE_CLIENT_H
 
-int main(int argc, char *argv[]){
-  testsuite_start_testing();
-  testsuite_enter_suite("rpc test");
+#include <hermes/rpc/transport.h>
 
-  testsuite_run_test(rpc_tests);
-  testsuite_run_test(client_server_tests);
+#include <stdint.h>
+#include <stdlib.h>
 
-  testsuite_finish_testing();
-  return testsuite_get_return_value();
-}
+typedef struct hm_credential_store_client_sync_type hm_credential_store_client_sync_t;
 
+hm_credential_store_client_sync_t* hm_credential_store_client_sync_create(hm_rpc_transport_t* transport);
+uint32_t hm_credential_store_client_sync_destroy(hm_credential_store_client_sync_t** c);
+uint32_t hm_crerential_store_client_sync_call_get_pub_key_by_id(hm_credential_store_client_sync_t* c, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length);
+#endif //HERMES_CREDENTIAL_STORE_CLIENT_H

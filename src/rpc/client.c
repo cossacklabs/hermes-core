@@ -64,10 +64,11 @@ uint32_t hm_rpc_client_sync_call(hm_rpc_client_sync_t* c, const uint8_t* func_na
   if(HM_SUCCESS!=(res=hm_rpc_transport_recv(c->transport, (uint8_t*)error, sizeof(uint32_t)))){
     return res;
   }
-  (*out_params)=hm_param_pack_receive(c->transport);
-  if(!*out_params){
-    return HM_FAIL;
+  if(HM_SUCCESS==(*error)){
+    (*out_params)=hm_param_pack_receive(c->transport);
+    if(!*out_params){
+      return HM_FAIL;
+    }
   }
   return HM_SUCCESS;
 }
-

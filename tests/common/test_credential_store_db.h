@@ -18,19 +18,16 @@
  *
  */
 
-#include <common/test_utils.h>
 
-void rpc_tests();
-void client_server_tests();
+#ifndef HERMES_TESTS_TEST_CREDENTIAL_STORE_DB_H
+#define HERMES_TESTS_TEST_CREDENTIAL_STORE_DB_H
 
-int main(int argc, char *argv[]){
-  testsuite_start_testing();
-  testsuite_enter_suite("rpc test");
+#include <hermes/credential_store/db.h>
 
-  testsuite_run_test(rpc_tests);
-  testsuite_run_test(client_server_tests);
+#include <stdint.h>
 
-  testsuite_finish_testing();
-  return testsuite_get_return_value();
-}
+hm_cs_db_t* hm_test_cs_db_create(const char* filename);
+uint32_t hm_test_cs_db_destroy(hm_cs_db_t** db);
 
+
+#endif //HERMES_TESTS_TEST_CREDENTIAL_STORE_DB_H

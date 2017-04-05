@@ -18,19 +18,19 @@
  *
  */
 
-#include <common/test_utils.h>
 
-void rpc_tests();
-void client_server_tests();
+#ifndef HM_COMMON_HASH_TABLE_H
+#define HM_COMMON_HASH_TABLE_H
 
-int main(int argc, char *argv[]){
-  testsuite_start_testing();
-  testsuite_enter_suite("rpc test");
+#include <stdint.h>
+#include <stdlib.h>
 
-  testsuite_run_test(rpc_tests);
-  testsuite_run_test(client_server_tests);
+typedef struct hm_hash_table_type hm_hash_table_t;
 
-  testsuite_finish_testing();
-  return testsuite_get_return_value();
-}
+hm_hash_table_t* hm_hash_table_create();
+uint32_t hm_hash_table_destroy(hm_hash_table_t** t);
 
+uint32_t hm_hash_table_set(hm_hash_table_t* t, const uint8_t* key, const size_t key_length, const uint8_t* val, const size_t val_length);
+uint32_t hm_hash_table_get(hm_hash_table_t* t, const uint8_t* key, const size_t key_length, uint8_t** val, size_t* val_length);
+
+#endif //HM_COMMON_HASH_TABLE_H

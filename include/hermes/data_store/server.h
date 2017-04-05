@@ -18,19 +18,20 @@
  *
  */
 
-#include <common/test_utils.h>
 
-void rpc_tests();
-void client_server_tests();
+#ifndef HERMES_DATA_STORE_SERVER_H
+#define HERMES_DATA_STORE_SERVER_H
 
-int main(int argc, char *argv[]){
-  testsuite_start_testing();
-  testsuite_enter_suite("rpc test");
+#include <hermes/rpc/transport.h>
+#include <hermes/data_store/db.h>
 
-  testsuite_run_test(rpc_tests);
-  testsuite_run_test(client_server_tests);
+#include <stdint.h>
+#include <stdlib.h>
 
-  testsuite_finish_testing();
-  return testsuite_get_return_value();
-}
+typedef struct hm_data_store_server_type hm_data_store_server_t;
 
+hm_data_store_server_t* hm_data_store_server_create(hm_rpc_transport_t* transport, hm_ds_db_t* db);
+uint32_t hm_data_store_server_destroy(hm_data_store_server_t** s);
+uint32_t hm_data_store_server_call(hm_data_store_server_t* s);
+
+#endif //HERMES_DATA_STORE_SERVER_H

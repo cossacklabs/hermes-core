@@ -66,6 +66,9 @@ BUILD_CMD_ = LOG=$$($(CMD) 2>&1) ; if [ $$? -eq 1 ]; then $(PRINT_ERROR_); elif 
 ifndef ERROR
 include src/common/common.mk
 include src/rpc/rpc.mk
+include src/credential_store/credential_store.mk
+include src/data_store/data_store.mk
+include src/key_store/key_store.mk
 endif
 
 
@@ -73,7 +76,7 @@ all: err core
 
 test_all: err test
 
-core: rpc_shared
+core: rpc_shared credential_store_shared data_store_shared key_store_shared
 
 common_static: CMD = $(AR) rcs $(BIN_PATH)/lib$(COMMON_BIN).a $(COMMON_OBJ)
 
@@ -93,6 +96,43 @@ rpc_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(RPC_BIN).$(SHARED_EXT) $(RPC
 rpc_shared: common_static $(RPC_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
+
+credential_store_static: CMD = $(AR) rcs $(BIN_PATH)/lib$(CREDENTIAL_STORE_BIN).a $(CREDENTIAL_STORE_OBJ)
+
+credential_store_static: common_static rpc_static $(CREDENTIAL_STORE_OBJ) 
+	@echo -n "link "
+	@$(BUILD_CMD)
+
+credential_store_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(CREDENTIAL_STORE_BIN).$(SHARED_EXT) $(CREDENTIAL_STORE_OBJ) $(LDFLAGS) -lcommon -lrpc
+
+credential_store_shared: common_static rpc_shared $(CREDENTIAL_STORE_OBJ)
+	@echo -n "link "
+	@$(BUILD_CMD)
+
+data_store_static: CMD = $(AR) rcs $(BIN_PATH)/lib$(DATA_STORE_BIN).a $(DATA_STORE_OBJ)
+
+data_store_static: common_static rpc_static $(DATA_STORE_OBJ) 
+	@echo -n "link "
+	@$(BUILD_CMD)
+
+data_store_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(DATA_STORE_BIN).$(SHARED_EXT) $(DATA_STORE_OBJ) $(LDFLAGS) -lcommon -lrpc
+
+data_store_shared: common_static rpc_shared $(DATA_STORE_OBJ)
+	@echo -n "link "
+	@$(BUILD_CMD)
+
+key_store_static: CMD = $(AR) rcs $(BIN_PATH)/lib$(KEY_STORE_BIN).a $(KEY_STORE_OBJ)
+
+key_store_static: common_static rpc_static $(KEY_STORE_OBJ) 
+	@echo -n "link "
+	@$(BUILD_CMD)
+
+key_store_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(KEY_STORE_BIN).$(SHARED_EXT) $(KEY_STORE_OBJ) $(LDFLAGS) -lcommon -lrpc
+
+key_store_shared: common_static rpc_shared $(KEY_STORE_OBJ)
+	@echo -n "link "
+	@$(BUILD_CMD)
+
 
 $(OBJ_PATH)/%.o: CMD = $(CC) $(CFLAGS) -c $< -o $@
 
