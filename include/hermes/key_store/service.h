@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Cossack Labs Limited
+ * Copyright (c) 2017 Cossack Labs Limited
  *
  * This file is part of Hermes.
  *
@@ -18,18 +18,18 @@
  *
  */
 
-#ifndef DB_USERS_DB_H_
-#define DB_USERS_DB_H_
 
-#include "buffer.h"
-#include "db.h"
+#ifndef HM_KEY_STORE_SERVICE
+#define HM_KEY_STORE_SERVICE
 
-typedef struct users_db_t_ users_db_t;
+#include <hermes/rpc/transport.h>
+#include <hermes/key_store/db.h>
 
-users_db_t* users_db_create();
-db_status_t users_db_destroy(users_db_t* db);
+typedef struct hm_credential_server_service_type hm_key_store_service_t;
 
-db_status_t users_db_get_pub_key(users_db_t* db, const char* user_id, buffer_t* res);
-db_status_t users_db_get_users_list(users_db_t* db, buffer_t* res);
+hm_key_store_service_t* hm_key_store_service_create(hm_rpc_transport_t* transport, hm_ks_db_t* db);
+uint32_t hm_key_store_service_destroy(hm_key_store_service_t** s);
+uint32_t hm_key_store_service_start(hm_key_store_service_t* s);
+uint32_t hm_key_store_service_stop(hm_key_store_service_t* s); 
 
-#endif /* DB_USERS_DB_H_ */
+#endif //HM_KEY_STORE_SERVICE

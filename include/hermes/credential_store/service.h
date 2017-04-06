@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Cossack Labs Limited
+ * Copyright (c) 2017 Cossack Labs Limited
  *
  * This file is part of Hermes.
  *
@@ -18,27 +18,18 @@
  *
  */
 
-#ifndef HERMES_UTILS_H_
-#define HERMES_UTILS_H_
 
-#define HERMES_MAC_LENGTH 16
-#define HERMES_ID_LENGTH 24
-#define HERMES_TOKEN_LENGTH 64
+#ifndef HM_CREDENTIAL_STORE_SERVICE
+#define HM_CREDENTIAL_STORE_SERVICE
 
-#ifdef DEBUG
-#include <stdio.h>
+#include <hermes/rpc/transport.h>
+#include <hermes/credential_store/db.h>
 
-#define HERMES_CHECK(cond, on_fail_call) do{if(!(cond)){		\
-	fprintf(stderr, "%s:%u - error: %s\n",__FILE__,__LINE__,#cond);\
-	on_fail_call;}}while(0)
+typedef struct hm_credential_server_service_type hm_credential_store_service_t;
 
-#else
+hm_credential_store_service_t* hm_credential_store_service_create(hm_rpc_transport_t* transport, hm_cs_db_t* db);
+uint32_t hm_credential_store_service_destroy(hm_credential_store_service_t** s);
+uint32_t hm_credential_store_service_start(hm_credential_store_service_t* s);
+uint32_t hm_credential_store_service_stop(hm_credential_store_service_t* s); 
 
-#define HERMES_CHECK(cond, on_fail_call) do{if(!(cond)){on_fail_call;}}while(0)
-
-#endif
-
-#define HERMES_CHECK_PARAM(cond) HERMES_CHECK(cond, HERMES_INVALID_PARAM)
-#define HERMES_LOG(component, msg) fprintf(stdout, "log: %s - %s\n", component, msg);
-
-#endif /* HERMES_UTILS_H_ */
+#endif //HM_CREDENTIAL_STORE_SERVICE

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Cossack Labs Limited
+ * Copyright (c) 2017 Cossack Labs Limited
  *
  * This file is part of Hermes.
  *
@@ -19,7 +19,17 @@
  */
 
 
-#include <hermes/hermes_storages.h>
+#ifndef HM_DATA_STORE_SERVICE
+#define HM_DATA_STORE_SERVICE
 
-hermes_storages_t* hermes_storages=NULL;
+#include <hermes/rpc/transport.h>
+#include <hermes/data_store/db.h>
 
+typedef struct hm_credential_server_service_type hm_data_store_service_t;
+
+hm_data_store_service_t* hm_data_store_service_create(hm_rpc_transport_t* transport, hm_ds_db_t* db);
+uint32_t hm_data_store_service_destroy(hm_data_store_service_t** s);
+uint32_t hm_data_store_service_start(hm_data_store_service_t* s);
+uint32_t hm_data_store_service_stop(hm_data_store_service_t* s); 
+
+#endif //HM_DATA_STORE_SERVICE
