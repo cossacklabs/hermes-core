@@ -65,7 +65,7 @@ uint32_t hm_rpc_server_send_error(hm_rpc_server_t* s, uint32_t error){
   if(!s || HM_SUCCESS==error){
     return HM_INVALID_PARAMETER;
   }
-  return hm_rpc_transport_send(s->transport, (uint8_t*)&error, sizeof(uint32_t));
+  return s->transport->send(s->transport->user_data, (uint8_t*)&error, sizeof(uint32_t));
 }
 
 uint32_t hm_rpc_server_send(hm_rpc_server_t* s, hm_param_pack_t* pack){
@@ -73,7 +73,7 @@ uint32_t hm_rpc_server_send(hm_rpc_server_t* s, hm_param_pack_t* pack){
     return HM_INVALID_PARAMETER;
   }
   size_t err=HM_SUCCESS;
-  if(HM_SUCCESS!=hm_rpc_transport_send(s->transport, (uint8_t*)&err, sizeof(uint32_t))){
+  if(HM_SUCCESS!=s->transport->send(s->transport->user_data, (uint8_t*)&err, sizeof(uint32_t))){
     return HM_FAIL;
   }
   return hm_param_pack_send(pack, s->transport);
@@ -111,12 +111,12 @@ uint32_t hm_rpc_server_call(hm_rpc_server_t* s, void* user_data){
     return HM_INVALID_PARAMETER;
   }
   uint32_t func_signature_length=0;
-  if(HM_SUCCESS!=hm_rpc_transport_recv(s->transport, (uint8_t*)&func_signature_length, sizeof(uint32_t))){
+  if(HM_SUCCESS!=s->transport->recv(s->transport->user_data, (uint8_t*)&func_signature_length, sizeof(uint32_t))){
     return HM_FAIL;    
   }
   uint8_t* func_signature=malloc(func_signature_length);
   assert(func_signature);
-  if(HM_SUCCESS!=hm_rpc_transport_recv(s->transport, func_signature, func_signature_length)){
+  if(HM_SUCCESS!=s->transport->recv(s->transport->user_data, func_signature, func_signature_length)){
     return HM_FAIL;    
   }
   uint32_t res=hm_rpc_server_call_func(s, func_signature, func_signature_length, user_data);

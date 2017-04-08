@@ -23,10 +23,10 @@
 #include <hermes/common/errors.h>
 
 uint32_t hm_credential_store_get_pub_key_by_id(hm_cs_db_t* db, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length){
-  if(!db || !id || !id_length || !key){
+  if(!db || !(db->get_pub) || !id || !id_length || !key){
     return HM_INVALID_PARAMETER;
   }
-  return hm_cs_db_get_pub_by_id(db, id, id_length, key, key_length);
+  return db->get_pub(db->user_data, id, id_length, key, key_length);
 }
 
 //proxies
@@ -69,7 +69,7 @@ uint32_t hm_credential_store_get_pub_key_by_id_stub(hm_param_pack_t* in, hm_para
   if(HM_SUCCESS!=(res=hm_credential_store_get_pub_key_by_id((hm_cs_db_t*)user_data, id, id_length, &key, &key_length))){
     return res;
   }
-  *out=HM_PARAM_PACK(HM_PARAM_BUFFER(key, key_length));
+  *out=HM_PARAM_PACK(HM_PARAM_BUFFER_C(key, key_length));
   if(!(*out)){
     return HM_FAIL;
   }
