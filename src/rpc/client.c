@@ -52,16 +52,16 @@ uint32_t hm_rpc_client_sync_call(hm_rpc_client_sync_t* c, const uint8_t* func_na
     return HM_INVALID_PARAMETER;
   }
   uint32_t res=HM_SUCCESS;
-  if(HM_SUCCESS!=(res=hm_rpc_transport_send(c->transport, (const uint8_t*)(&func_name_length), sizeof(uint32_t)))){
+  if(HM_SUCCESS!=(res=c->transport->send(c->transport->user_data, (const uint8_t*)(&func_name_length), sizeof(uint32_t)))){
     return res;
   }
-  if(HM_SUCCESS!=(res=hm_rpc_transport_send(c->transport, func_name, func_name_length))){
+  if(HM_SUCCESS!=(res=c->transport->send(c->transport->user_data, func_name, func_name_length))){
     return res;
   }
   if(HM_SUCCESS!=(res=hm_param_pack_send(in_params, c->transport))){
     return res;
   }
-  if(HM_SUCCESS!=(res=hm_rpc_transport_recv(c->transport, (uint8_t*)error, sizeof(uint32_t)))){
+  if(HM_SUCCESS!=(res=c->transport->recv(c->transport->user_data, (uint8_t*)error, sizeof(uint32_t)))){
     return res;
   }
   if(HM_SUCCESS==(*error)){

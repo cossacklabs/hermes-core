@@ -29,50 +29,19 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-struct hm_rpc_transport_type{
+typedef struct hm_rpc_test_transport_type{
   int read_pipe;
   int write_pipe;
-};
+}hm_rpc_test_transport_t;
 
-hm_rpc_transport_t* hm_test_transport_create(const char* write_pipe_name, const char* read_pipe_name, bool is_server){
-  hm_rpc_transport_t* t = calloc(sizeof(hm_rpc_transport_t), 1);
-  assert(t);
-  if(is_server){
-    t->write_pipe=open(write_pipe_name, O_WRONLY);
-    t->read_pipe=open(read_pipe_name, O_RDONLY); 
-  }else{
-    t->read_pipe=open(read_pipe_name, O_RDONLY); 
-    t->write_pipe=open(write_pipe_name, O_WRONLY);
-  }
-  if(!(t->write_pipe) || !(t->read_pipe)){
-    hm_test_transport_destroy(t);
-    return NULL;
-  }
-  return t;
-}
-
-uint32_t hm_test_transport_destroy(hm_rpc_transport_t* t){
-  if(!t){
-    return HM_INVALID_PARAMETER;
-  }
-  if(t->write_pipe){
-    close(t->write_pipe);
-  }
-  if(t->read_pipe){
-    close(t->read_pipe);
-  }
-  free(t);
-  return HM_SUCCESS;
-}
-
-uint32_t hm_rpc_transport_send(void* transport, const uint8_t* buffer, const size_t buffer_length){
+uint32_t hm_rpc_test_transport_send(void* transport, const uint8_t* buffer, const size_t buffer_length){
   if(!transport || !buffer || !buffer_length){
     return HM_INVALID_PARAMETER;
   }
   size_t curr_pos=0;
   ssize_t sended_bytes=0;
   while(curr_pos<buffer_length){
-    sended_bytes=write(((hm_rpc_transport_t*)(transport))->write_pipe, buffer+curr_pos, buffer_length-curr_pos);
+    sended_bytes=write(((hm_rpc_test_transport_t*)(transport))->write_pipe, buffer+curr_pos, buffer_length-curr_pos);
     curr_pos+=sended_bytes;
   }
   if(curr_pos!=buffer_length){
@@ -80,14 +49,14 @@ uint32_t hm_rpc_transport_send(void* transport, const uint8_t* buffer, const siz
   }
   return HM_SUCCESS;
 }
-uint32_t hm_rpc_transport_recv(void* transport, uint8_t* buffer, size_t buffer_length){
+uint32_t hm_rpc_test_transport_recv(void* transport, uint8_t* buffer, size_t buffer_length){
   if(!transport || !buffer || !buffer_length){
     return HM_INVALID_PARAMETER;
   }
   size_t curr_pos=0;
   ssize_t readed_bytes=0;
   while(curr_pos<buffer_length){
-    readed_bytes=read(((hm_rpc_transport_t*)(transport))->read_pipe, buffer+curr_pos, buffer_length-curr_pos);
+    readed_bytes=read(((hm_rpc_test_transport_t*)(transport))->read_pipe, buffer+curr_pos, buffer_length-curr_pos);
     curr_pos+=readed_bytes;
   }
   if(curr_pos!=buffer_length){
@@ -95,3 +64,40 @@ uint32_t hm_rpc_transport_recv(void* transport, uint8_t* buffer, size_t buffer_l
   }
   return HM_SUCCESS;
 }
+
+
+hm_rpc_transport_t* hm_test_transport_create(const char* write_pipe_name, const char* read_pipe_name, bool is_server){
+  hm_rpc_transport_t* t = calloc(sizeof(hm_rpc_transport_t), 1);
+  assert(t);
+  t->user_data = calloc(sizeof(hm_rpc_test_transport_t),1);
+  if(is_server){
+    ((hm_rpc_test_transport_t*)(t->user_data))->write_pipe=open(write_pipe_name, O_WRONLY);
+    ((hm_rpc_test_transport_t*)(t->user_data))->read_pipe=open(read_pipe_name, O_RDONLY); 
+  }else{
+    ((hm_rpc_test_transport_t*)(t->user_data))->read_pipe=open(read_pipe_name, O_RDONLY); 
+    ((hm_rpc_test_transport_t*)(t->user_data))->write_pipe=open(write_pipe_name, O_WRONLY);
+  }
+  if(!(((hm_rpc_test_transport_t*)(t->user_data))->write_pipe) || !(((hm_rpc_test_transport_t*)(t->user_data))->read_pipe)){
+    hm_test_transport_destroy(t);
+    return NULL;
+  }
+  t->send=hm_rpc_test_transport_send;
+  t->recv=hm_rpc_test_transport_recv;
+  return t;
+}
+
+uint32_t hm_test_transport_destroy(hm_rpc_transport_t* t){
+  if(!t || !(t->user_data)){
+    return HM_INVALID_PARAMETER;
+  }
+  if(((hm_rpc_test_transport_t*)(t->user_data))->write_pipe){
+    close(((hm_rpc_test_transport_t*)(t->user_data))->write_pipe);
+  }
+  if(((hm_rpc_test_transport_t*)(t->user_data))->read_pipe){
+    close(((hm_rpc_test_transport_t*)(t->user_data))->read_pipe);
+  }
+  free(t->user_data);
+  free(t);
+  return HM_SUCCESS;
+}
+
