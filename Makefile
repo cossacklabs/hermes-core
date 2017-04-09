@@ -78,6 +78,8 @@ test_all: err test
 
 core: rpc_shared credential_store_shared data_store_shared key_store_shared
 
+static_core: rpc_static credential_store_static data_store_static key_store_static
+
 common_static: CMD = $(AR) rcs $(BIN_PATH)/lib$(COMMON_BIN).a $(COMMON_OBJ)
 
 common_static: $(COMMON_OBJ)
