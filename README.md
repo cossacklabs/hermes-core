@@ -1,12 +1,12 @@
 # Hermes core library 0.5 PoC
 
-Hermes is novel way to store and protect the data cryptographically, which enables you to add CRUD permissions to data blocks via cryptographic process, where server running Hermes can't do anything worse than DoS. 
+Hermes is a cryptography-based method of providing protected data storage and sharing that allows enforcing cryptographically checked CRUD permissions to data blocks and doesn't let server that's running Hermes do anything worse than DoS. 
 
-Scientific paper and a number of descriptive documents are in progress. In the meanwhile, you can read [wiki](https://github.com/cossacklabs/hermes-core/wiki) for simplistic description.
+Scientific paper and a number of descriptive documents are in progress. Meanwhile, you can read [wiki](https://github.com/cossacklabs/hermes-core/wiki) for a simplistic description.
 
 This repository holds public proof-of-concept version, which should be used to study and verify the methodology and cryptographic backend. 
 
-There is a separate, commercial licensed Hermes version for industrial use (it's core crypto code is equal to this repository, yet it holds additional convenience interfaces and services). 
+There is a separate, commercial licensed Hermes version for industrial use (its core crypto code is similar to this repository, yet it holds additional convenience interfaces and services). 
 
 Hermes is a part of backend protection suite called [Toughbase](https://www.cossacklabs.com/toughbase/).
 
@@ -14,7 +14,7 @@ Hermes is a part of backend protection suite called [Toughbase](https://www.coss
 
 Requirements:
 
-To build Hermes you need only standard build environment (in Debian you need to install ‘build-essential’ package) and our crypto SDK [Themis](https://www.github.com/cossacklabs/themis/) installed. This open-source version of Hermes is checked to work only on Linux. 
+To build Hermes, you only need to install the standard build environment (in Debian you need to install ‘build-essential’ package) and our crypto SDK [Themis](https://www.github.com/cossacklabs/themis/). This open-source version of Hermes is only checked to work on Linux. 
 
 To build and install Hermes:
 
@@ -27,19 +27,19 @@ Hermes is ready to use.
 
 # Using Hermes:
 
-Hermes sits right between frontend app and data storage. Because of that, to use Hermes you need something to act these roles.
+Hermes sits right between frontend app and data storage so you'll need something to fill these roles to use Hermes.
 
-To study Hermes better, we've included simple file storage primitives, file_db. They're not included in deafult Hermes build, and, if requires, can be included by: 
+We've included simple file storage primitives - file_db - to help you study Hermes in action. They're not present in the deafult Hermes build, but can easily be included through: 
 
 ```
 make WITH_FILE_DB
 ```
 
-After that, Hermes libraries can use files to 
+After that, Hermes libraries can use files to...
 
-To learn more, how Hermes can be used within other applications, please see C tests (examples coming soon!). 
+To learn more about the ways of using Hermes with(in) other applications, please see C tests (examples coming soon!). 
 
-For Python users there is a simple example with usage of ctypes wrappers of hermes procedures. 
+For Python users there is a simple example with usage of ctypes wrappers of Hermes procedures. 
 
 Pyhermes.py is a simple console application to demonstrate main hermes abilities:
 
