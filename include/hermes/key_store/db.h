@@ -26,14 +26,20 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-typedef struct hm_ks_db_type hm_ks_db_t;
 
-uint32_t hm_ks_db_set_rtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length, const uint8_t* rtoken, const size_t rtoken_length);
-uint32_t hm_ks_db_set_wtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length, const uint8_t* wtoken, const size_t wtoken_length);
-uint32_t hm_ks_db_get_rtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, uint8_t** rtoken, size_t* rtoken_id_length, uint8_t** owner_id, size_t* owner_id_length);
-uint32_t hm_ks_db_get_wtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, uint8_t** wtoken, size_t* wtoken_id_length, uint8_t** owner_id, size_t* owner_id_length);
-uint32_t hm_ks_db_del_rtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length);
-uint32_t hm_ks_db_del_wtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length);
+typedef uint32_t(*hm_ks_db_set_token)(void* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length, const uint8_t* rtoken, const size_t rtoken_length);
+typedef uint32_t(*hm_ks_db_get_token)(void* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, uint8_t** wtoken, size_t* wtoken_id_length, uint8_t** owner_id, size_t* owner_id_length);
+typedef uint32_t(*hm_ks_db_del_token)(void* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length);
+
+typedef struct hm_ks_db_type{
+    void* user_data;
+    hm_ks_db_set_token set_rtoken;
+    hm_ks_db_set_token set_wtoken;
+    hm_ks_db_get_token get_rtoken;
+    hm_ks_db_get_token get_wtoken;
+    hm_ks_db_del_token del_rtoken;
+    hm_ks_db_del_token del_wtoken;
+}hm_ks_db_t;
 
 
 #endif //HERMES_KEY_STORE_DB_H
