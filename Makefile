@@ -69,6 +69,7 @@ include src/rpc/rpc.mk
 include src/credential_store/credential_store.mk
 include src/data_store/data_store.mk
 include src/key_store/key_store.mk
+include src/mid_hermes/mid_hermes.mk
 endif
 
 
@@ -76,9 +77,9 @@ all: err core
 
 test_all: err test
 
-core: rpc_shared credential_store_shared data_store_shared key_store_shared
+core: rpc_shared credential_store_shared data_store_shared key_store_shared mid_hermes_shared
 
-static_core: rpc_static credential_store_static data_store_static key_store_static
+static_core: rpc_static credential_store_static data_store_static key_store_static mid_hermes_static
 
 common_static: CMD = $(AR) rcs $(BIN_PATH)/lib$(COMMON_BIN).a $(COMMON_OBJ)
 
@@ -132,6 +133,18 @@ key_store_static: common_static rpc_static $(KEY_STORE_OBJ)
 key_store_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(KEY_STORE_BIN).$(SHARED_EXT) $(KEY_STORE_OBJ) $(LDFLAGS) -lcommon -lrpc
 
 key_store_shared: common_static rpc_shared $(KEY_STORE_OBJ)
+	@echo -n "link "
+	@$(BUILD_CMD)
+
+mid_hermes_static: CMD = $(AR) rcs $(BIN_PATH)/lib$(MID_HERMES_BIN).a $(MID_HERMES_OBJ)
+
+mid_hermes_static: common_static rpc_static $(MID_HERMES_OBJ) 
+	@echo -n "link "
+	@$(BUILD_CMD)
+
+mid_hermes_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(MID_HERMES_BIN).$(SHARED_EXT) $(MID_HERMES_OBJ) $(LDFLAGS) -lcommon -lrpc
+
+mid_hermes_shared: common_static rpc_shared $(MID_HERMES_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
