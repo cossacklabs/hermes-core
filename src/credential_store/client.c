@@ -54,7 +54,7 @@ uint32_t hm_credential_store_client_sync_destroy(hm_credential_store_client_sync
   return HM_SUCCESS;
 }
 
-uint32_t hm_crerential_store_client_sync_call_get_pub_key_by_id(hm_credential_store_client_sync_t* c, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length){
+uint32_t hm_credential_store_client_sync_call_get_pub_key_by_id(hm_credential_store_client_sync_t* c, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length){
   if(!c || !id || !id_length || !key){
     return HM_INVALID_PARAMETER;
   }

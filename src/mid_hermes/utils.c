@@ -71,7 +71,7 @@ uint32_t hm_mac_create(const uint8_t* key, const size_t key_len, const uint8_t* 
   }
   pre_mac=malloc(pre_mac_len);
   assert(pre_mac);
-  if(THEMIS_BUFFER_TOO_SMALL!=themis_secure_cell_encrypt_context_imprint(key, key_len, data, data_len, context, context_len, pre_mac, &pre_mac_len)){
+  if(THEMIS_SUCCESS!=themis_secure_cell_encrypt_context_imprint(key, key_len, data, data_len, context, context_len, pre_mac, &pre_mac_len)){
     free(pre_mac);
     return HM_FAIL;
   }
@@ -93,7 +93,7 @@ uint32_t hm_asym_encrypt(const uint8_t* sk, const size_t sk_len, const uint8_t* 
   }
   *encrypted_data=malloc(res_buf_len);
   assert(*encrypted_data);
-  if(THEMIS_BUFFER_TOO_SMALL != themis_secure_message_wrap(sk, sk_len, pk, pk_len, data, data_len, *encrypted_data, &res_buf_len)){
+  if(THEMIS_SUCCESS != themis_secure_message_wrap(sk, sk_len, pk, pk_len, data, data_len, *encrypted_data, &res_buf_len)){
     free(*encrypted_data);
     return HM_FAIL;
   }
@@ -106,12 +106,12 @@ uint32_t hm_asym_decrypt(const uint8_t* sk, const size_t sk_len, const uint8_t* 
     return HM_INVALID_PARAMETER;
   }
   size_t res_buf_len=0;
-  if(THEMIS_BUFFER_TOO_SMALL != themis_secure_message_wrap(sk, sk_len, pk, pk_len, encrypted_data, encrypted_data_len, NULL, &res_buf_len)){
+  if(THEMIS_BUFFER_TOO_SMALL != themis_secure_message_unwrap(sk, sk_len, pk, pk_len, encrypted_data, encrypted_data_len, NULL, &res_buf_len)){
     return HM_FAIL;
   }
   *data=malloc(res_buf_len);
   assert(*data);
-  if(THEMIS_BUFFER_TOO_SMALL != themis_secure_message_wrap(sk, sk_len, pk, pk_len, encrypted_data, encrypted_data_len, *data, &res_buf_len)){
+  if(THEMIS_SUCCESS != themis_secure_message_unwrap(sk, sk_len, pk, pk_len, encrypted_data, encrypted_data_len, *data, &res_buf_len)){
     free(*data);
     return HM_FAIL;
   }

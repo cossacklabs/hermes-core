@@ -61,10 +61,12 @@ mid_hermes_t* mid_hermes_create(const uint8_t* id, const size_t id_len, const ui
     mid_hermes_destroy(&mh);
     return NULL;
   }
+  fprintf(stderr, "aaaaaa\n");
   if(HM_SUCCESS!=hm_credential_store_client_sync_call_get_pub_key_by_id(mh->csc, mh->id, mh->id_len, &(mh->pk), &(mh->pk_len))){
     mid_hermes_destroy(&mh);
     return NULL;
   }
+  fprintf(stderr, "bbbbbb\n");
   return mh;
 }
 
@@ -131,7 +133,7 @@ uint32_t mid_hermes_create_block(mid_hermes_t* mh, const uint8_t* block, const s
     return res;    
   }
   free(enc_rtoken);
-  if(HM_SUCCESS!=(res=hm_key_store_client_sync_call_set_rtoken(mh->ksc, *id, id_len_, mh->id, mh->id_len, mh->id, mh->id_len, enc_wtoken, enc_wtoken_len))){
+  if(HM_SUCCESS!=(res=hm_key_store_client_sync_call_set_wtoken(mh->ksc, *id, id_len_, mh->id, mh->id_len, mh->id, mh->id_len, enc_wtoken, enc_wtoken_len))){
     free(enc_wtoken);
     hm_data_store_client_sync_call_delete_block(mh->dsc, *id, id_len_, mac, mac_len);
     free(mac);
@@ -150,7 +152,7 @@ uint32_t mid_hermes_get_token(mid_hermes_t* mh, const uint8_t* block_id, const s
   uint8_t* enc_token=NULL, *owner_id=NULL, *owner_pk=NULL;
   size_t enc_token_len=0, owner_id_len=0, owner_pk_len=0;
   uint32_t res;
-  if(HM_SUCCESS!=(res=(is_update?hm_key_store_client_sync_call_get_wtoken(mh->ksc, block_id, block_id_len, mh->id, mh->id_len, &enc_token, &enc_token_len, &owner_id, &owner_id_len):hm_key_store_client_sync_call_get_wtoken(mh->ksc, block_id, block_id_len, mh->id, mh->id_len, &enc_token, &enc_token_len, &owner_id, &owner_id_len)))){
+  if(HM_SUCCESS!=(res=(is_update?hm_key_store_client_sync_call_get_wtoken(mh->ksc, block_id, block_id_len, mh->id, mh->id_len, &enc_token, &enc_token_len, &owner_id, &owner_id_len):hm_key_store_client_sync_call_get_rtoken(mh->ksc, block_id, block_id_len, mh->id, mh->id_len, &enc_token, &enc_token_len, &owner_id, &owner_id_len)))){
     return res;
   }
   if(HM_SUCCESS!=(res=hm_credential_store_client_sync_call_get_pub_key_by_id(mh->csc, owner_id, owner_id_len, &owner_pk, &owner_pk_len))){
@@ -158,6 +160,13 @@ uint32_t mid_hermes_get_token(mid_hermes_t* mh, const uint8_t* block_id, const s
     free(owner_id);
     return res;
   }
+  //  free(owner_id);
+  if(HM_SUCCESS!=(res=hm_asym_decrypt(mh->sk, mh->sk_len, owner_pk, owner_pk_len, enc_token, enc_token_len, token, token_len))){
+    free(enc_token);
+    free(owner_pk);
+  }
+  //  free(enc1_token);
+  //  free(owner_pk);
   return res;
 }
 
@@ -176,10 +185,10 @@ uint32_t mid_hermes_read_block_(mid_hermes_t* mh, const uint8_t* block_id, const
     return res;
   }
   res=hm_decrypt(*rtoken, *rtoken_len, enc_block, enc_block_len, *meta, *meta_len, block, block_len);
-  free(enc_block);
+  //free(enc_block);
   if(HM_SUCCESS!=res){
     free(*rtoken);
-    free(*meta);
+    //free(*meta);
     return res;
   }
   return HM_SUCCESS;
@@ -210,13 +219,13 @@ uint32_t mid_hermes_read_block_mac(mid_hermes_t* mh, const uint8_t* block_id, co
   }
   if(HM_SUCCESS!=(res=mid_hermes_get_token(mh, block_id, block_id_len, true, wtoken, wtoken_len))){
     free(block);
-    free(meta);
+    //    free(meta);
     free(*rtoken);
     return res;
   }
   res=hm_mac_create(*wtoken, *wtoken_len, block, block_len, meta, meta_len, mac, mac_len);
   free(block);
-  free(meta);
+  //  free(meta);
   if(HM_SUCCESS!=res){
     free(*wtoken);
     free(*rtoken);
@@ -292,7 +301,7 @@ uint32_t grant_access(mid_hermes_t* mh, const uint8_t* block_id, const size_t bl
     return res;
   }
   res=is_update?hm_key_store_client_sync_call_set_wtoken(mh->ksc, block_id, block_id_length, user_id, user_id_length, mh->id, mh->id_len, enc_token, enc_token_len):hm_key_store_client_sync_call_set_rtoken(mh->ksc, block_id, block_id_length, user_id, user_id_length, mh->id, mh->id_len, enc_token, enc_token_len);
-  free(peer_pk);
+  //free(peer_pk);
   free(token);
   free(enc_token);
   return res;
