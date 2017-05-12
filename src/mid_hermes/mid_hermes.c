@@ -61,12 +61,10 @@ mid_hermes_t* mid_hermes_create(const uint8_t* id, const size_t id_len, const ui
     mid_hermes_destroy(&mh);
     return NULL;
   }
-  fprintf(stderr, "aaaaaa\n");
   if(HM_SUCCESS!=hm_credential_store_client_sync_call_get_pub_key_by_id(mh->csc, mh->id, mh->id_len, &(mh->pk), &(mh->pk_len))){
     mid_hermes_destroy(&mh);
     return NULL;
   }
-  fprintf(stderr, "bbbbbb\n");
   return mh;
 }
 
