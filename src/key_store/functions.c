@@ -25,75 +25,75 @@
 #include <string.h>
 
 uint32_t hm_key_store_set_rtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length, const uint8_t* rtoken, const size_t rtoken_length){
-  if(!db || !block_id || !block_id_length || !user_id || !user_id_length || !owner_id || !owner_id_length || !rtoken || !rtoken_length){
+  if(!db || !(db->user_data) || !(db->get_rtoken) || !(db->set_rtoken) || !block_id || !block_id_length || !user_id || !user_id_length || !owner_id || !owner_id_length || !rtoken || !rtoken_length){
     return HM_INVALID_PARAMETER;
   }
   uint32_t res;
   if(user_id_length!=owner_id_length || 0!=memcmp(user_id, owner_id, user_id_length)){
     uint8_t *test_token=NULL, *test_id=NULL;
     size_t test_token_length=0, test_id_length=0;
-    if(HM_SUCCESS!=(res=hm_ks_db_get_rtoken(db, block_id, block_id_length, owner_id, owner_id_length, &test_token, &test_token_length, &test_id, &test_id_length))){
+    if(HM_SUCCESS!=(res=db->get_rtoken(db->user_data, block_id, block_id_length, owner_id, owner_id_length, &test_token, &test_token_length, &test_id, &test_id_length))){
       return HM_FAIL;
     }
     free(test_token);
     free(test_id);
   }
-  return hm_ks_db_set_rtoken(db, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length, rtoken, rtoken_length);
+  return db->set_rtoken(db->user_data, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length, rtoken, rtoken_length);
 }
 
 uint32_t hm_key_store_set_wtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length, const uint8_t* wtoken, const size_t wtoken_length){
-  if(!db || !block_id || !block_id_length || !user_id || !user_id_length || !owner_id || !owner_id_length || !wtoken || !wtoken_length){
+  if(!db || !(db->user_data) || !(db->get_wtoken) || !(db->set_wtoken) || !block_id || !block_id_length || !user_id || !user_id_length || !owner_id || !owner_id_length || !wtoken || !wtoken_length){
     return HM_INVALID_PARAMETER;
   }
   uint32_t res;
   if(user_id_length!=owner_id_length || 0!=memcmp(user_id, owner_id, user_id_length)){
     uint8_t *test_token=NULL, *test_id=NULL;
     size_t test_token_length=0, test_id_length=0;
-    if(HM_SUCCESS!=(res=hm_ks_db_get_wtoken(db, block_id, block_id_length, owner_id, owner_id_length, &test_token, &test_token_length, &test_id, &test_id_length))){
+    if(HM_SUCCESS!=(res=db->get_wtoken(db->user_data, block_id, block_id_length, owner_id, owner_id_length, &test_token, &test_token_length, &test_id, &test_id_length))){
       return HM_FAIL;
     }
     free(test_token);
     free(test_id);
   }
-  return hm_ks_db_set_wtoken(db, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length, wtoken, wtoken_length);
+  return db->set_wtoken(db->user_data, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length, wtoken, wtoken_length);
 }
 
 uint32_t hm_key_store_get_rtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, uint8_t** rtoken, size_t* rtoken_length, uint8_t** owner_id, size_t* owner_id_length){
-  if(!db || !block_id || !block_id_length || !user_id || !user_id_length || !rtoken || !owner_id){
+  if(!db || !(db->user_data) || !(db->get_rtoken) || !block_id || !block_id_length || !user_id || !user_id_length || !rtoken || !owner_id){
     return HM_INVALID_PARAMETER;
   }
-  return hm_ks_db_get_rtoken(db, block_id, block_id_length, user_id, user_id_length, rtoken, rtoken_length, owner_id, owner_id_length);
+  return db->get_rtoken(db->user_data, block_id, block_id_length, user_id, user_id_length, rtoken, rtoken_length, owner_id, owner_id_length);
 }
 
 uint32_t hm_key_store_get_wtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, uint8_t** wtoken, size_t* wtoken_length, uint8_t** owner_id, size_t* owner_id_length){
-  if(!db || !block_id || !block_id_length || !user_id || !user_id_length || !wtoken || !owner_id){
+  if(!db || !(db->user_data) || !(db->get_wtoken) || !block_id || !block_id_length || !user_id || !user_id_length || !wtoken || !owner_id){
     return HM_INVALID_PARAMETER;
   }
-  return hm_ks_db_get_wtoken(db, block_id, block_id_length, user_id, user_id_length, wtoken, wtoken_length, owner_id, owner_id_length);
+  return db->get_wtoken(db->user_data, block_id, block_id_length, user_id, user_id_length, wtoken, wtoken_length, owner_id, owner_id_length);
 }
 
 uint32_t hm_key_store_del_rtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length){
-  if(!db || !block_id || !block_id_length || !user_id || !user_id_length || !owner_id || !owner_id_length){
+  if(!db || !(db->user_data) || !(db->get_rtoken) || (!(db->del_rtoken)) || !block_id || !block_id_length || !user_id || !user_id_length || !owner_id || !owner_id_length){
     return HM_INVALID_PARAMETER;
   }
   uint8_t *test_token=NULL, *test_id=NULL;
   size_t test_token_length=0, test_id_length=0;
-  if(HM_SUCCESS!=hm_ks_db_get_rtoken(db, block_id, block_id_length, owner_id, owner_id_length, &test_token, &test_token_length, &test_id, &test_id_length)){
+  if(HM_SUCCESS!=db->get_rtoken(db->user_data, block_id, block_id_length, owner_id, owner_id_length, &test_token, &test_token_length, &test_id, &test_id_length)){
     return HM_FAIL;
   }
-  return hm_ks_db_del_rtoken(db, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length);
+  return db->del_rtoken(db->user_data, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length);
 }
 
 uint32_t hm_key_store_del_wtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length){
-  if(!db || !block_id || !block_id_length || !user_id || !user_id_length || !owner_id || !owner_id_length){
+  if(!db || !(db->user_data) || !(db->get_wtoken) || !(db->del_wtoken) || !block_id || !block_id_length || !user_id || !user_id_length || !owner_id || !owner_id_length){
     return HM_INVALID_PARAMETER;
   }
   uint8_t *test_token=NULL, *test_id=NULL;
   size_t test_token_length=0, test_id_length=0;
-  if(HM_SUCCESS!=hm_ks_db_get_wtoken(db, block_id, block_id_length, owner_id, owner_id_length, &test_token, &test_token_length, &test_id, &test_id_length)){
+  if(HM_SUCCESS!=db->get_wtoken(db->user_data, block_id, block_id_length, owner_id, owner_id_length, &test_token, &test_token_length, &test_id, &test_id_length)){
     return HM_FAIL;
   }
-  return hm_ks_db_del_wtoken(db, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length);  
+  return db->del_wtoken(db->user_data, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length);  
 }
 
 
@@ -107,9 +107,8 @@ uint32_t hm_key_store_set_rtoken_sync_proxy(hm_rpc_client_sync_t* c, const uint8
   if(!in){
     return HM_FAIL;
   }
-  hm_param_pack_t* out=NULL;
   uint32_t status, res;
-  if(HM_SUCCESS!=(res=hm_rpc_client_sync_call(c, (const uint8_t*)hm_key_store_set_rtoken_NAME, sizeof(hm_key_store_set_rtoken_NAME), in, &status, &(out)))){
+  if(HM_SUCCESS!=(res=hm_rpc_client_sync_call(c, (const uint8_t*)hm_key_store_set_rtoken_NAME, sizeof(hm_key_store_set_rtoken_NAME), in, &status, NULL))){
     hm_param_pack_destroy(&in);
     return res;
   }
@@ -125,9 +124,8 @@ uint32_t hm_key_store_set_wtoken_sync_proxy(hm_rpc_client_sync_t* c, const uint8
   if(!in){
     return HM_FAIL;
   }
-  hm_param_pack_t* out=NULL;
   uint32_t status, res;
-  if(HM_SUCCESS!=(res=hm_rpc_client_sync_call(c, (const uint8_t*)hm_key_store_set_wtoken_NAME, sizeof(hm_key_store_set_wtoken_NAME), in, &status, &(out)))){
+  if(HM_SUCCESS!=(res=hm_rpc_client_sync_call(c, (const uint8_t*)hm_key_store_set_wtoken_NAME, sizeof(hm_key_store_set_wtoken_NAME), in, &status, NULL))){
     hm_param_pack_destroy(&in);
     return res;
   }
@@ -193,9 +191,8 @@ uint32_t hm_key_store_del_rtoken_sync_proxy(hm_rpc_client_sync_t* c, const uint8
   if(!in){
     return HM_FAIL;
   }
-  hm_param_pack_t* out=NULL;
   uint32_t status, res;
-  if(HM_SUCCESS!=(res=hm_rpc_client_sync_call(c, (const uint8_t*)hm_key_store_del_rtoken_NAME, sizeof(hm_key_store_del_rtoken_NAME), in, &status, &(out)))){
+  if(HM_SUCCESS!=(res=hm_rpc_client_sync_call(c, (const uint8_t*)hm_key_store_del_rtoken_NAME, sizeof(hm_key_store_del_rtoken_NAME), in, &status, NULL))){
     hm_param_pack_destroy(&in);
     return res;
   }
@@ -211,9 +208,8 @@ uint32_t hm_key_store_del_wtoken_sync_proxy(hm_rpc_client_sync_t* c, const uint8
   if(!in){
     return HM_FAIL;
   }
-  hm_param_pack_t* out=NULL;
   uint32_t status, res;
-  if(HM_SUCCESS!=(res=hm_rpc_client_sync_call(c, (const uint8_t*)hm_key_store_del_wtoken_NAME, sizeof(hm_key_store_del_wtoken_NAME), in, &status, &(out)))){
+  if(HM_SUCCESS!=(res=hm_rpc_client_sync_call(c, (const uint8_t*)hm_key_store_del_wtoken_NAME, sizeof(hm_key_store_del_wtoken_NAME), in, &status, NULL))){
     hm_param_pack_destroy(&in);
     return res;
   }

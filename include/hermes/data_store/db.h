@@ -26,12 +26,18 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-typedef struct hm_ds_db_type hm_ds_db_t;
+typedef uint32_t(*hm_ds_db_insert_block)(void* db, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length, const uint8_t* mac, const size_t mac_length, uint8_t** id, size_t* id_length);
+typedef uint32_t(*hm_ds_db_read_block)(void* db, const uint8_t* id, const size_t id_length, uint8_t** block, size_t*  block_length, uint8_t** mac, size_t*  mac_length);
+typedef uint32_t(*hm_ds_db_read_block_mac)(void* db, const uint8_t* id, const size_t id_length, uint8_t** mac, size_t*  mac_length);
+typedef uint32_t(*hm_ds_db_update_block)(void* db, const uint8_t* id, const size_t id_length, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length, const uint8_t* mac, const size_t mac_length);
+typedef uint32_t(*hm_ds_db_delete_block)(void* db, const uint8_t* id, const size_t id_length);
 
-uint32_t hm_ds_db_insert_block(hm_ds_db_t* db, const uint8_t* block, const size_t block_length, const uint8_t* mac, const size_t mac_length, uint8_t** id, size_t* id_length);
-uint32_t hm_ds_db_read_block(hm_ds_db_t* db, const uint8_t* id, const size_t id_length, uint8_t** block, size_t*  block_length);
-uint32_t hm_ds_db_read_block_mac(hm_ds_db_t* db, const uint8_t* id, const size_t id_length, uint8_t** mac, size_t*  mac_length);
-uint32_t hm_ds_db_update_block(hm_ds_db_t* db, const uint8_t* id, const size_t id_length, const uint8_t* block, const size_t block_length, const uint8_t* mac, const size_t mac_length);
-uint32_t hm_ds_db_delete_block(hm_ds_db_t* db, const uint8_t* id, const size_t id_length);
-
+typedef struct hm_ds_db_type{
+    void* user_data;
+    hm_ds_db_insert_block create_block;
+    hm_ds_db_read_block read_block;
+    hm_ds_db_read_block_mac read_block_mac;
+    hm_ds_db_update_block update_block;
+    hm_ds_db_delete_block delete_block;
+}hm_ds_db_t;
 #endif //HERMES_DATA_STORE_DB_H

@@ -30,18 +30,18 @@
 #include <stdlib.h>
 
 #define hm_data_store_create_block_NAME "hm_data_store_create_block"
-uint32_t hm_data_store_create_block(hm_ds_db_t* db, const uint8_t* block, const size_t block_length, const uint8_t* mac, const size_t mac_length, uint8_t** id, size_t* id_length);
+uint32_t hm_data_store_create_block(hm_ds_db_t* db, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length, const uint8_t* mac, const size_t mac_length, uint8_t** id, size_t* id_length);
 #define hm_data_store_read_block_NAME "hm_data_store_read_block"
-uint32_t hm_data_store_read_block(hm_ds_db_t* db, const uint8_t* id, const size_t id_length, uint8_t** block, size_t*  block_length);
+uint32_t hm_data_store_read_block(hm_ds_db_t* db, const uint8_t* id, const size_t id_length, uint8_t** block, size_t*  block_length, uint8_t** meta, size_t* meta_length);
 #define hm_data_store_update_block_NAME "hm_data_store_update_block"
-uint32_t hm_data_store_update_block(hm_ds_db_t* db, const uint8_t* id, const size_t id_length, const uint8_t* block, const size_t block_length, const uint8_t* mac, const size_t mac_length, const uint8_t* old_mac, const size_t old_mac_length);
+uint32_t hm_data_store_update_block(hm_ds_db_t* db, const uint8_t* id, const size_t id_length, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length, const uint8_t* mac, const size_t mac_length, const uint8_t* old_mac, const size_t old_mac_length);
 #define hm_data_store_delete_block_NAME "hm_data_store_delete_block"
 uint32_t hm_data_store_delete_block(hm_ds_db_t* db, const uint8_t* id, const size_t id_length, const uint8_t* old_mac, const size_t old_mac_length);
 
 //proxies
-uint32_t hm_data_store_create_block_sync_proxy(hm_rpc_client_sync_t* c, const uint8_t* block, const size_t block_length, const uint8_t* mac, const size_t mac_length, uint8_t** id, size_t* id_length);
-uint32_t hm_data_store_read_block_sync_proxy(hm_rpc_client_sync_t* c, const uint8_t* id, const size_t id_length, uint8_t** block, size_t*  block_length);
-uint32_t hm_data_store_update_block_sync_proxy(hm_rpc_client_sync_t* c, const uint8_t* id, const size_t id_length, const uint8_t* block, const size_t block_length, const uint8_t* mac, const size_t mac_length, const uint8_t* old_mac, const size_t old_mac_length);
+uint32_t hm_data_store_create_block_sync_proxy(hm_rpc_client_sync_t* c, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length, const uint8_t* mac, const size_t mac_length, uint8_t** id, size_t* id_length);
+uint32_t hm_data_store_read_block_sync_proxy(hm_rpc_client_sync_t* c, const uint8_t* id, const size_t id_length, uint8_t** block, size_t*  block_length, uint8_t** meta, size_t* meta_length);
+uint32_t hm_data_store_update_block_sync_proxy(hm_rpc_client_sync_t* c, const uint8_t* id, const size_t id_length, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length, const uint8_t* mac, const size_t mac_length, const uint8_t* old_mac, const size_t old_mac_length);
 uint32_t hm_data_store_delete_block_sync_proxy(hm_rpc_client_sync_t* c, const uint8_t* id, const size_t id_length, const uint8_t* old_mac, const size_t old_mac_length);
 
 //stubs

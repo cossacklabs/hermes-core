@@ -24,6 +24,8 @@
 #include <hermes/common/errors.h>
 #include <assert.h>
 
+#include <stdio.h>
+
 struct hm_rpc_server_type{
   hm_rpc_transport_t* transport;
   hm_hash_table_t* func_table;
@@ -69,14 +71,17 @@ uint32_t hm_rpc_server_send_error(hm_rpc_server_t* s, uint32_t error){
 }
 
 uint32_t hm_rpc_server_send(hm_rpc_server_t* s, hm_param_pack_t* pack){
-  if(!s || !pack){
+  if(!s){
     return HM_INVALID_PARAMETER;
   }
   size_t err=HM_SUCCESS;
   if(HM_SUCCESS!=s->transport->send(s->transport->user_data, (uint8_t*)&err, sizeof(uint32_t))){
     return HM_FAIL;
   }
-  return hm_param_pack_send(pack, s->transport);
+  if(pack){
+     return hm_param_pack_send(pack, s->transport);
+  }
+  return HM_SUCCESS;
 }
 
 
