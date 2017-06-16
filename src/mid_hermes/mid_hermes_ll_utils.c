@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Cossack Labs Limited
+ * Copyright (c) 2017 Cossack Labs Limited
  *
  * This file is part of Hermes.
  *
@@ -18,23 +18,17 @@
  *
  */
 
-#ifndef HERMES_ERRORS_H_
-#define HERMES_ERRORS_H_
+#include <hermes/mid_hermes/mid_hermes_ll_utils.h>
 
-#define HM_SUCCESS 0
-#define HM_ERROR 0x000f0000
-#define HM_FAIL (HM_ERROR|1)
-#define HM_INVALID_PARAMETER (HM_ERROR|2)
-#define HM_BUFFER_TOO_SMALL (HM_ERROR|3)
-#define HM_BAD_ALLOC (HM_ERROR|4)
-#define HM_NOT_IMPLEMENTED (HM_ERROR|0x8000)
+#include <assert.h>
 
-typedef uint32_t hermes_status_t;
+uint8_t* malloc_and_copy(const uint8_t* data, const size_t data_length){
+  if(!data || !data_length){
+    return NULL;
+  }
+  uint8_t* res=malloc(data_length);
+  assert(res);
+  memcpy(res, data, data_length);
+  return res;
+}
 
-#ifdef DEBUG
-#define DEBUGINFO(level, msg) {}while(false)
-#else
-#define DEBUGINFO(level, msg) {}while(false)
-#endif
-
-#endif /* HERMES_ERRORS_H_ */
