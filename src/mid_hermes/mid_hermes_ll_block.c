@@ -30,14 +30,56 @@ mid_hermes_ll_block_t* mid_hermes_ll_block_create_new(mid_hermes_ll_buffer_t* da
   HERMES_CHECK_IN_PARAM(data);
   HERMES_CHECK_IN_PARAM(meta);
   HERMES_CHECK_IN_PARAM(user);
-  
+  mid_hermes_ll_block_t* b=calloc(1, sizeof(mid_hermes_ll_block_t));
+  assert(b);
+  b->rtoken = mid_hermes_ll_token_generate(mid_hermes_ll_buffer_create(NULL, 0), user);
+  b->wtoken = mid_hermes_ll_token_generate(mid_hermes_ll_buffer_create(NULL, 0), user);
+  if(!(b->rtoken) || !(b->wtoken)){
+    mid_hermes_ll_block_destroy(&b);
+    return NULL;
+  }
+  mid_hermes_ll_buffer_t* wt=mid_hermes_ll_token_get_data(b->wtoken);
+  if(!wt){
+    mid_hermes_ll_block_destroy(&b);
+    return NULL;
+  }
+  b->mac=mid_hermes_ll_buffer_create(NULL, 0);
+  hermes_status_t res=hm_mac_create(wt->data, wt->data_length wt->length, data->data, data->length, meta->data, meta->length, &(b->mac->data), &(b->mac->length));
+  mid_hermes_ll_buffer_destroy(&wt);
+  if(HM_SUCCESS!=res){
+    mid_hermes_ll_block_destroy(&b);
+    return NULL;
+  }
+  mid_hermes_ll_buffer_t* rt=mid_hermes_ll_token_get_data(b->rtoken);
+  if(!rt){
+    mid_hermes_ll_block_destroy(&b);
+    return NULL;
+  }
+  b->block=mid_hermes_ll_buffer_create(NULL, 0);
+  res=hm_encrypt(rt->data, rt->length, data->data, data->length, meta->data, meta->length, &(b->block->data), &(b->block->length));\
+  mid_hermes_ll_buffer_destroy(&rt);
+  if(HM_SUCCESS!=res){
+    mid_hermes_ll_block_destroy(&b);
+    return NULL;
+  }
+  b->meta=meta;
+  b->data=data;
+  return b;
 }
 
 mid_hermes_ll_block_t* mid_hermes_ll_block_create_new_with_id(mid_hermes_ll_buffer_t* id;
                                                               mid_hermes_ll_buffer_t* data;
                                                               mid_hermes_ll_buffer_t* meta,
                                                               const mid_hermes_ll_user_t* user){
-
+  HERMES_CHECK_IN_PARAM(id);
+  HERMES_CHECK_IN_PARAM(data);
+  HERMES_CHECK_IN_PARAM(meta);
+  HERMES_CHECK_IN_PARAM(user);
+  mid_hermes_ll_block_t* b=mid_hermes_ll_block_create_new(data, meta, user);
+  if(!b){
+    return NULL;
+  }
+  return mid_hermes_ll_block_set_id(b, id);  
 }
 
 mid_hermes_ll_block_t* mid_hermes_ll_block_restore(mid_hermes_ll_buffer_t* id;
@@ -72,20 +114,54 @@ mid_hermes_ll_buffer_t* mid_hermes_ll_block_get_data(mid_hermes_ll_block_t* b){
     return NULL;
   }
   hermes_status_t res=hm_decrypt(rt->data, rt->length, b->block->data, b->block->length, b->meta->data, b->meta->length, &(bl->data), &(bl->length));
+  mid_hermes_ll_buffer_destroy(&rt);
   if(HM_SUCCESS!=res){
-    
+    mid_hermes_ll_buffer_destroy(&bl);
+    return NULL;
   }
-
+  return bl;
 }
 
-mid_hermes_ll_buffer_t* mid_hermes_ll_block_set_data(mid_hermes_ll_block_t* b, const mid_hermes_ll_buffer_t* data, const mid_hermes_ll_buffer_t* meta){
-
+mid_hermes_ll_block_t* mid_hermes_ll_block_set_data(mid_hermes_ll_block_t* b, mid_hermes_ll_buffer_t* data, mid_hermes_ll_buffer_t* meta){
+  HERMES_CHECK_IN_PARAM(b);
+  HERMES_CHECK_IN_PARAM(b->rtoken);
+  HERMES_CHECK_IN_PARAM(b->wtoken);
+  HERMES_CHECK_IN_PARAM(b->mac);
+  mid_hermes_ll_block_t* new_bl=mid_hermes_ll_block_create_new_with_id(b->id, data, meta, b->wtoken->user);
+  if(!new_bl){
+    return NULL;
+  }
+  b->id=NULL;
+  new_bl->old_mac=b->mac;
+  b->mac=NULL;
+  mid_hermes_ll_block_destroy(&b);
+  return new_bl;
 }
 
-mid_hermes_ll_buffer_t* mid_hermes_ll_block_set_id(mid_hermes_ll_block_t* b, const mid_hermes_ll_buffer_t* id){
-
+hermes_status_t mid_hermes_ll_block_set_id(mid_hermes_ll_block_t* b, mid_hermes_ll_buffer_t* id){
+  HERMES_CHECK_IN_PARAM(b);
+  HERMES_CHECK_IN_PARAM(id);
+  HERMES_CHECK_IN_PARAM(b->id);
+  HERMES_CHECK_IN_PARAM(b->rtoken);
+  HERMES_CHECK_IN_PARAM(b->wtoken);
+  b->rtocken->block_id=id;
+  b->wtocken->block_id=id;
+  b->id=id;
+  return HM_SUCCESS;
 }
 
 hermes_status_t mid_hermes_ll_block_destroy(mid_hermes_ll_block_t** b){
-
+  HERMES_CHECK_IN_PARAM(b);
+  HERMES_CHECK_IN_PARAM(*b);
+  mid_hermes_ll_buffer_destroy((*b)->id);
+  mid_hermes_ll_buffer_destroy((*b)->block);
+  mid_hermes_ll_buffer_destroy((*b)->data);
+  mid_hermes_ll_buffer_destroy((*b)->meta);
+  mid_hermes_ll_buffer_destroy((*b)->old_mac);
+  mid_hermes_ll_buffer_destroy((*b)->mac);
+  mid_hermes_ll_token_destroy((*b)->rtoken);
+  mid_hermes_ll_token_destroy((*b)->wtoken);
+  free(*b);
+  *b=NULL;
+  return HM_SUCCESS;
 }

@@ -31,6 +31,7 @@
 struct mid_hermes_ll_block_type{
   const mid_hermes_ll_buffer_t* id;
   const mid_hermes_ll_buffer_t* block;
+  const mid_hermes_ll_buffer_t* data;
   const mid_hermes_ll_buffer_t* meta;
   const mid_hermes_ll_buffer_t* old_mac;
   const mid_hermes_ll_buffer_t* mac;
@@ -55,8 +56,8 @@ mid_hermes_ll_block_t* mid_hermes_ll_block_restore(const mid_hermes_ll_buffer_t*
                                                    const mid_hermes_ll_token_t* wtoken);
 
 mid_hermes_ll_buffer_t* mid_hermes_ll_block_get_data(mid_hermes_ll_block_t* b);
-mid_hermes_ll_buffer_t* mid_hermes_ll_block_set_data(mid_hermes_ll_block_t* b, const mid_hermes_ll_buffer_t* data, const mid_hermes_ll_buffer_t* meta);
-mid_hermes_ll_buffer_t* mid_hermes_ll_block_set_id(mid_hermes_ll_block_t* b, const mid_hermes_ll_buffer_t* id);
+mid_hermes_ll_block_t* mid_hermes_ll_block_set_data(mid_hermes_ll_block_t* b, mid_hermes_ll_buffer_t* data, mid_hermes_ll_buffer_t* meta);
+hermes_status_t mid_hermes_ll_block_set_id(mid_hermes_ll_block_t* b, mid_hermes_ll_buffer_t* id);
 
 hermes_status_t mid_hermes_ll_block_destroy(mid_hermes_ll_block_t** b);
 
