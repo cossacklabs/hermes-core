@@ -18,26 +18,28 @@
  *
  */
 
+#include <hermes/common/errors.h>
 #include <hermes/mid_hermes/mid_hermes_ll_user.h>
 
 #include "utils.h"
+#include <assert.h>
 
-mid_hermes_ll_user_t* mid_hermes_ll_local_user_create(const mid_hermes_ll_buffer_t* id,
-                                                      const mid_hermes_ll_buffer_t* sk,
-                                                      const mid_hermes_ll_buffer_t* pk){
+mid_hermes_ll_user_t* mid_hermes_ll_local_user_create(mid_hermes_ll_buffer_t* id,
+                                                      mid_hermes_ll_buffer_t* sk,
+                                                      mid_hermes_ll_buffer_t* pk){
   HERMES_CHECK_IN_PARAM_RET_NULL(id);
   HERMES_CHECK_IN_PARAM_RET_NULL(!mid_hermes_ll_buffer_is_empty(id));
   HERMES_CHECK_IN_PARAM_RET_NULL(sk);
   HERMES_CHECK_IN_PARAM_RET_NULL(!mid_hermes_ll_buffer_is_empty(sk));
   HERMES_CHECK_IN_PARAM_RET_NULL(pk);
   HERMES_CHECK_IN_PARAM_RET_NULL(!mid_hermes_ll_buffer_is_empty(pk));
-  mid_hermes_ll_user_t* u=mid_hermes_ll_user_create(id, id_length, pk, pk_length);
+  mid_hermes_ll_user_t* u=mid_hermes_ll_user_create(id, pk);
   u->sk=sk;
   return u;
 }
 
-mid_hermes_ll_user_t* mid_hermes_ll_user_create(const mid_hermes_ll_buffer_t* id,
-                                                const mid_hermes_ll_buffer_t* pk){
+mid_hermes_ll_user_t* mid_hermes_ll_user_create(mid_hermes_ll_buffer_t* id,
+                                                mid_hermes_ll_buffer_t* pk){
   HERMES_CHECK_IN_PARAM_RET_NULL(id);
   HERMES_CHECK_IN_PARAM_RET_NULL(!mid_hermes_ll_buffer_is_empty(id));
   HERMES_CHECK_IN_PARAM_RET_NULL(pk);
@@ -52,9 +54,9 @@ mid_hermes_ll_user_t* mid_hermes_ll_user_create(const mid_hermes_ll_buffer_t* id
 hermes_status_t mid_hermes_ll_user_destroy(mid_hermes_ll_user_t** u){
   HERMES_CHECK_IN_PARAM(u);
   HERMES_CHECK_IN_PARAM(*u);
-  mid_hermes_ll_buffer_destroy((*u)->id);
-  mid_hermes_ll_buffer_destroy((*u)->sk);
-  mid_hermes_ll_buffer_destroy((*u)->pk);
+  mid_hermes_ll_buffer_destroy(&((*u)->id));
+  mid_hermes_ll_buffer_destroy(&((*u)->sk));
+  mid_hermes_ll_buffer_destroy(&((*u)->pk));
   free(*u);
   *u=NULL;
   return HM_SUCCESS;

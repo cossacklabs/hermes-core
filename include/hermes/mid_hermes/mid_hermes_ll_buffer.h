@@ -22,9 +22,11 @@
 #ifndef MID_HERMES_LL_BUFFER_H
 #define MID_HERMES_LL_BUFFER_H
 
-#include <hermes/common/utils.h>
+#include <hermes/common/errors.h>
 
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h> 
 
 typedef struct mid_hermes_ll_buffer_type{
   uint8_t* data;

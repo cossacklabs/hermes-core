@@ -21,6 +21,7 @@
 #include <hermes/mid_hermes/mid_hermes_ll_buffer.h>
 
 #include <assert.h>
+#include <string.h>
 
 mid_hermes_ll_buffer_t* mid_hermes_ll_buffer_create(const uint8_t* data, const size_t length){
   mid_hermes_ll_buffer_t *b=calloc(1, sizeof(mid_hermes_ll_buffer_t));
@@ -29,15 +30,15 @@ mid_hermes_ll_buffer_t* mid_hermes_ll_buffer_create(const uint8_t* data, const s
     return b;
   }
   b->data=malloc(length);
-  asser(b->data);
+  assert(b->data);
   memcpy(b->data, data, length);
   b->length=length;
   return b;
 }
 
 mid_hermes_ll_buffer_t* mid_hermes_ll_buffer_copy(mid_hermes_ll_buffer_t* src, mid_hermes_ll_buffer_t* dst){
-  HERMES_CHECK_IN_PARAM(src);
-  HERMES_CHECK_IN_PARAM(dst);
+  HERMES_CHECK_IN_PARAM_RET_NULL(src);
+  HERMES_CHECK_IN_PARAM_RET_NULL(dst);
   if(HM_SUCCESS!=mid_hermes_ll_buffer_reset(dst, src->data, src->length)){
     return NULL;
   }
@@ -45,7 +46,7 @@ mid_hermes_ll_buffer_t* mid_hermes_ll_buffer_copy(mid_hermes_ll_buffer_t* src, m
 }
 
 bool mid_hermes_ll_buffer_is_empty(mid_hermes_ll_buffer_t* b){
-  asssert(b);
+  assert(b);
   if(!(b->data) || !(b->length)){
     return true;
   }

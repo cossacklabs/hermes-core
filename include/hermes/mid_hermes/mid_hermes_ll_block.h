@@ -22,38 +22,40 @@
 #ifndef MID_HERMES_LL_BLOCK_H
 #define MID_HERMES_LL_BLOCK_H
 
-#include <hermes/mid_hermes_mid_hermes_ll.h>
+#include <hermes/mid_hermes/mid_hermes_ll.h>
 #include <hermes/mid_hermes/mid_hermes_ll_user.h>
 #include <hermes/mid_hermes/mid_hermes_ll_token.h>
 #include <hermes/mid_hermes/mid_hermes_ll_buffer.h>
 
 
 struct mid_hermes_ll_block_type{
-  const mid_hermes_ll_buffer_t* id;
-  const mid_hermes_ll_buffer_t* block;
-  const mid_hermes_ll_buffer_t* data;
-  const mid_hermes_ll_buffer_t* meta;
-  const mid_hermes_ll_buffer_t* old_mac;
-  const mid_hermes_ll_buffer_t* mac;
+  mid_hermes_ll_buffer_t* id;
+  mid_hermes_ll_buffer_t* block;
+  mid_hermes_ll_buffer_t* data;
+  mid_hermes_ll_buffer_t* meta;
+  mid_hermes_ll_buffer_t* old_mac;
+  mid_hermes_ll_buffer_t* mac;
   mid_hermes_ll_token_t* rtoken;
   mid_hermes_ll_token_t* wtoken;
 };
 
-mid_hermes_ll_block_t* mid_hermes_ll_block_create_new(const mid_hermes_ll_buffer_t* block;
-                                                      const mid_hermes_ll_buffer_t* meta,
+typedef struct mid_hermes_ll_block_type mid_hermes_ll_block_t;
+
+mid_hermes_ll_block_t* mid_hermes_ll_block_create_new(mid_hermes_ll_buffer_t* block,
+                                                      mid_hermes_ll_buffer_t* meta,
                                                       const mid_hermes_ll_user_t* user);
 
-mid_hermes_ll_block_t* mid_hermes_ll_block_create_new_with_id(const mid_hermes_ll_buffer_t* id;
-                                                              const mid_hermes_ll_buffer_t* block;
-                                                              const mid_hermes_ll_buffer_t* meta,
+mid_hermes_ll_block_t* mid_hermes_ll_block_create_new_with_id(mid_hermes_ll_buffer_t* id,
+                                                              mid_hermes_ll_buffer_t* block,
+                                                              mid_hermes_ll_buffer_t* meta,
                                                               const mid_hermes_ll_user_t* user);
 
-mid_hermes_ll_block_t* mid_hermes_ll_block_restore(const mid_hermes_ll_buffer_t* id;
-                                                   const mid_hermes_ll_buffer_t* block;
-                                                   const mid_hermes_ll_buffer_t* meta,
+mid_hermes_ll_block_t* mid_hermes_ll_block_restore(mid_hermes_ll_buffer_t* id,
+                                                   mid_hermes_ll_buffer_t* block,
+                                                   mid_hermes_ll_buffer_t* meta,
                                                    const mid_hermes_ll_user_t* user,
-                                                   const mid_hermes_ll_token_t* rtoken,
-                                                   const mid_hermes_ll_token_t* wtoken);
+                                                   mid_hermes_ll_token_t* rtoken,
+                                                   mid_hermes_ll_token_t* wtoken);
 
 mid_hermes_ll_buffer_t* mid_hermes_ll_block_get_data(mid_hermes_ll_block_t* b);
 mid_hermes_ll_block_t* mid_hermes_ll_block_set_data(mid_hermes_ll_block_t* b, mid_hermes_ll_buffer_t* data, mid_hermes_ll_buffer_t* meta);

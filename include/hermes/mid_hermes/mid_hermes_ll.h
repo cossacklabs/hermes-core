@@ -22,30 +22,23 @@
 #ifndef MID_HERMES_MID_HERMES_LL_H
 #define MID_HERMES_MID_HERMES_LL_H
 
+
+#include <hermes/common/errors.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-typedef uint32_t hermes_status_t
+#include <hermes/mid_hermes/mid_hermes_ll_block.h>
+
 typedef struct mid_hermes_ll_type mid_hermes_ll_t;
 typedef struct mid_hermes_ll_token_type mid_hermes_ll_token_t;
 
 
-mid_hermes_ll_t* mid_mermes_ll_create(const uint8_t* id, const size_t id_length, const uint8_t* sk, const size_t sk);
+mid_hermes_ll_t* mid_mermes_ll_create(const uint8_t* id, const size_t id_length, const uint8_t* sk, const size_t sk_length);
 hermes_status_t mid_hermes_ll_destroy(mid_hermes_ll_t** ctx);
 
 hermes_status_t mid_hermes_ll_create_block(mid_hermes_ll_t* ctx,
                                            const mid_hermes_ll_block_t* block,
                                            uint8_t** encrypted_block,
                                            size_t* encrypted_block_length);
-
-hermes_status_t mid_hermes_ll_mac(mid_hermes_ll_t* ctx,
-                                  const uint8_t* block,
-                                  const size_t block_length,
-                                  const uint8_t* wtoken,
-                                  const size_t wtoken_length,
-                                  const uint8_t* wtoken_creator_pk,
-                                  const size_t wtoken_creator_pk_length,
-                                  uint8_t** mac, size_t mac);
-
 
 #endif //MID_HERMES_MID_HERMES_LL_H

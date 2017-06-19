@@ -21,15 +21,17 @@
 #include <hermes/mid_hermes/mid_hermes_ll.h>
 #include <hermes/mid_hermes/mid_hermes_ll_block.h>
 
+#include <hermes/common/errors.h>
+
 #include "utils.h"
 #include <assert.h>
 
-mid_hermes_ll_block_t* mid_hermes_ll_block_create_new(mid_hermes_ll_buffer_t* data;
+mid_hermes_ll_block_t* mid_hermes_ll_block_create_new(mid_hermes_ll_buffer_t* data,
                                                       mid_hermes_ll_buffer_t* meta,
                                                       const mid_hermes_ll_user_t* user){
-  HERMES_CHECK_IN_PARAM(data);
-  HERMES_CHECK_IN_PARAM(meta);
-  HERMES_CHECK_IN_PARAM(user);
+  HERMES_CHECK_IN_PARAM_RET_NULL(data);
+  HERMES_CHECK_IN_PARAM_RET_NULL(meta);
+  HERMES_CHECK_IN_PARAM_RET_NULL(user);
   mid_hermes_ll_block_t* b=calloc(1, sizeof(mid_hermes_ll_block_t));
   assert(b);
   b->rtoken = mid_hermes_ll_token_generate(mid_hermes_ll_buffer_create(NULL, 0), user);
@@ -44,7 +46,7 @@ mid_hermes_ll_block_t* mid_hermes_ll_block_create_new(mid_hermes_ll_buffer_t* da
     return NULL;
   }
   b->mac=mid_hermes_ll_buffer_create(NULL, 0);
-  hermes_status_t res=hm_mac_create(wt->data, wt->data_length wt->length, data->data, data->length, meta->data, meta->length, &(b->mac->data), &(b->mac->length));
+  hermes_status_t res=hm_mac_create(wt->data, wt->length, data->data, data->length, meta->data, meta->length, &(b->mac->data), &(b->mac->length));
   mid_hermes_ll_buffer_destroy(&wt);
   if(HM_SUCCESS!=res){
     mid_hermes_ll_block_destroy(&b);
@@ -67,30 +69,36 @@ mid_hermes_ll_block_t* mid_hermes_ll_block_create_new(mid_hermes_ll_buffer_t* da
   return b;
 }
 
-mid_hermes_ll_block_t* mid_hermes_ll_block_create_new_with_id(mid_hermes_ll_buffer_t* id;
-                                                              mid_hermes_ll_buffer_t* data;
+mid_hermes_ll_block_t* mid_hermes_ll_block_create_new_with_id(mid_hermes_ll_buffer_t* id,
+                                                              mid_hermes_ll_buffer_t* data,
                                                               mid_hermes_ll_buffer_t* meta,
                                                               const mid_hermes_ll_user_t* user){
-  HERMES_CHECK_IN_PARAM(id);
-  HERMES_CHECK_IN_PARAM(data);
-  HERMES_CHECK_IN_PARAM(meta);
-  HERMES_CHECK_IN_PARAM(user);
+  HERMES_CHECK_IN_PARAM_RET_NULL(id);
+  HERMES_CHECK_IN_PARAM_RET_NULL(data);
+  HERMES_CHECK_IN_PARAM_RET_NULL(meta);
+  HERMES_CHECK_IN_PARAM_RET_NULL(user);
   mid_hermes_ll_block_t* b=mid_hermes_ll_block_create_new(data, meta, user);
   if(!b){
     return NULL;
   }
-  return mid_hermes_ll_block_set_id(b, id);  
+  hermes_status_t res=mid_hermes_ll_block_set_id(b, id);
+  if(HM_SUCCESS!=res){
+    mid_hermes_ll_block_destroy(&b);
+    return NULL;
+  }
+  return b;
 }
 
-mid_hermes_ll_block_t* mid_hermes_ll_block_restore(mid_hermes_ll_buffer_t* id;
-                                                   mid_hermes_ll_buffer_t* block;
+mid_hermes_ll_block_t* mid_hermes_ll_block_restore(mid_hermes_ll_buffer_t* id,
+                                                   mid_hermes_ll_buffer_t* block,
                                                    mid_hermes_ll_buffer_t* meta,
+                                                   const mid_hermes_ll_user_t* user,
                                                    mid_hermes_ll_token_t* rtoken,
                                                    mid_hermes_ll_token_t* wtoken){
-  HERMES_CHECK_IN_PARAM(id);
-  HERMES_CHECK_IN_PARAM(block);
-  HERMES_CHECK_IN_PARAM(meta);
-  HERMES_CHECK_IN_PARAM(rtoren);
+  HERMES_CHECK_IN_PARAM_RET_NULL(id);
+  HERMES_CHECK_IN_PARAM_RET_NULL(block);
+  HERMES_CHECK_IN_PARAM_RET_NULL(meta);
+  HERMES_CHECK_IN_PARAM_RET_NULL(rtoken);
   mid_hermes_ll_block_t* b=calloc(1, sizeof(mid_hermes_ll_block_t));
   assert(b);
   b->id=id;
@@ -98,10 +106,11 @@ mid_hermes_ll_block_t* mid_hermes_ll_block_restore(mid_hermes_ll_buffer_t* id;
   b->meta=meta;
   b->rtoken=rtoken;
   b->wtoken=wtoken;
+  return b;
 }
 
 mid_hermes_ll_buffer_t* mid_hermes_ll_block_get_data(mid_hermes_ll_block_t* b){
-  HERMES_CHECK_IN_PARAM(b);
+  HERMES_CHECK_IN_PARAM_RET_NULL(b);
   if(!(b->rtoken)){
     return NULL;
   }
@@ -123,10 +132,10 @@ mid_hermes_ll_buffer_t* mid_hermes_ll_block_get_data(mid_hermes_ll_block_t* b){
 }
 
 mid_hermes_ll_block_t* mid_hermes_ll_block_set_data(mid_hermes_ll_block_t* b, mid_hermes_ll_buffer_t* data, mid_hermes_ll_buffer_t* meta){
-  HERMES_CHECK_IN_PARAM(b);
-  HERMES_CHECK_IN_PARAM(b->rtoken);
-  HERMES_CHECK_IN_PARAM(b->wtoken);
-  HERMES_CHECK_IN_PARAM(b->mac);
+  HERMES_CHECK_IN_PARAM_RET_NULL(b);
+  HERMES_CHECK_IN_PARAM_RET_NULL(b->rtoken);
+  HERMES_CHECK_IN_PARAM_RET_NULL(b->wtoken);
+  HERMES_CHECK_IN_PARAM_RET_NULL(b->mac);
   mid_hermes_ll_block_t* new_bl=mid_hermes_ll_block_create_new_with_id(b->id, data, meta, b->wtoken->user);
   if(!new_bl){
     return NULL;
@@ -144,8 +153,8 @@ hermes_status_t mid_hermes_ll_block_set_id(mid_hermes_ll_block_t* b, mid_hermes_
   HERMES_CHECK_IN_PARAM(b->id);
   HERMES_CHECK_IN_PARAM(b->rtoken);
   HERMES_CHECK_IN_PARAM(b->wtoken);
-  b->rtocken->block_id=id;
-  b->wtocken->block_id=id;
+  b->rtoken->block_id=id;
+  b->wtoken->block_id=id;
   b->id=id;
   return HM_SUCCESS;
 }
@@ -153,14 +162,14 @@ hermes_status_t mid_hermes_ll_block_set_id(mid_hermes_ll_block_t* b, mid_hermes_
 hermes_status_t mid_hermes_ll_block_destroy(mid_hermes_ll_block_t** b){
   HERMES_CHECK_IN_PARAM(b);
   HERMES_CHECK_IN_PARAM(*b);
-  mid_hermes_ll_buffer_destroy((*b)->id);
-  mid_hermes_ll_buffer_destroy((*b)->block);
-  mid_hermes_ll_buffer_destroy((*b)->data);
-  mid_hermes_ll_buffer_destroy((*b)->meta);
-  mid_hermes_ll_buffer_destroy((*b)->old_mac);
-  mid_hermes_ll_buffer_destroy((*b)->mac);
-  mid_hermes_ll_token_destroy((*b)->rtoken);
-  mid_hermes_ll_token_destroy((*b)->wtoken);
+  mid_hermes_ll_buffer_destroy(&((*b)->id));
+  mid_hermes_ll_buffer_destroy(&((*b)->block));
+  mid_hermes_ll_buffer_destroy(&((*b)->data));
+  mid_hermes_ll_buffer_destroy(&((*b)->meta));
+  mid_hermes_ll_buffer_destroy(&((*b)->old_mac));
+  mid_hermes_ll_buffer_destroy(&((*b)->mac));
+  mid_hermes_ll_token_destroy(&((*b)->rtoken));
+  mid_hermes_ll_token_destroy(&((*b)->wtoken));
   free(*b);
   *b=NULL;
   return HM_SUCCESS;

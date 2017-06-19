@@ -37,7 +37,7 @@ typedef struct mid_hermes_ll_token_type{
 mid_hermes_ll_token_t* mid_hermes_ll_token_create(const mid_hermes_ll_buffer_t* id,
                                                   const mid_hermes_ll_user_t* user,
                                                   const mid_hermes_ll_user_t* owner,
-                                                  mid_hermes_ll_buffer_t token);
+                                                  mid_hermes_ll_buffer_t* token);
 
 mid_hermes_ll_token_t* mid_hermes_ll_token_generate(const mid_hermes_ll_buffer_t* id,
                                                     const mid_hermes_ll_user_t* user_and_owner);

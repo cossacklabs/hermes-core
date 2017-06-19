@@ -21,13 +21,15 @@
 #ifndef HERMES_ERRORS_H_
 #define HERMES_ERRORS_H_
 
+#include <stdint.h>
+
 #define HM_SUCCESS 0
-#define HM_ERROR 0x000f0000
-#define HM_FAIL (HM_ERROR|1)
-#define HM_INVALID_PARAMETER (HM_ERROR|2)
-#define HM_BUFFER_TOO_SMALL (HM_ERROR|3)
-#define HM_BAD_ALLOC (HM_ERROR|4)
-#define HM_NOT_IMPLEMENTED (HM_ERROR|0x8000)
+#define HM_ERR 0x000f0000
+#define HM_FAIL (HM_ERR|1)
+#define HM_INVALID_PARAMETER (HM_ERR|2)
+#define HM_BUFFER_TOO_SMALL (HM_ERR|3)
+#define HM_BAD_ALLOC (HM_ERR|4)
+#define HM_NOT_IMPLEMENTED (HM_ERR|0x8000)
 
 typedef uint32_t hermes_status_t;
 
@@ -36,5 +38,19 @@ typedef uint32_t hermes_status_t;
 #else
 #define DEBUGINFO(level, msg) {}while(false)
 #endif
+
+#define HERMES_CHECK_IN_PARAM_RET_NULL(p) \
+  do{                                     \
+    if(!p){                               \
+      return NULL;                        \
+    }                                     \
+  }while(0)
+
+#define HERMES_CHECK_IN_PARAM(p)       \
+  do{                                           \
+    if(!p){                                     \
+      return HM_INVALID_PARAMETER;              \
+    }                                           \
+  }while(0)
 
 #endif /* HERMES_ERRORS_H_ */
