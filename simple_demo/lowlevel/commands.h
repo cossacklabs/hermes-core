@@ -19,21 +19,12 @@
  */
 
 
-#ifndef MID_HERMES_MID_HERMES_LL_H
-#define MID_HERMES_MID_HERMES_LL_H
+#ifndef COMMANDS_H
+#define COMMANDS_H
+
+int add_block(const char* user_id, const char* user_sk, const char* block_file_name, const char* block_meta_data);
+int get_block(const char* user_id, const char* user_sk, const char* block_file_name);
 
 
-#include <hermes/common/errors.h>
-#include <stdint.h>
-#include <stdlib.h>
 
-
-typedef struct mid_hermes_ll_type mid_hermes_ll_t;
-typedef struct mid_hermes_ll_token_type mid_hermes_ll_token_t;
-
-
-mid_hermes_ll_t* mid_mermes_ll_create(const uint8_t* id, const size_t id_length, const uint8_t* sk, const size_t sk_length);
-hermes_status_t mid_hermes_ll_destroy(mid_hermes_ll_t** ctx);
-
-
-#endif //MID_HERMES_MID_HERMES_LL_H
+#endif //COMMANDS_H

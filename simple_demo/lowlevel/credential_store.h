@@ -19,21 +19,20 @@
  */
 
 
-#ifndef MID_HERMES_MID_HERMES_LL_H
-#define MID_HERMES_MID_HERMES_LL_H
+#ifndef CREDENTIAL_STORE_H
+#define CREDENTIAL_STORE_H
 
-
-#include <hermes/common/errors.h>
 #include <stdint.h>
 #include <stdlib.h>
 
 
-typedef struct mid_hermes_ll_type mid_hermes_ll_t;
-typedef struct mid_hermes_ll_token_type mid_hermes_ll_token_t;
+typedef struct credential_store_type credential_store_t;
 
+credential_store_t* credential_store_create();
 
-mid_hermes_ll_t* mid_mermes_ll_create(const uint8_t* id, const size_t id_length, const uint8_t* sk, const size_t sk_length);
-hermes_status_t mid_hermes_ll_destroy(mid_hermes_ll_t** ctx);
+uint32_t credential_store_get_public_key(credential_store_t* cs, const uint8_t* user_id, const size_t user_id_length, uint8_t** pub_key, size_t* pub_key_length);
 
+uint32_t credential_store_destroy(credential_store_t** cs);
 
-#endif //MID_HERMES_MID_HERMES_LL_H
+#endif //CREDENTIAL_STORE_H
+

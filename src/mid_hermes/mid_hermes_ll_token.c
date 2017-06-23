@@ -59,7 +59,7 @@ mid_hermes_ll_token_t* mid_hermes_ll_token_generate(const mid_hermes_ll_buffer_t
   return mid_hermes_ll_token_create(id, user_and_owner, user_and_owner, enc_token);
 }
 
-mid_hermes_ll_buffer_t* mid_hermes_ll_token_get_token(mid_hermes_ll_token_t* t){
+mid_hermes_ll_buffer_t* mid_hermes_ll_token_get_data(mid_hermes_ll_token_t* t){
   HERMES_CHECK_IN_PARAM_RET_NULL(t);
   mid_hermes_ll_buffer_t* b = mid_hermes_ll_buffer_create(NULL,0);
   if(HM_SUCCESS!=hm_asym_decrypt(t->user->sk->data, t->user->sk->length, t->owner->pk->data, t->owner->pk->length, t->token->data, t->token->length, &(b->data),&(b->length))){
@@ -73,7 +73,7 @@ mid_hermes_ll_token_t* mid_hermes_ll_token_get_token_for_user(mid_hermes_ll_toke
                                                               const mid_hermes_ll_user_t* for_user){
   HERMES_CHECK_IN_PARAM_RET_NULL(t);
   HERMES_CHECK_IN_PARAM_RET_NULL(for_user);
-  mid_hermes_ll_buffer_t* b=mid_hermes_ll_token_get_token(t);
+  mid_hermes_ll_buffer_t* b=mid_hermes_ll_token_get_data(t);
   if(!b){
     return NULL;
   }

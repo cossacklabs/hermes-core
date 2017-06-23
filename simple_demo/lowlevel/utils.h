@@ -19,21 +19,34 @@
  */
 
 
-#ifndef MID_HERMES_MID_HERMES_LL_H
-#define MID_HERMES_MID_HERMES_LL_H
+#ifndef UTILS_H
+#define UTILS_H
 
-
-#include <hermes/common/errors.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdbool.h>
+
+char* buf_to_string(const uint8_t* buf, const size_t buf_length, char* string);
+size_t string_to_buf(const char* string, uint8_t* buf);
+
+char* build_path(char* to, ...);
+
+#define BUILD_PATH(to, ...) build_path(to, __VA_ARGS__, NULL)
+
+char* build_typed_path(char* to, ...);
+
+#define C(a) 'c', a
+#define E(b, bl) 'e', b, bl
+
+#define BUILD_TYPED_PATH(to, ...) build_typed_path(to, __VA_ARGS__, 'f', NULL)
+
+int remove_directory(const char *path);
+int create_directory(const char *path);
+bool check_file_exist(const char* file_name);
 
 
-typedef struct mid_hermes_ll_type mid_hermes_ll_t;
-typedef struct mid_hermes_ll_token_type mid_hermes_ll_token_t;
+uint32_t read_whole_file(const char* filename, uint8_t** buf, size_t* buf_length);
+uint32_t write_whole_file(const char* filename, const uint8_t* buf, const size_t buf_length);
 
 
-mid_hermes_ll_t* mid_mermes_ll_create(const uint8_t* id, const size_t id_length, const uint8_t* sk, const size_t sk_length);
-hermes_status_t mid_hermes_ll_destroy(mid_hermes_ll_t** ctx);
-
-
-#endif //MID_HERMES_MID_HERMES_LL_H
+#endif //UTILS_H
