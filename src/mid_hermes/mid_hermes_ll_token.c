@@ -26,25 +26,20 @@
 
 #include <assert.h>
 
-mid_hermes_ll_token_t* mid_hermes_ll_token_create(const mid_hermes_ll_buffer_t* block_id,
-                                                  const mid_hermes_ll_user_t* user,
+mid_hermes_ll_token_t* mid_hermes_ll_token_create(const mid_hermes_ll_user_t* user,
                                                   const mid_hermes_ll_user_t* owner,
                                                   mid_hermes_ll_buffer_t* token){
-  HERMES_CHECK_IN_PARAM_RET_NULL(block_id);
   HERMES_CHECK_IN_PARAM_RET_NULL(user);
   HERMES_CHECK_IN_PARAM_RET_NULL(token);
   mid_hermes_ll_token_t* t = calloc(1, sizeof(mid_hermes_ll_token_t));
   assert(t);
-  t->block_id=block_id;
   t->user=user;
   t->owner=owner;
   t->token=token;
   return t;
 }
 
-mid_hermes_ll_token_t* mid_hermes_ll_token_generate(const mid_hermes_ll_buffer_t* id,
-                                                    const mid_hermes_ll_user_t* user_and_owner){
-  HERMES_CHECK_IN_PARAM_RET_NULL(id);
+mid_hermes_ll_token_t* mid_hermes_ll_token_generate(const mid_hermes_ll_user_t* user_and_owner){
   HERMES_CHECK_IN_PARAM_RET_NULL(user_and_owner);
   uint8_t token[HM_TOKEN_LEN];
   if(SOTER_SUCCESS!=soter_rand(token, HM_TOKEN_LEN)){
@@ -56,7 +51,7 @@ mid_hermes_ll_token_t* mid_hermes_ll_token_generate(const mid_hermes_ll_buffer_t
   if(HM_SUCCESS!=res){
     return NULL;
   }
-  return mid_hermes_ll_token_create(id, user_and_owner, user_and_owner, enc_token);
+  return mid_hermes_ll_token_create(user_and_owner, user_and_owner, enc_token);
 }
 
 mid_hermes_ll_buffer_t* mid_hermes_ll_token_get_data(mid_hermes_ll_token_t* t){
@@ -85,13 +80,13 @@ mid_hermes_ll_token_t* mid_hermes_ll_token_get_token_for_user(mid_hermes_ll_toke
     return NULL;
   }
   mid_hermes_ll_buffer_destroy(&b);
-  return mid_hermes_ll_token_create(t->block_id, for_user, t->user, eb);
+  return mid_hermes_ll_token_create(for_user, t->user, eb);
 }
 
 hermes_status_t mid_hermes_ll_token_destroy(mid_hermes_ll_token_t** t){
   HERMES_CHECK_IN_PARAM(t);
   HERMES_CHECK_IN_PARAM(*t);
-  free((*t)->token);
+  mid_hermes_ll_buffer_destroy(&((*t)->token));
   free(*t);
   *t=NULL;
   return HM_SUCCESS;

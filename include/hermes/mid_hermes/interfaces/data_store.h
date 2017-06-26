@@ -19,17 +19,19 @@
  */
 
 
-#ifndef DATA_STORE_H
-#define DATA_STORE_H
+#ifndef HERMES_DATA_STORE_H
+#define HERMES_DATA_STORE_H
+
+#include <hermes/common/errors.h>
 
 #include <stdlib.h>
 #include <stdint.h>
 
-typedef struct data_store_type data_store_t;
+typedef struct hermes_data_store_type hermes_data_store_t;
 
-data_store_t* data_store_create();
+hermes_data_store_t* hermes_data_store_create();
 
-uint8_t data_store_set_block(data_store_t* ds,
+hermes_status_t hermes_data_store_set_block(hermes_data_store_t* ds,
                              uint8_t** id,
                              size_t* id_length,
                              const uint8_t* data,
@@ -41,7 +43,7 @@ uint8_t data_store_set_block(data_store_t* ds,
                              const uint8_t* old_mac,
                              const size_t old_mac_length);
 
-uint8_t data_store_get_block(data_store_t* ds,
+hermes_status_t hermes_data_store_get_block(hermes_data_store_t* ds,
                              const uint8_t* id,
                              const size_t id_length,
                              uint8_t** data,
@@ -49,12 +51,12 @@ uint8_t data_store_get_block(data_store_t* ds,
                              uint8_t** meta,
                              size_t* meta_length);
 
-uint8_t data_store_rem_block(data_store_t* ds,
+hermes_status_t hermes_data_store_rem_block(hermes_data_store_t* ds,
                              const uint8_t* id,
                              const size_t id_length,
                              const uint8_t* old_mac,
                              const size_t old_mac_length);
 
-uint32_t data_store_destroy(data_store_t** ds);
+hermes_status_t hermes_data_store_destroy(hermes_data_store_t** ds);
 
-#endif //DATA_STORE_H
+#endif //HERMES_DATA_STORE_H

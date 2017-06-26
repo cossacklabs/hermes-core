@@ -82,15 +82,13 @@ int remove_directory(const char *path)
 
 int create_directory(const char *path){
   int retval;
-  while (0 != (retval = mkdir(path,0777))){
-      char subpath[FILENAME_MAX] = "", *delim;
-      if (NULL == (delim = strrchr(path, '/'))){
-        return retval;
-      }
-      strncat(subpath, path, delim - path);
-      create_directory(subpath);
-    }
-  return retval;
+  char subpath[FILENAME_MAX] = "", *delim;
+  if (NULL != (delim = strrchr(path, '/'))){
+    strncat(subpath, path, delim - path);
+    create_directory(subpath);    
+  }
+  mkdir(path,0777);
+  return 0;
 }
 
 
@@ -133,6 +131,7 @@ char* build_path(char* to, ...){
 }
 
 char* build_typed_path(char* to, ...){
+  sprintf(to, ".");
   va_list valist;
   va_start(valist, to);
   char b64encoded[2048];

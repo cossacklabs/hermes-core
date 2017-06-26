@@ -25,11 +25,11 @@
 #include <hermes/common/errors.h>
 #include <hermes/mid_hermes/mid_hermes_ll_buffer.h>
 
-
 typedef struct mid_hermes_ll_user_type{
   mid_hermes_ll_buffer_t* id;
   mid_hermes_ll_buffer_t* sk;
   mid_hermes_ll_buffer_t* pk;
+  uint32_t count;
 } mid_hermes_ll_user_t;
 
 mid_hermes_ll_user_t* mid_hermes_ll_local_user_create(mid_hermes_ll_buffer_t* id,
@@ -39,6 +39,9 @@ mid_hermes_ll_user_t* mid_hermes_ll_local_user_create(mid_hermes_ll_buffer_t* id
 mid_hermes_ll_user_t* mid_hermes_ll_user_create(mid_hermes_ll_buffer_t* id,
                                                 mid_hermes_ll_buffer_t* pk);
 
+mid_hermes_ll_user_t* mid_hermes_ll_user_get(mid_hermes_ll_user_t* u);
+
+hermes_status_t mid_hermes_ll_user_forse_destroy(mid_hermes_ll_user_t** u);
 hermes_status_t mid_hermes_ll_user_destroy(mid_hermes_ll_user_t** u);
 
 

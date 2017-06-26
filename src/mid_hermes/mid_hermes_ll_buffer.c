@@ -26,12 +26,14 @@
 mid_hermes_ll_buffer_t* mid_hermes_ll_buffer_create(const uint8_t* data, const size_t length){
   mid_hermes_ll_buffer_t *b=calloc(1, sizeof(mid_hermes_ll_buffer_t));
   assert(b);
-  if(data==NULL){
+  if(!data && !length){
     return b;
   }
   b->data=malloc(length);
   assert(b->data);
-  memcpy(b->data, data, length);
+  if(data){
+    memcpy(b->data, data, length);
+  }
   b->length=length;
   return b;
 }

@@ -19,22 +19,21 @@
  */
 
 
-#ifndef FILE_KEY_STORE_H
-#define FILE_KEY_STORE_H
+#ifndef HERMES_KEY_STORE_H
+#define HERMES_KEY_STORE_H
+
+#include <hermes/common/errors.h>
 
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
 
-#define KS_SUCCESS 0
-#define KS_FAIL 1
+typedef struct hermes_key_store_type hermes_key_store_t;
 
-typedef struct key_store_type key_store_t;
+hermes_key_store_t* hermes_key_store_create();
 
-key_store_t* key_store_create();
-
-uint32_t key_store_get_rtoken(key_store_t* ks,
+hermes_status_t hermes_key_store_get_rtoken(hermes_key_store_t* ks,
                               const uint8_t* user_id,
                               const size_t user_id_length,
                               const uint8_t* block_id,
@@ -44,7 +43,7 @@ uint32_t key_store_get_rtoken(key_store_t* ks,
                               uint8_t** owner_id,
                               size_t* owner_id_length);
 
-uint32_t key_store_get_wtoken(key_store_t* ks,
+hermes_status_t hermes_key_store_get_wtoken(hermes_key_store_t* ks,
                               const uint8_t* user_id,
                               const size_t user_id_length,
                               const uint8_t* block_id,
@@ -54,7 +53,7 @@ uint32_t key_store_get_wtoken(key_store_t* ks,
                               uint8_t** owner_id,
                               size_t* owner_id_length);
 
-uint32_t key_store_set_rtoken(key_store_t* ks,
+hermes_status_t hermes_key_store_set_rtoken(hermes_key_store_t* ks,
                               const uint8_t* user_id,
                               const size_t user_id_length,
                               const uint8_t* block_id,
@@ -64,7 +63,7 @@ uint32_t key_store_set_rtoken(key_store_t* ks,
                               const uint8_t* owner_id,
                               const size_t owner_id_length);
 
-uint32_t key_store_set_wtoken(key_store_t* ks,
+hermes_status_t hermes_key_store_set_wtoken(hermes_key_store_t* ks,
                               const uint8_t* user_id,
                               const size_t user_id_length,
                               const uint8_t* block_id,
@@ -74,21 +73,26 @@ uint32_t key_store_set_wtoken(key_store_t* ks,
                               const uint8_t* owner_id,
                               const size_t owner_id_length);
 
-uint32_t key_store_destroy(key_store_t** ks);
+hermes_status_t hermes_key_store_destroy(hermes_key_store_t** ks);
 
-typedef struct key_store_iterator_type key_store_iterator_t;
+typedef struct hermes_key_store_iterator_type hermes_key_store_iterator_t;
 
-key_store_iterator_t* key_store_iterator_create(key_store_t* ks, const uint8_t* block_id, const size_t block_id_length);
+hermes_key_store_iterator_t* hermes_key_store_iterator_create(hermes_key_store_t* ks, const uint8_t* block_id, const size_t block_id_length);
 
-uint32_t key_store_iterator_next(key_store_iterator_t* i);
+hermes_status_t hermes_key_store_iterator_next(hermes_key_store_iterator_t* i);
 
-uint8_t* key_store_iterator_get_user_id(key_store_iterator_t* i);
-size_t key_store_iterator_get_user_id_length(key_store_iterator_t* i);
-uint8_t* key_store_iterator_get_token(key_store_iterator_t* i);
-size_t key_store_iterator_get_token_length(key_store_iterator_t* i);
-bool key_store_iterator_get_token_type(key_store_iterator_t* i);
+uint8_t* hermes_key_store_iterator_get_user_id(hermes_key_store_iterator_t* i);
+size_t hermes_key_store_iterator_get_user_id_length(hermes_key_store_iterator_t* i);
+uint8_t* hermes_key_store_iterator_get_rtoken(hermes_key_store_iterator_t* i);
+size_t hermes_key_store_iterator_get_rtoken_length(hermes_key_store_iterator_t* i);
+uint8_t* hermes_key_store_iterator_get_rtoken_owner(hermes_key_store_iterator_t* i);
+size_t hermes_key_store_iterator_get_rtoken_owner_length(hermes_key_store_iterator_t* i);
+uint8_t* hermes_key_store_iterator_get_wtoken(hermes_key_store_iterator_t* i);
+size_t hermes_key_store_iterator_get_wtoken_length(hermes_key_store_iterator_t* i);
+uint8_t* hermes_key_store_iterator_get_wtoken_owner(hermes_key_store_iterator_t* i);
+size_t hermes_key_store_iterator_get_wtoken_owner_length(hermes_key_store_iterator_t* i);
 
-uint32_t key_store_iterator_destroy(key_store_iterator_t** i);
+hermes_status_t hermes_key_store_iterator_destroy(hermes_key_store_iterator_t** i);
 
 
-#endif //FILE_KEY_STORE_H
+#endif //HERMES_KEY_STORE_H

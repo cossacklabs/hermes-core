@@ -28,6 +28,11 @@
 #include <hermes/mid_hermes/mid_hermes_ll_buffer.h>
 #include <hermes/mid_hermes/mid_hermes_ll_rights_list.h>
 
+#include <hermes/mid_hermes/interfaces/key_store.h>
+#include <hermes/mid_hermes/interfaces/credential_store.h>
+#include <hermes/mid_hermes/interfaces/data_store.h>
+
+typedef struct mid_hermes_ll_block_type mid_hermes_ll_block_t;
 
 struct mid_hermes_ll_block_type{
   const mid_hermes_ll_user_t* user;
@@ -37,35 +42,52 @@ struct mid_hermes_ll_block_type{
   mid_hermes_ll_buffer_t* meta;
   mid_hermes_ll_buffer_t* old_mac;
   mid_hermes_ll_buffer_t* mac;
-  mid_hermes_ll_rights_list_t* rights;
+  mid_hermes_ll_token_t* rtoken;
+  mid_hermes_ll_token_t* wtoken;
+
+  mid_hermes_ll_block_t*(*init_empty)(mid_hermes_ll_block_t* bl,
+                                      const mid_hermes_ll_user_t* user);
+  
+  mid_hermes_ll_block_t*(*init)(mid_hermes_ll_block_t* bl,
+                                const mid_hermes_ll_user_t* user,
+                                mid_hermes_ll_buffer_t* id,
+                                mid_hermes_ll_buffer_t* block,
+                                mid_hermes_ll_buffer_t* meta,
+                                mid_hermes_ll_token_t* rtoken,
+                                mid_hermes_ll_token_t* wtoken);
+
+  mid_hermes_ll_block_t*(*update)(mid_hermes_ll_block_t* bl,
+                                  mid_hermes_ll_buffer_t* block,
+                                  mid_hermes_ll_buffer_t* meta);
+  
+  mid_hermes_ll_block_t*(*rotate)(mid_hermes_ll_block_t* bl,
+                                  mid_hermes_ll_rights_list_t* rights);
+
+  //store dependent functions
+  mid_hermes_ll_rights_list_t*(*access_rights)(mid_hermes_ll_block_t* bl,
+                                               hermes_key_store_t* ks,
+                                               hermes_credential_store_t* cs);
+  
+  mid_hermes_ll_block_t*(*load)(mid_hermes_ll_block_t* bl, 
+                                mid_hermes_ll_buffer_t* id,
+                                hermes_data_store_t* ds,
+                                hermes_key_store_t* ks,
+                                hermes_credential_store_t* cs);
+  
+  mid_hermes_ll_block_t*(*save)(mid_hermes_ll_block_t* bl,
+                                mid_hermes_ll_rights_list_t* rights,
+                                hermes_data_store_t* ds,
+                                hermes_key_store_t* ks);
 };
 
-typedef struct mid_hermes_ll_block_type mid_hermes_ll_block_t;
+mid_hermes_ll_block_t* mid_hermes_ll_block_create_empty(const mid_hermes_ll_user_t* user);
 
-mid_hermes_ll_block_t* mid_hermes_ll_block_create_new(mid_hermes_ll_buffer_t* block,
-                                                      mid_hermes_ll_buffer_t* meta,
-                                                      const mid_hermes_ll_user_t* user);
-
-mid_hermes_ll_block_t* mid_hermes_ll_block_create_new_with_id(mid_hermes_ll_buffer_t* id,
-                                                              mid_hermes_ll_buffer_t* block,
-                                                              mid_hermes_ll_buffer_t* meta,
-                                                              const mid_hermes_ll_user_t* user);
-
-mid_hermes_ll_block_t* mid_hermes_ll_block_restore(mid_hermes_ll_buffer_t* id,
-                                                   mid_hermes_ll_buffer_t* block,
-                                                   mid_hermes_ll_buffer_t* meta,
-                                                   const mid_hermes_ll_user_t* user,
-                                                   mid_hermes_ll_rights_list_t* rights);
-
-mid_hermes_ll_block_t* mid_hermes_ll_block_set_id(mid_hermes_ll_block_t* b, mid_hermes_ll_buffer_t* id);
-
-mid_hermes_ll_buffer_t* mid_hermes_ll_block_get_data(mid_hermes_ll_block_t* b);
-mid_hermes_ll_block_t* mid_hermes_ll_block_set_data(mid_hermes_ll_block_t* b, mid_hermes_ll_buffer_t* data, mid_hermes_ll_buffer_t* meta);
-
-mid_hermes_ll_block_t* mid_hermes_ll_block_grant_read_access(mid_hermes_ll_block_t* b, const mid_hermes_ll_user_t* user);
-mid_hermes_ll_block_t* mid_hermes_ll_block_grant_update_access(mid_hermes_ll_block_t* b, const mid_hermes_ll_user_t* user);
-mid_hermes_ll_block_t* mid_hermes_ll_block_deny_read_access(mid_hermes_ll_block_t* b, const mid_hermes_ll_user_t* user);
-mid_hermes_ll_block_t* mid_hermes_ll_block_deny_update_access(mid_hermes_ll_block_t* b, const mid_hermes_ll_user_t* user);
+mid_hermes_ll_block_t* mid_hermes_ll_block_create(const mid_hermes_ll_user_t* user,
+                                                  mid_hermes_ll_buffer_t* id,
+                                                  mid_hermes_ll_buffer_t* block,
+                                                  mid_hermes_ll_buffer_t* meta,
+                                                  mid_hermes_ll_token_t* rtoken,
+                                                  mid_hermes_ll_token_t* wtoken);
 
 hermes_status_t mid_hermes_ll_block_destroy(mid_hermes_ll_block_t** b);
 

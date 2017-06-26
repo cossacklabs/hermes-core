@@ -8,10 +8,10 @@ CFLAGS += -I../../include
 LDFLAGS += -L../../build -lsoter -lmid_hermes -lcredential_store -lrpc -lkey_store -ldata_store -lthemis
 
 all: $(OBJ)
-	$(CC) $(OBJ) $(LDFLAGS) -o hermes_client_ll
+	$(CC) -g $(OBJ) $(LDFLAGS) -o hermes_client_ll
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -g -c $< -o $@
 
 clean:
 	rm -f *.o

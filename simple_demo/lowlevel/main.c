@@ -18,13 +18,15 @@
  *
  */
 
-#include "key_store.h"
-#include "credential_store.h"
-#include "data_store.h"
+#include <hermes/mid_hermes/interfaces/key_store.h>
+#include <hermes/mid_hermes/interfaces/credential_store.h>
+#include <hermes/mid_hermes/interfaces/data_store.h>
 
 #include <themis/themis.h>
 
 #include <string.h>
+#include "commands.h"
+
 
 #define COMMAND_GET_BLOCK 1
 #define COMMAND_ADD_BLOCK 2
@@ -36,21 +38,21 @@
 #define COMMAND_DENY_UPDATE 8
 #define COMMAND_ROTATE 9
 
-key_store_t* ks=NULL;
-credential_store_t* cs=NULL;
-data_store_t* ds=NULL;
+hermes_key_store_t* ks=NULL;
+hermes_credential_store_t* cs=NULL;
+hermes_data_store_t* ds=NULL;
 
 int finalize(){
-  key_store_destroy(&ks);
-  data_store_destroy(&ds);
-  credential_store_destroy(&cs);
+  hermes_key_store_destroy(&ks);
+  hermes_data_store_destroy(&ds);
+  hermes_credential_store_destroy(&cs);
   return 0;
 }
 
 int init(){
-  ks=key_store_create();
-  ds=data_store_create();
-  cs=credential_store_create();
+  ks=hermes_key_store_create();
+  ds=hermes_data_store_create();
+  cs=hermes_credential_store_create();
   if(!ks || !cs || !ds){
     return 1;
 }
@@ -126,7 +128,19 @@ int main(int argc, char* argv[]){
   int res=0;
   switch(parse_command(argv[1])){
   case COMMAND_GET_BLOCK:
+    if(argc!=5 || 0!=get_block(argv[2], argv[3], argv[4])){
+      fprintf(stderr, "error: block getting error\n");
+      finalize();
+      return 1;      
+    }
+    break;
   case COMMAND_ADD_BLOCK:
+    if(argc!=6 || 0!=add_block(argv[2], argv[3], argv[4], argv[5])){
+      fprintf(stderr, "error: block adding error\n");
+      finalize();
+      return 1;      
+    }
+    break;
   case COMMAND_UPD_BLOCK:
   case COMMAND_DEL_BLOCK:
   case COMMAND_GRANT_READ:
@@ -139,7 +153,6 @@ int main(int argc, char* argv[]){
     finalize();
     return 1;    
   }
-  
   finalize();
-  return 0;
+  return res;
 }
