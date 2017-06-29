@@ -70,6 +70,6 @@ const uint8_t* buffer_get_data(buffer_t* buffer);
   HERMES_BUFFER_MAGIC, HERMES_BUFFER_NODE_TYPE_STR, (str)
 
 #define BUFFER_NODE_BIN(data, data_length)					\
-  HERMES_BUFFER_MAGIC, HERMES_BUFFER_NODE_TYPE_BIN, (data), (data_length)  
+  HERMES_BUFFER_MAGIC, HERMES_BUFFER_NODE_TYPE_BIN, (data), (data_length)
 
 #endif /* HERMES_BUFFER_H_ */

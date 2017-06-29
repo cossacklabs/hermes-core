@@ -290,12 +290,12 @@ uint32_t grant_access(mid_hermes_t* mh, const uint8_t* block_id, const size_t bl
     return res;
   }
   if(HM_SUCCESS!=(res=mid_hermes_get_token(mh, block_id, block_id_length, is_update, &token, &token_len))){
-    free(peer_pk);
+    //    free(peer_pk);
     return res;
   }
   if(HM_SUCCESS!=(res=hm_asym_encrypt(mh->sk, mh->sk_len, peer_pk, peer_pk_len, token, token_len, &enc_token, &enc_token_len))){
-    free(peer_pk);
-    free(token);
+    //free(peer_pk);
+    //free(token);
     return res;
   }
   res=is_update?hm_key_store_client_sync_call_set_wtoken(mh->ksc, block_id, block_id_length, user_id, user_id_length, mh->id, mh->id_len, enc_token, enc_token_len):hm_key_store_client_sync_call_set_rtoken(mh->ksc, block_id, block_id_length, user_id, user_id_length, mh->id, mh->id_len, enc_token, enc_token_len);
