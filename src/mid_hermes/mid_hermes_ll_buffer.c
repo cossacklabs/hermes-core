@@ -55,6 +55,15 @@ bool mid_hermes_ll_buffer_is_empty(mid_hermes_ll_buffer_t* b){
   return false;
 }
 
+bool mid_hermes_ll_buffer_is_equal(mid_hermes_ll_buffer_t* b, mid_hermes_ll_buffer_t* c){
+  assert(b);
+  assert(c);
+  if((c->length)!=(b->length) || 0!=memcmp(b->data, c->data, b->length)){
+    return false;
+  }
+  return true;
+}
+
 hermes_status_t mid_hermes_ll_buffer_reset(mid_hermes_ll_buffer_t* b, const uint8_t* data, const size_t length){
   HERMES_CHECK_IN_PARAM(b);
   if(b->data){

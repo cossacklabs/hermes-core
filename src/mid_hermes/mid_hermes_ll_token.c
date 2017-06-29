@@ -26,8 +26,8 @@
 
 #include <assert.h>
 
-mid_hermes_ll_token_t* mid_hermes_ll_token_create(const mid_hermes_ll_user_t* user,
-                                                  const mid_hermes_ll_user_t* owner,
+mid_hermes_ll_token_t* mid_hermes_ll_token_create(mid_hermes_ll_user_t* user,
+                                                  mid_hermes_ll_user_t* owner,
                                                   mid_hermes_ll_buffer_t* token){
   HERMES_CHECK_IN_PARAM_RET_NULL(user);
   HERMES_CHECK_IN_PARAM_RET_NULL(token);
@@ -39,7 +39,7 @@ mid_hermes_ll_token_t* mid_hermes_ll_token_create(const mid_hermes_ll_user_t* us
   return t;
 }
 
-mid_hermes_ll_token_t* mid_hermes_ll_token_generate(const mid_hermes_ll_user_t* user_and_owner){
+mid_hermes_ll_token_t* mid_hermes_ll_token_generate(mid_hermes_ll_user_t* user_and_owner){
   HERMES_CHECK_IN_PARAM_RET_NULL(user_and_owner);
   uint8_t token[HM_TOKEN_LEN];
   if(SOTER_SUCCESS!=soter_rand(token, HM_TOKEN_LEN)){
@@ -65,7 +65,7 @@ mid_hermes_ll_buffer_t* mid_hermes_ll_token_get_data(mid_hermes_ll_token_t* t){
 }
 
 mid_hermes_ll_token_t* mid_hermes_ll_token_get_token_for_user(mid_hermes_ll_token_t* t,
-                                                              const mid_hermes_ll_user_t* for_user){
+                                                              mid_hermes_ll_user_t* for_user){
   HERMES_CHECK_IN_PARAM_RET_NULL(t);
   HERMES_CHECK_IN_PARAM_RET_NULL(for_user);
   mid_hermes_ll_buffer_t* b=mid_hermes_ll_token_get_data(t);
@@ -87,7 +87,71 @@ hermes_status_t mid_hermes_ll_token_destroy(mid_hermes_ll_token_t** t){
   HERMES_CHECK_IN_PARAM(t);
   HERMES_CHECK_IN_PARAM(*t);
   mid_hermes_ll_buffer_destroy(&((*t)->token));
+  if(((*t)->user)!=((*t)->user)){
+    mid_hermes_ll_user_destroy(&((*t)->owner));
+  }
+  mid_hermes_ll_user_destroy(&((*t)->user));
   free(*t);
   *t=NULL;
   return HM_SUCCESS;
+}
+
+//store dependent
+mid_hermes_ll_token_t* mid_hermes_ll_token_load_c(const uint8_t* user_id,
+                                                  const size_t user_id_length,
+                                                  const uint8_t* block_id,
+                                                  const size_t block_id_length,
+                                                  hermes_key_store_t* ks,
+                                                  hermes_credential_store_t* cs,
+                                                  bool is_update){
+  if(!user_id || !user_id_length || !block_id || !block_id_length || !ks || !cs){
+    return NULL;
+  }
+  mid_hermes_ll_buffer_t* ownerid=mid_hermes_ll_buffer_create(NULL,0);
+  mid_hermes_ll_buffer_t* token=mid_hermes_ll_buffer_create(NULL,0);
+  mid_hermes_ll_user_t* user=NULL, *owner=NULL;
+  if(!ownerid
+     || !token
+     || (0!=(is_update?hermes_key_store_get_wtoken:hermes_key_store_get_rtoken)(ks,
+                                                                                user_id,
+                                                                                user_id_length,
+                                                                                block_id,
+                                                                                block_id_length,
+                                                                                &(token->data),
+                                                                                &(token->length),
+                                                                                &(ownerid->data),
+                                                                                &(ownerid->length)))
+     || !(user=mid_hermes_ll_user_load_c(user_id, user_id_length, cs))
+     || !(owner=mid_hermes_ll_user_load(ownerid, cs))){
+    mid_hermes_ll_user_destroy(&user);
+    mid_hermes_ll_buffer_destroy(&ownerid);
+    mid_hermes_ll_buffer_destroy(&token);
+    return NULL;
+  }
+  mid_hermes_ll_token_t* token_=mid_hermes_ll_token_create(user, owner, token);
+  if(!token){
+    mid_hermes_ll_user_destroy(&user);
+    mid_hermes_ll_user_destroy(&owner);
+    mid_hermes_ll_buffer_destroy(&token);
+    return NULL;
+  }
+  return token_;
+}
+
+mid_hermes_ll_token_t* mid_hermes_ll_rtoken_load_c(const uint8_t* user_id,
+                                                   const size_t user_id_length,
+                                                   const uint8_t* block_id,
+                                                   const size_t block_id_length,
+                                                   hermes_key_store_t* ks,
+                                                   hermes_credential_store_t* cs){
+  return mid_hermes_ll_token_load_c(user_id, user_id_length, block_id, block_id_length, ks, cs, false);
+}
+
+mid_hermes_ll_token_t* mid_hermes_ll_wtoken_load_c(const uint8_t* user_id,
+                                                   const size_t user_id_length,
+                                                   const uint8_t* block_id,
+                                                   const size_t block_id_length,
+                                                   hermes_key_store_t* ks,
+                                                   hermes_credential_store_t* cs){
+  return mid_hermes_ll_token_load_c(user_id, user_id_length, block_id, block_id_length, ks, cs, true);
 }

@@ -35,7 +35,7 @@
 typedef struct mid_hermes_ll_block_type mid_hermes_ll_block_t;
 
 struct mid_hermes_ll_block_type{
-  const mid_hermes_ll_user_t* user;
+  mid_hermes_ll_user_t* user;
   mid_hermes_ll_buffer_t* id;
   mid_hermes_ll_buffer_t* block;
   mid_hermes_ll_buffer_t* data;
@@ -46,10 +46,10 @@ struct mid_hermes_ll_block_type{
   mid_hermes_ll_token_t* wtoken;
 
   mid_hermes_ll_block_t*(*init_empty)(mid_hermes_ll_block_t* bl,
-                                      const mid_hermes_ll_user_t* user);
+                                      mid_hermes_ll_user_t* user);
   
   mid_hermes_ll_block_t*(*init)(mid_hermes_ll_block_t* bl,
-                                const mid_hermes_ll_user_t* user,
+                                mid_hermes_ll_user_t* user,
                                 mid_hermes_ll_buffer_t* id,
                                 mid_hermes_ll_buffer_t* block,
                                 mid_hermes_ll_buffer_t* meta,
@@ -78,11 +78,16 @@ struct mid_hermes_ll_block_type{
                                 mid_hermes_ll_rights_list_t* rights,
                                 hermes_data_store_t* ds,
                                 hermes_key_store_t* ks);
+
+  mid_hermes_ll_block_t*(*delete)(mid_hermes_ll_block_t* bl,
+                                  mid_hermes_ll_rights_list_t* rights,
+                                  hermes_data_store_t* ds,
+                                  hermes_key_store_t* ks);
 };
 
-mid_hermes_ll_block_t* mid_hermes_ll_block_create_empty(const mid_hermes_ll_user_t* user);
+mid_hermes_ll_block_t* mid_hermes_ll_block_create_empty(mid_hermes_ll_user_t* user);
 
-mid_hermes_ll_block_t* mid_hermes_ll_block_create(const mid_hermes_ll_user_t* user,
+mid_hermes_ll_block_t* mid_hermes_ll_block_create(mid_hermes_ll_user_t* user,
                                                   mid_hermes_ll_buffer_t* id,
                                                   mid_hermes_ll_buffer_t* block,
                                                   mid_hermes_ll_buffer_t* meta,

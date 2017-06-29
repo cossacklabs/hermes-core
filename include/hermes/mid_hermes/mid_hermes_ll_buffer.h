@@ -36,6 +36,7 @@ typedef struct mid_hermes_ll_buffer_type{
 mid_hermes_ll_buffer_t* mid_hermes_ll_buffer_create(const uint8_t* data, const size_t length);
 mid_hermes_ll_buffer_t* mid_hermes_ll_buffer_copy(mid_hermes_ll_buffer_t* src, mid_hermes_ll_buffer_t* dst);
 bool mid_hermes_ll_buffer_is_empty(mid_hermes_ll_buffer_t* b);
+bool mid_hermes_ll_buffer_is_equal(mid_hermes_ll_buffer_t* b, mid_hermes_ll_buffer_t* c);
 hermes_status_t mid_hermes_ll_buffer_reset(mid_hermes_ll_buffer_t* b, const uint8_t* data, const size_t length);
 hermes_status_t mid_hermes_ll_buffer_destroy(mid_hermes_ll_buffer_t** b);
 

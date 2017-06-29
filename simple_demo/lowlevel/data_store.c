@@ -79,6 +79,7 @@ hermes_status_t hermes_data_store_set_block(hermes_data_store_t* ds,
       return DS_FAIL;
     }    
   }
+  free(stored_mac);
   BUILD_TYPED_PATH(fpath, C(ds->path), E(*id, *id_length));
   create_directory(fpath);
   BUILD_TYPED_PATH(fpath, C(ds->path), E(*id, *id_length), C("data"));
@@ -122,7 +123,25 @@ hermes_status_t hermes_data_store_rem_block(hermes_data_store_t* ds,
                                     const size_t id_length,
                                     const uint8_t* old_mac,
                                     const size_t old_mac_length){
-  return HM_FAIL;
+  if(!ds || !id || !id_length || !old_mac || !old_mac_length){
+    return DS_FAIL; 
+  }
+  char fpath[10*1024];
+  uint8_t* stored_mac=NULL;
+  size_t stored_mac_length=0;
+  BUILD_TYPED_PATH(fpath, C(ds->path), E(id, id_length), C("mac"));
+  if(0!=read_whole_file(fpath, &stored_mac, &stored_mac_length)){
+    return DS_FAIL;;
+  }
+  /*very important part*/
+  if(!old_mac || stored_mac_length!=old_mac_length || 0!=memcmp(stored_mac, old_mac, stored_mac_length)){
+    return DS_FAIL;
+  }    
+  BUILD_TYPED_PATH(fpath, C(ds->path), E(id, id_length));
+  if(0!=remove_directory(fpath)){
+    return HM_FAIL;
+  }
+  return HM_SUCCESS;
 }
 
 

@@ -34,11 +34,11 @@ extern hermes_key_store_t* ks;
 extern hermes_credential_store_t* cs;
 extern hermes_data_store_t* ds;
 
-int write_block(mid_hermes_ll_block_t* bl){
+int write_block(mid_hermes_ll_block_t* bl, mid_hermes_ll_rights_list_t* rights){
   if(!bl){
     return 1;
   }
-  if(!bl->save(bl, NULL, ds, ks)){
+  if(!bl->save(bl, rights, ds, ks)){
     return 1;
   }
   return 0;
@@ -76,12 +76,64 @@ int add_block(const char* user_id, const char* user_sk, const char* block_file_n
     mid_hermes_ll_buffer_destroy(&data);
     return 1;
   }
-  if(0!=write_block(bl)){
+  if(0!=write_block(bl, NULL)){
     mid_hermes_ll_block_destroy(&bl);
     return 1;
   }
   mid_hermes_ll_block_destroy(&bl);
-  mid_hermes_ll_user_destroy(&u);
+  return 0;
+}
+
+int upd_block(const char* user_id, const char* user_sk, const char* block_file_name, const char* block_meta_data){
+  mid_hermes_ll_user_t* u=create_user(user_id, user_sk);
+  mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create_empty(u);
+  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1);
+  mid_hermes_ll_buffer_t* new_meta=mid_hermes_ll_buffer_create(block_meta_data, strlen(block_meta_data)+1);
+  mid_hermes_ll_buffer_t* new_data=mid_hermes_ll_buffer_create(NULL, 0);
+  if(!u
+     || !bl
+     || !block_id
+     || !new_meta
+     || !new_data
+     || (0!=read_whole_file(block_file_name, &(new_data->data), &(new_data->length)))
+     || !(bl->load(bl, block_id, ds, ks, cs))){
+    mid_hermes_ll_buffer_destroy(&block_id);
+    mid_hermes_ll_buffer_destroy(&new_data);
+    mid_hermes_ll_buffer_destroy(&new_meta);
+    mid_hermes_ll_block_destroy(&bl);
+    return 1;
+  }
+  if(!(bl->update(bl, new_data, new_meta))){
+    mid_hermes_ll_buffer_destroy(&new_data);
+    mid_hermes_ll_buffer_destroy(&new_meta);
+    mid_hermes_ll_block_destroy(&bl);
+    return 1;
+  }
+  if(!bl->save(bl, NULL, ds, ks)){
+    return 1;
+    mid_hermes_ll_block_destroy(&bl);
+  }
+  mid_hermes_ll_block_destroy(&bl);
+  return 0;
+}
+
+int del_block(const char* user_id, const char* user_sk, const char* block_file_name){
+  mid_hermes_ll_user_t* u=create_user(user_id, user_sk);
+  mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create_empty(u);
+  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1);
+  if(!u
+     || !bl
+     || !block_id
+     || !(bl->load(bl, block_id, ds, ks, cs))){
+    mid_hermes_ll_buffer_destroy(&block_id);
+    mid_hermes_ll_block_destroy(&bl);
+    return 1;
+  }
+  if(!bl->delete(bl, NULL, ds, ks)){
+    return 1;
+    mid_hermes_ll_block_destroy(&bl);
+  }
+  mid_hermes_ll_block_destroy(&bl);
   return 0;
 }
 
@@ -89,6 +141,24 @@ int get_block(const char* user_id, const char* user_sk, const char* block_file_n
   mid_hermes_ll_user_t* u=create_user(user_id, user_sk);
   assert(u);
   mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create_empty(u);
+  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1);
   assert(bl);
-  
+  if(!(bl->load(bl, block_id, ds, ks, cs))){
+    mid_hermes_ll_block_destroy(&bl);
+    mid_hermes_ll_buffer_destroy(&block_id);
+    return 1;
+  }
+  char block_fname[256];
+  sprintf(block_fname, "%s_block", block_file_name);
+  if(0!=write_whole_file(block_fname, bl->data->data, bl->data->length)){
+    mid_hermes_ll_block_destroy(&bl);
+    return 1;
+  }
+  sprintf(block_fname, "%s_meta", block_file_name);
+  if(0!=write_whole_file(block_fname, bl->meta->data, bl->meta->length)){
+    mid_hermes_ll_block_destroy(&bl);
+    return 1;
+  }
+  mid_hermes_ll_block_destroy(&bl);
+  return 0;
 }

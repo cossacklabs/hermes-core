@@ -22,6 +22,7 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
+int upd_block(const char* user_id, const char* user_sk, const char* block_file_name, const char* block_meta_data);
 int add_block(const char* user_id, const char* user_sk, const char* block_file_name, const char* block_meta_data);
 int get_block(const char* user_id, const char* user_sk, const char* block_file_name);
 

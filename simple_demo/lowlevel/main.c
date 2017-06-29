@@ -142,7 +142,19 @@ int main(int argc, char* argv[]){
     }
     break;
   case COMMAND_UPD_BLOCK:
+    if(argc!=6 || 0!=upd_block(argv[2], argv[3], argv[4], argv[5])){
+      fprintf(stderr, "error: block update error\n");
+      finalize();
+      return 1;      
+    }
+    break;    
   case COMMAND_DEL_BLOCK:
+    if(argc!=5 || 0!=del_block(argv[2], argv[3], argv[4])){
+      fprintf(stderr, "error: block deleting error\n");
+      finalize();
+      return 1;      
+    }
+    break;
   case COMMAND_GRANT_READ:
   case COMMAND_GRANT_UPDATE:
   case COMMAND_DENY_READ:

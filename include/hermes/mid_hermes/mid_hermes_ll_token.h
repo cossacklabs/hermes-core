@@ -26,24 +26,39 @@
 
 #include <hermes/mid_hermes/mid_hermes_ll_buffer.h>
 #include <hermes/mid_hermes/mid_hermes_ll_user.h>
+#include <hermes/mid_hermes/interfaces/key_store.h>
 
 typedef struct mid_hermes_ll_token_type{
-  const mid_hermes_ll_user_t* user;
-  const mid_hermes_ll_user_t* owner;
+  mid_hermes_ll_user_t* user;
+  mid_hermes_ll_user_t* owner;
   mid_hermes_ll_buffer_t* token;
 } mid_hermes_ll_token_t;
 
-mid_hermes_ll_token_t* mid_hermes_ll_token_create(const mid_hermes_ll_user_t* user,
-                                                  const mid_hermes_ll_user_t* owner,
+mid_hermes_ll_token_t* mid_hermes_ll_token_create(mid_hermes_ll_user_t* user,
+                                                  mid_hermes_ll_user_t* owner,
                                                   mid_hermes_ll_buffer_t* token);
 
-mid_hermes_ll_token_t* mid_hermes_ll_token_generate(const mid_hermes_ll_user_t* user_and_owner);
+mid_hermes_ll_token_t* mid_hermes_ll_token_generate(mid_hermes_ll_user_t* user_and_owner);
 
 mid_hermes_ll_buffer_t* mid_hermes_ll_token_get_data(mid_hermes_ll_token_t* t);
 
 mid_hermes_ll_token_t* mid_hermes_ll_token_get_token_for_user(mid_hermes_ll_token_t* t,
-                                                              const mid_hermes_ll_user_t* for_user);
+                                                              mid_hermes_ll_user_t* for_user);
 
 hermes_status_t mid_hermes_ll_token_destroy(mid_hermes_ll_token_t** t);
 
+//store dependent
+mid_hermes_ll_token_t* mid_hermes_ll_rtoken_load_c(const uint8_t* user_id,
+						   const size_t user_id_length,
+						   const uint8_t* block_id,
+						   const size_t block_id_length,
+						   hermes_key_store_t* ks,
+						   hermes_credential_store_t* cs);
+
+mid_hermes_ll_token_t* mid_hermes_ll_wtoken_load_c(const uint8_t* user_id,
+						   const size_t user_id_length,
+						   const uint8_t* block_id,
+						   const size_t block_id_length,
+						   hermes_key_store_t* ks,
+						   hermes_credential_store_t* cs);
 #endif //MID_HERMES_LL_TOKEN_H
