@@ -52,14 +52,19 @@ mid_hermes_ll_user_t* create_user(const char* user_id, const char* user_sk){
     return NULL;
   }
   uint8_t ssk[2048];
-  size_t ssk_length=string_to_buf(user_sk, ssk);
-  if(!ssk_length){
-    mid_hermes_ll_buffer_destroy(&pk);
-    return NULL;
+  size_t ssk_length=sizeof(ssk);
+  if(user_sk){
+    ssk_length=string_to_buf(user_sk, ssk);
+    if(!ssk_length){
+      mid_hermes_ll_buffer_destroy(&pk);
+      return NULL;
+    }
+    return mid_hermes_ll_local_user_create(mid_hermes_ll_buffer_create(user_id, strlen(user_id)+1),
+                                           user_sk?mid_hermes_ll_buffer_create(ssk, ssk_length):NULL,
+                                           pk);
   }
-  return mid_hermes_ll_local_user_create(mid_hermes_ll_buffer_create(user_id, strlen(user_id)+1),
-                                         mid_hermes_ll_buffer_create(ssk, ssk_length),
-                                         pk);
+  return mid_hermes_ll_user_create(mid_hermes_ll_buffer_create(user_id, strlen(user_id)+1),
+                                   pk);  
 }
 
 int add_block(const char* user_id, const char* user_sk, const char* block_file_name, const char* block_meta_data){
@@ -70,7 +75,12 @@ int add_block(const char* user_id, const char* user_sk, const char* block_file_n
     mid_hermes_ll_buffer_destroy(&data);
     return 1;
   }
-  mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create(u, mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1), data, mid_hermes_ll_buffer_create(block_meta_data, strlen(block_meta_data)+1), NULL, NULL);
+  mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create(u,
+                                                       mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1),
+                                                       data,
+                                                       mid_hermes_ll_buffer_create(block_meta_data, strlen(block_meta_data)+1),
+                                                       NULL,
+                                                       NULL);
   if(!bl){
     mid_hermes_ll_user_destroy(&u);
     mid_hermes_ll_buffer_destroy(&data);
@@ -160,5 +170,154 @@ int get_block(const char* user_id, const char* user_sk, const char* block_file_n
     return 1;
   }
   mid_hermes_ll_block_destroy(&bl);
+  return 0;
+}
+
+int grant_read(const char* user_id, const char* user_sk, const char* block_file_name, const char* for_user_id){
+  mid_hermes_ll_user_t* u=create_user(user_id, user_sk);
+  assert(u);
+  mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create_empty(u);
+  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1);
+  assert(bl);
+  if(!(bl->load(bl, block_id, ds, ks, cs))){
+    mid_hermes_ll_block_destroy(&bl);
+    mid_hermes_ll_buffer_destroy(&block_id);
+    return 1;
+  }
+  mid_hermes_ll_user_t* for_u=create_user(for_user_id, NULL);
+  mid_hermes_ll_token_t* rtoken=bl->rtoken_for(bl, for_u);
+  if(!rtoken){
+    mid_hermes_ll_block_destroy(&bl);
+    mid_hermes_ll_user_destroy(&for_u);
+    return 1;
+  }
+  if(HM_SUCCESS!=mid_hermes_ll_token_save(bl->user, bl->id, rtoken, ks, false)){
+    mid_hermes_ll_block_destroy(&bl);
+    mid_hermes_ll_token_destroy(&rtoken);
+    return 1;
+  }
+  mid_hermes_ll_block_destroy(&bl);
+  mid_hermes_ll_token_destroy(&rtoken);
+  return 0;
+}
+
+int grant_update(const char* user_id, const char* user_sk, const char* block_file_name, const char* for_user_id){
+  mid_hermes_ll_user_t* u=create_user(user_id, user_sk);
+  assert(u);
+  mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create_empty(u);
+  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1);
+  assert(bl);
+  if(!(bl->load(bl, block_id, ds, ks, cs))){
+    mid_hermes_ll_block_destroy(&bl);
+    mid_hermes_ll_buffer_destroy(&block_id);
+    return 1;
+  }
+  if(!bl->wtoken){
+    mid_hermes_ll_block_destroy(&bl);
+    return 1;
+  }
+  mid_hermes_ll_user_t* for_u=create_user(for_user_id, NULL);
+  mid_hermes_ll_token_t* wtoken=NULL;
+  if(!for_u
+     || !(wtoken=bl->wtoken_for(bl, for_u))){
+    mid_hermes_ll_block_destroy(&bl);
+    mid_hermes_ll_user_destroy(&for_u);
+    return 1;
+  }
+  if(HM_SUCCESS!=mid_hermes_ll_token_save(bl->user, bl->id, wtoken, ks, true)){
+    mid_hermes_ll_block_destroy(&bl);
+    mid_hermes_ll_token_destroy(&wtoken);
+    return 1;
+  }
+  mid_hermes_ll_block_destroy(&bl);
+  mid_hermes_ll_token_destroy(&wtoken);
+  return 0;
+}
+
+int deny_read(const char* user_id, const char* user_sk, const char* block_file_name, const char* for_user_id){
+  mid_hermes_ll_user_t* u=create_user(user_id, user_sk);
+  assert(u);
+  mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create_empty(u);
+  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1);
+  assert(bl);
+  if(!(bl->load(bl, block_id, ds, ks, cs))){
+    mid_hermes_ll_block_destroy(&bl);
+    mid_hermes_ll_buffer_destroy(&block_id);
+    return 1;
+  }
+  if(!bl->wtoken){
+    mid_hermes_ll_block_destroy(&bl);
+    return 1;
+  }
+  mid_hermes_ll_user_t* for_u=create_user(for_user_id, NULL);
+  mid_hermes_ll_token_t* wtoken=NULL;
+  if(!for_u
+     || !(wtoken=bl->wtoken_for(bl, for_u))){
+    mid_hermes_ll_block_destroy(&bl);
+    mid_hermes_ll_user_destroy(&for_u);
+    return 1;
+  }
+  if(HM_SUCCESS!=mid_hermes_ll_token_del(for_u, bl->id, ks, false)){
+    mid_hermes_ll_block_destroy(&bl);
+    mid_hermes_ll_token_destroy(&wtoken);
+    return 1;
+  }
+  mid_hermes_ll_block_destroy(&bl);
+  mid_hermes_ll_token_destroy(&wtoken);
+  return 0;
+}
+
+int deny_update(const char* user_id, const char* user_sk, const char* block_file_name, const char* for_user_id){
+  mid_hermes_ll_user_t* u=create_user(user_id, user_sk);
+  assert(u);
+  mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create_empty(u);
+  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1);
+  assert(bl);
+  if(!(bl->load(bl, block_id, ds, ks, cs))){
+    mid_hermes_ll_block_destroy(&bl);
+    mid_hermes_ll_buffer_destroy(&block_id);
+    return 1;
+  }
+  if(!bl->wtoken){
+    mid_hermes_ll_block_destroy(&bl);
+    return 1;
+  }
+  mid_hermes_ll_user_t* for_u=create_user(for_user_id, NULL);
+  mid_hermes_ll_token_t* wtoken=NULL;
+  if(!for_u
+     || !(wtoken=bl->wtoken_for(bl, for_u))){
+    mid_hermes_ll_block_destroy(&bl);
+    mid_hermes_ll_user_destroy(&for_u);
+    return 1;
+  }
+  if(HM_SUCCESS!=mid_hermes_ll_token_del(for_u, bl->id, ks, true)){
+    mid_hermes_ll_block_destroy(&bl);
+    mid_hermes_ll_token_destroy(&wtoken);
+    return 1;
+  }
+  mid_hermes_ll_block_destroy(&bl);
+  mid_hermes_ll_token_destroy(&wtoken);
+  return 0;  
+}
+
+int rotate_block(const char* user_id, const char* user_sk, const char* block_file_name){
+  mid_hermes_ll_user_t* u=create_user(user_id, user_sk);
+  assert(u);
+  mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create_empty(u);
+  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1);
+  assert(bl);
+  if(!(bl->load(bl, block_id, ds, ks, cs))){
+    mid_hermes_ll_block_destroy(&bl);
+    mid_hermes_ll_buffer_destroy(&block_id);
+    return 1;
+  }
+  mid_hermes_ll_rights_list_t* rl=bl->access_rights(bl, ks, cs);
+  if(!rl || !(bl->rotate(bl, rl)) || !(bl->save(bl, rl, ds, ks))){
+    mid_hermes_ll_rights_list_destroy(&rl);
+    mid_hermes_ll_block_destroy(&bl);
+    return 1;
+  }
+  mid_hermes_ll_block_destroy(&bl);
+  mid_hermes_ll_rights_list_destroy(&rl);
   return 0;
 }

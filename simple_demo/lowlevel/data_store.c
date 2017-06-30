@@ -76,6 +76,7 @@ hermes_status_t hermes_data_store_set_block(hermes_data_store_t* ds,
   /*very important part*/
   if(stored_mac){
     if(!old_mac || stored_mac_length!=old_mac_length || 0!=memcmp(stored_mac, old_mac, stored_mac_length)){
+      free(stored_mac);
       return DS_FAIL;
     }    
   }
@@ -135,8 +136,10 @@ hermes_status_t hermes_data_store_rem_block(hermes_data_store_t* ds,
   }
   /*very important part*/
   if(!old_mac || stored_mac_length!=old_mac_length || 0!=memcmp(stored_mac, old_mac, stored_mac_length)){
+    free(stored_mac);
     return DS_FAIL;
   }    
+  free(stored_mac);
   BUILD_TYPED_PATH(fpath, C(ds->path), E(id, id_length));
   if(0!=remove_directory(fpath)){
     return HM_FAIL;

@@ -63,6 +63,13 @@ struct mid_hermes_ll_block_type{
   mid_hermes_ll_block_t*(*rotate)(mid_hermes_ll_block_t* bl,
                                   mid_hermes_ll_rights_list_t* rights);
 
+
+  mid_hermes_ll_token_t*(*rtoken_for)(mid_hermes_ll_block_t* bl,
+                                      mid_hermes_ll_user_t* for_user);
+
+  mid_hermes_ll_token_t*(*wtoken_for)(mid_hermes_ll_block_t* bl,
+                                      mid_hermes_ll_user_t* for_user);
+
   //store dependent functions
   mid_hermes_ll_rights_list_t*(*access_rights)(mid_hermes_ll_block_t* bl,
                                                hermes_key_store_t* ks,

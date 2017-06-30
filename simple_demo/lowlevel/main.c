@@ -156,10 +156,40 @@ int main(int argc, char* argv[]){
     }
     break;
   case COMMAND_GRANT_READ:
+    if(argc!=6 || 0!=grant_read(argv[2], argv[3], argv[4], argv[5])){
+      fprintf(stderr, "error: block read access granting error\n");
+      finalize();
+      return 1;            
+    }
+    break;
   case COMMAND_GRANT_UPDATE:
+    if(argc!=6 || 0!=grant_update(argv[2], argv[3], argv[4], argv[5])){
+      fprintf(stderr, "error: block update access granting error\n");
+      finalize();
+      return 1;            
+    }
+    break;
   case COMMAND_DENY_READ:
+    if(argc!=6 || 0!=deny_read(argv[2], argv[3], argv[4], argv[5])){
+      fprintf(stderr, "error: block read access denying error\n");
+      finalize();
+      return 1;            
+    }
+    break;
   case COMMAND_DENY_UPDATE:
+    if(argc!=6 || 0!=deny_update(argv[2], argv[3], argv[4], argv[5])){
+      fprintf(stderr, "error: block update access denying error\n");
+      finalize();
+      return 1;            
+    }
+    break;
   case COMMAND_ROTATE:
+    if(argc!=5 || 0!=rotate_block(argv[2], argv[3], argv[4])){
+      fprintf(stderr, "error: block rotate error\n");
+      finalize();
+      return 1;            
+    }
+    break;
   default:
     fprintf(stderr, "error: undefined command %s\n", argv[1]);
     finalize();

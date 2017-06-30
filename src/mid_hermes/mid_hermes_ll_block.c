@@ -137,8 +137,8 @@ mid_hermes_ll_block_t* mid_hermes_ll_block_rotate(mid_hermes_ll_block_t* bl,
   if(!bl || !rights || !(bl->rtoken) || !(bl->wtoken)){
     return NULL;
   }
-  mid_hermes_ll_token_t* new_rtoken=mid_hermes_ll_token_generate(bl->user);
-  mid_hermes_ll_token_t* new_wtoken=mid_hermes_ll_token_generate(bl->user);
+  mid_hermes_ll_token_t* new_rtoken=mid_hermes_ll_token_generate(mid_hermes_ll_user_copy(bl->user));
+  mid_hermes_ll_token_t* new_wtoken=mid_hermes_ll_token_generate(mid_hermes_ll_user_copy(bl->user));
   mid_hermes_ll_buffer_t* new_block=mid_hermes_ll_buffer_create(NULL,0);
   mid_hermes_ll_buffer_t* new_mac=mid_hermes_ll_buffer_create(NULL,0);
   mid_hermes_ll_buffer_t* rt=mid_hermes_ll_token_get_data(new_rtoken);
@@ -180,9 +180,12 @@ mid_hermes_ll_block_t* mid_hermes_ll_block_rotate(mid_hermes_ll_block_t* bl,
     return NULL;
   }
   while((node=mid_hermes_ll_rights_list_iterator_next(i))){
-    mid_hermes_ll_token_t* nrt=mid_hermes_ll_token_get_token_for_user(new_rtoken, node->user);
-    mid_hermes_ll_token_t* nwt=mid_hermes_ll_token_get_token_for_user(new_wtoken, node->user);
-    if(!nrt || !nwt){
+    mid_hermes_ll_token_t* nrt=mid_hermes_ll_token_get_token_for_user(new_rtoken, mid_hermes_ll_user_copy(node->user));
+    mid_hermes_ll_token_t* nwt=NULL;
+    if(node->wtoken){
+      nwt=mid_hermes_ll_token_get_token_for_user(new_wtoken, mid_hermes_ll_user_copy(node->user));
+    }
+    if(!nrt){
       mid_hermes_ll_rights_list_iterator_destroy(&i);
       mid_hermes_ll_token_destroy(&nrt);
       mid_hermes_ll_token_destroy(&nwt);
@@ -191,10 +194,26 @@ mid_hermes_ll_block_t* mid_hermes_ll_block_rotate(mid_hermes_ll_block_t* bl,
     mid_hermes_ll_token_destroy(&(node->rtoken));
     mid_hermes_ll_token_destroy(&(node->wtoken));
     node->rtoken=nrt;
-    node->rtoken=nwt;
+    node->wtoken=nwt;
   }
   mid_hermes_ll_rights_list_iterator_destroy(&i);
   return bl;
+}
+
+mid_hermes_ll_token_t* mid_hermes_ll_block_rtoken_for(mid_hermes_ll_block_t* bl,
+                                    mid_hermes_ll_user_t* for_user){
+  if(!bl || !(bl->rtoken) || !for_user){
+    return NULL;
+  }
+  return mid_hermes_ll_token_get_token_for_user(bl->rtoken, for_user);
+}
+
+mid_hermes_ll_token_t* mid_hermes_ll_block_wtoken_for(mid_hermes_ll_block_t* bl,
+                                    mid_hermes_ll_user_t* for_user){
+  if(!bl || !(bl->wtoken) || !for_user){
+    return NULL;
+  }
+  return mid_hermes_ll_token_get_token_for_user(bl->wtoken, for_user);
 }
 
 //store dependent functions
@@ -218,14 +237,16 @@ mid_hermes_ll_rights_list_t* mid_hermes_ll_block_access_rights(mid_hermes_ll_blo
     }
     mid_hermes_ll_token_t* rtoken=mid_hermes_ll_rtoken_load_c(hermes_key_store_iterator_get_user_id(i),
                                                               hermes_key_store_iterator_get_user_id_length(i),
-                                                              bl->id->data, bl->id->length,
+                                                              bl->id->data,
+                                                              bl->id->length,
                                                               ks,
                                                               cs);
     mid_hermes_ll_token_t* wtoken=mid_hermes_ll_wtoken_load_c(hermes_key_store_iterator_get_user_id(i),
-                                                               hermes_key_store_iterator_get_user_id_length(i),
-                                                               bl->id->data, bl->id->length,
-                                                               ks,
-                                                               cs);
+                                                              hermes_key_store_iterator_get_user_id_length(i),
+                                                              bl->id->data,
+                                                              bl->id->length,
+                                                              ks,
+                                                              cs);
     if(!user
        || !rtoken
        || (HM_SUCCESS != mid_hermes_ll_rights_list_rpush_val(rights, user, rtoken, wtoken))){
@@ -295,8 +316,16 @@ mid_hermes_ll_block_t* mid_hermes_ll_block_load(mid_hermes_ll_block_t* bl,
   }
   mid_hermes_ll_buffer_t* data=mid_hermes_ll_buffer_create(NULL, 0);
   mid_hermes_ll_buffer_t* meta=mid_hermes_ll_buffer_create(NULL, 0);
-  mid_hermes_ll_token_t* rtoken=mid_hermes_ll_token_load(mid_hermes_ll_user_copy(bl->user), id, ks, cs, false);
-  mid_hermes_ll_token_t* wtoken=mid_hermes_ll_token_load(mid_hermes_ll_user_copy(bl->user), id, ks, cs, true);
+  mid_hermes_ll_user_t* rtoken_user=mid_hermes_ll_user_copy(bl->user);
+  mid_hermes_ll_user_t* wtoken_user=mid_hermes_ll_user_copy(bl->user);
+  mid_hermes_ll_token_t* rtoken=mid_hermes_ll_token_load(rtoken_user, id, ks, cs, false);
+  if(!rtoken){
+    mid_hermes_ll_user_destroy(&rtoken_user);
+  }
+  mid_hermes_ll_token_t* wtoken=mid_hermes_ll_token_load(wtoken_user, id, ks, cs, true);
+  if(!wtoken){
+    mid_hermes_ll_user_destroy(&wtoken_user);
+  }
   if(!data
      || !meta
      || !rtoken
@@ -489,6 +518,8 @@ mid_hermes_ll_block_t* mid_hermes_ll_block_create_empty(mid_hermes_ll_user_t* us
   bl->load=mid_hermes_ll_block_load;
   bl->save=mid_hermes_ll_block_save;
   bl->delete=mid_hermes_ll_block_delete;
+  bl->rtoken_for=mid_hermes_ll_block_rtoken_for;
+  bl->wtoken_for=mid_hermes_ll_block_wtoken_for;
   if(!(bl->init_empty(bl, user))){
     mid_hermes_ll_block_destroy(&bl);
   }
@@ -511,6 +542,8 @@ mid_hermes_ll_block_t* mid_hermes_ll_block_create(mid_hermes_ll_user_t* user,
   bl->load=mid_hermes_ll_block_load;
   bl->save=mid_hermes_ll_block_save;
   bl->delete=mid_hermes_ll_block_delete;
+  bl->rtoken_for=mid_hermes_ll_block_rtoken_for;
+  bl->wtoken_for=mid_hermes_ll_block_wtoken_for;
   if(!(bl->init(bl, user, id, block, meta, rtoken, wtoken))){
     mid_hermes_ll_block_destroy(&bl);
   }

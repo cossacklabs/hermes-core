@@ -80,14 +80,14 @@ mid_hermes_ll_token_t* mid_hermes_ll_token_get_token_for_user(mid_hermes_ll_toke
     return NULL;
   }
   mid_hermes_ll_buffer_destroy(&b);
-  return mid_hermes_ll_token_create(for_user, t->user, eb);
+  return mid_hermes_ll_token_create(for_user, mid_hermes_ll_user_copy(t->user), eb);
 }
 
 hermes_status_t mid_hermes_ll_token_destroy(mid_hermes_ll_token_t** t){
   HERMES_CHECK_IN_PARAM(t);
   HERMES_CHECK_IN_PARAM(*t);
   mid_hermes_ll_buffer_destroy(&((*t)->token));
-  if(((*t)->user)!=((*t)->user)){
+  if(((*t)->user)!=((*t)->owner)){
     mid_hermes_ll_user_destroy(&((*t)->owner));
   }
   mid_hermes_ll_user_destroy(&((*t)->user));
@@ -154,4 +154,53 @@ mid_hermes_ll_token_t* mid_hermes_ll_wtoken_load_c(const uint8_t* user_id,
                                                    hermes_key_store_t* ks,
                                                    hermes_credential_store_t* cs){
   return mid_hermes_ll_token_load_c(user_id, user_id_length, block_id, block_id_length, ks, cs, true);
+}
+
+hermes_status_t mid_hermes_ll_token_save(const mid_hermes_ll_user_t* user,
+                                         const mid_hermes_ll_buffer_t* block_id,
+                                         const mid_hermes_ll_token_t* t,
+                                         hermes_key_store_t* ks,
+                                         bool is_update){
+  if(!user || !block_id || !t || !ks){
+    return HM_FAIL;
+  }
+  return (is_update?hermes_key_store_set_wtoken:hermes_key_store_set_rtoken)(ks,
+                                                                             t->user->id->data,
+                                                                             t->user->id->length,
+                                                                             block_id->data,
+                                                                             block_id->length,
+                                                                             t->token->data,
+                                                                             t->token->length,
+                                                                             t->owner->id->data,
+                                                                             t->owner->id->length);
+}
+
+hermes_status_t mid_hermes_ll_token_del(const mid_hermes_ll_user_t* user,
+                                        const mid_hermes_ll_buffer_t* bl_id,
+                                        hermes_key_store_t* ks,
+                                        bool is_update){
+  if(!user || !bl_id || !ks){
+    return HM_FAIL;
+  }
+  hermes_status_t res=hermes_key_store_set_wtoken(ks,
+                                                  user->id->data,
+                                                  user->id->length,
+                                                  bl_id->data,
+                                                  bl_id->length,
+                                                  NULL,
+                                                  0,
+                                                  NULL,
+                                                  0);
+  if(!is_update){
+    return hermes_key_store_set_rtoken(ks,
+                                 user->id->data,
+                                 user->id->length,
+                                 bl_id->data,
+                                 bl_id->length,
+                                 NULL,
+                                 0,
+                                 NULL,
+                                 0);
+  }
+  return res;
 }
