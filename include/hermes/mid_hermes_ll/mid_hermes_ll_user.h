@@ -23,8 +23,8 @@
 #define MID_HERMES_LL_USER_H
 
 #include <hermes/common/errors.h>
-#include <hermes/mid_hermes/mid_hermes_ll_buffer.h>
-#include <hermes/mid_hermes/interfaces/credential_store.h>
+#include <hermes/mid_hermes_ll/mid_hermes_ll_buffer.h>
+#include <hermes/mid_hermes_ll/interfaces/credential_store.h>
 
 #include <stdbool.h>
 

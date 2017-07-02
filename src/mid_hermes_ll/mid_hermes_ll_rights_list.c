@@ -18,7 +18,7 @@
  *
  */
 
-#include <hermes/mid_hermes/mid_hermes_ll_rights_list.h>
+#include <hermes/mid_hermes_ll/mid_hermes_ll_rights_list.h>
 
 #include <assert.h>
 #include <string.h>

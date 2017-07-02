@@ -22,15 +22,14 @@
 #ifndef MID_HERMES_LL_BLOCK_H
 #define MID_HERMES_LL_BLOCK_H
 
-#include <hermes/mid_hermes/mid_hermes_ll.h>
-#include <hermes/mid_hermes/mid_hermes_ll_user.h>
-#include <hermes/mid_hermes/mid_hermes_ll_token.h>
-#include <hermes/mid_hermes/mid_hermes_ll_buffer.h>
-#include <hermes/mid_hermes/mid_hermes_ll_rights_list.h>
+#include <hermes/mid_hermes_ll/mid_hermes_ll_user.h>
+#include <hermes/mid_hermes_ll/mid_hermes_ll_token.h>
+#include <hermes/mid_hermes_ll/mid_hermes_ll_buffer.h>
+#include <hermes/mid_hermes_ll/mid_hermes_ll_rights_list.h>
 
-#include <hermes/mid_hermes/interfaces/key_store.h>
-#include <hermes/mid_hermes/interfaces/credential_store.h>
-#include <hermes/mid_hermes/interfaces/data_store.h>
+#include <hermes/mid_hermes_ll/interfaces/key_store.h>
+#include <hermes/mid_hermes_ll/interfaces/credential_store.h>
+#include <hermes/mid_hermes_ll/interfaces/data_store.h>
 
 typedef struct mid_hermes_ll_block_type mid_hermes_ll_block_t;
 

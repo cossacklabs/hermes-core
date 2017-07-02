@@ -18,11 +18,11 @@
  *
  */
 
-#include <hermes/mid_hermes/mid_hermes_ll.h>
-#include <hermes/mid_hermes/mid_hermes_ll_buffer.h>
-#include <hermes/mid_hermes/mid_hermes_ll_block.h>
-#include <hermes/mid_hermes/mid_hermes_ll_rights_list.h>
-#include <hermes/mid_hermes/interfaces/key_store.h>
+#include <hermes/mid_hermes_ll/mid_hermes_ll.h>
+#include <hermes/mid_hermes_ll/mid_hermes_ll_buffer.h>
+#include <hermes/mid_hermes_ll/mid_hermes_ll_block.h>
+#include <hermes/mid_hermes_ll/mid_hermes_ll_rights_list.h>
+#include <hermes/mid_hermes_ll/interfaces/key_store.h>
 
 #include <hermes/common/errors.h>
 

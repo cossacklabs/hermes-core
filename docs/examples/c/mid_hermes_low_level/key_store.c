@@ -18,8 +18,8 @@
  *
  */
 
-#include <hermes/mid_hermes/interfaces/key_store.h>
-#include "utils.h"
+#include <hermes/mid_hermes_ll/interfaces/key_store.h>
+#include "../utils/utils.h"
 #include <assert.h>
 #include <string.h>
 #include <sys/stat.h>

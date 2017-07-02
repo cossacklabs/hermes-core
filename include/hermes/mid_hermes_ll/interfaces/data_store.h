@@ -58,5 +58,4 @@ hermes_status_t hermes_data_store_rem_block(hermes_data_store_t* ds,
                              const size_t old_mac_length);
 
 hermes_status_t hermes_data_store_destroy(hermes_data_store_t** ds);
-
 #endif //HERMES_DATA_STORE_H

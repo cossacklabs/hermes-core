@@ -19,9 +19,28 @@
  */
 
 
-#ifndef MID_HERMES_LL_UTILS_H
-#define MID_HERMES_LL_UTILS_H
+#ifndef HERMES_CREDENTIAL_STORE_H
+#define HERMES_CREDENTIAL_STORE_H
 
-uint8_t* malloc_and_copy(const uint8_t* data, const size_t data_length);
+#include <hermes/common/errors.h>
 
-#endif //MID_HERMES_LL_UTILS_H
+#include <stdint.h>
+#include <stdlib.h>
+
+
+#include <hermes/common/errors.h>
+
+#include <stdint.h>
+#include <stdlib.h>
+
+
+typedef struct hermes_credential_store_type hermes_credential_store_t;
+
+hermes_credential_store_t* hermes_credential_store_create();
+
+hermes_status_t hermes_credential_store_get_public_key(hermes_credential_store_t* cs, const uint8_t* user_id, const size_t user_id_length, uint8_t** pub_key, size_t* pub_key_length);
+
+hermes_status_t hermes_credential_store_destroy(hermes_credential_store_t** cs);
+
+#endif //HERMES_CREDENTIAL_STORE_H
+

@@ -18,9 +18,9 @@
  *
  */
 
-#include <hermes/mid_hermes/interfaces/credential_store.h>
+#include <hermes/mid_hermes_ll/interfaces/credential_store.h>
 #include <string.h>
-#include "utils.h"
+#include "../utils/utils.h"
 #include <assert.h>
 
 #define CREDENTIAL_STORE_PATH "db/credential_store"

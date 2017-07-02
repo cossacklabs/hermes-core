@@ -19,7 +19,7 @@
  */
 
 #include <hermes/common/errors.h>
-#include <hermes/mid_hermes/mid_hermes_ll_user.h>
+#include <hermes/mid_hermes_ll/mid_hermes_ll_user.h>
 
 #include "utils.h"
 #include <assert.h>

@@ -18,9 +18,9 @@
  *
  */
 
-#include <hermes/mid_hermes/interfaces/data_store.h>
+#include <hermes/mid_hermes_ll/interfaces/data_store.h>
 
-#include "utils.h"
+#include "../utils/utils.h"
 #include <assert.h>
 #include <soter/soter.h>
 #include <string.h>

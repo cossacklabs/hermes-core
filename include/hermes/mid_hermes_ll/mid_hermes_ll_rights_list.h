@@ -22,8 +22,8 @@
 #ifndef MID_HERMES_LL_RIGHTS_LIST_H
 #define MID_HERMES_LL_RIGHTS_LIST_H
 
-#include <hermes/mid_hermes/mid_hermes_ll_user.h>
-#include <hermes/mid_hermes/mid_hermes_ll_token.h>
+#include <hermes/mid_hermes_ll/mid_hermes_ll_user.h>
+#include <hermes/mid_hermes_ll/mid_hermes_ll_token.h>
 #include <hermes/common/errors.h>
 
 

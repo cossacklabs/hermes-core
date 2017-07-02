@@ -18,8 +18,8 @@
  *
  */
 
-#include <hermes/mid_hermes/mid_hermes_ll.h>
-#include <hermes/mid_hermes/mid_hermes_ll_token.h>
+#include <hermes/mid_hermes_ll/mid_hermes_ll.h>
+#include <hermes/mid_hermes_ll/mid_hermes_ll_token.h>
 #include "utils.h"
 
 #include <themis/themis.h>

@@ -18,9 +18,9 @@
  *
  */
 
-#include <hermes/mid_hermes/interfaces/key_store.h>
-#include <hermes/mid_hermes/interfaces/credential_store.h>
-#include <hermes/mid_hermes/interfaces/data_store.h>
+#include <hermes/mid_hermes_ll/interfaces/key_store.h>
+#include <hermes/mid_hermes_ll/interfaces/credential_store.h>
+#include <hermes/mid_hermes_ll/interfaces/data_store.h>
 
 #include <themis/themis.h>
 
