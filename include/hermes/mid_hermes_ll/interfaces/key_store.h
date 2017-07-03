@@ -31,8 +31,6 @@
 
 typedef struct hermes_key_store_type hermes_key_store_t;
 
-hermes_key_store_t* hermes_key_store_create();
-
 hermes_status_t hermes_key_store_get_rtoken(hermes_key_store_t* ks,
                               const uint8_t* user_id,
                               const size_t user_id_length,

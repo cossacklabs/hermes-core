@@ -19,25 +19,12 @@
  */
 
 
-#ifndef HERMES_CREDENTIAL_STORE_H
-#define HERMES_CREDENTIAL_STORE_H
+#ifndef KEY_STORE_IMPL_H
+#define KEY_STORE_IMPL_H
 
-#include <hermes/common/errors.h>
+#include <hermes/mid_hermes_ll/interfaces/key_store.h>
+#include <hermes/rpc/transport.h>
 
-#include <stdint.h>
-#include <stdlib.h>
+hermes_key_store_t* hermes_key_store_create(hm_rpc_transport_t* transport);
 
-
-#include <hermes/common/errors.h>
-
-#include <stdint.h>
-#include <stdlib.h>
-
-
-typedef struct hermes_credential_store_type hermes_credential_store_t;
-
-hermes_status_t hermes_credential_store_get_public_key(hermes_credential_store_t* cs, const uint8_t* user_id, const size_t user_id_length, uint8_t** pub_key, size_t* pub_key_length);
-hermes_status_t hermes_credential_store_destroy(hermes_credential_store_t** cs);
-
-#endif //HERMES_CREDENTIAL_STORE_H
-
+#endif //KEY_STORE_IMPL_H

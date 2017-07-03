@@ -50,6 +50,7 @@ mid_hermes_ll_user_t* create_user(const char* user_id, const char* user_sk){
     return NULL;
   }
   uint8_t ssk[2048];
+
   size_t ssk_length=sizeof(ssk);
   if(user_sk){
     ssk_length=string_to_buf(user_sk, ssk);

@@ -97,6 +97,28 @@ mid_hermes_ll_user_t* mid_hermes_ll_user_load_c(const uint8_t* id,
   return u;
 }
 
+mid_hermes_ll_user_t* mid_hermes_ll_local_user_load_c(const uint8_t* id,
+                                            	      const size_t id_length,
+						      const uint8_t* sk,
+						      const size_t sk_length,
+                                                      hermes_credential_store_t* cs){
+  if(!id || !id_length || !sk || !sk_length || !cs){
+    return NULL;
+  }
+  mid_hermes_ll_buffer_t* b_id=mid_hermes_ll_buffer_create(id, id_length);
+  mid_hermes_ll_buffer_t* b_sk=mid_hermes_ll_buffer_create(sk, sk_length);
+  mid_hermes_ll_user_t* u=NULL;
+  if(!b_id
+     || !b_sk
+     || !(u=mid_hermes_ll_user_load(b_id, cs))){
+    mid_hermes_ll_buffer_destroy(&b_id);
+    mid_hermes_ll_buffer_destroy(&b_sk);
+  }
+  u->sk=b_sk;
+  return u;
+}
+
+
 bool mid_hermes_ll_user_is_equal(const mid_hermes_ll_user_t* u, const mid_hermes_ll_user_t* v){
   assert(u);
   assert(v);
@@ -117,6 +139,31 @@ mid_hermes_ll_user_t* mid_hermes_ll_user_create_c(const uint8_t* id,
      || !pkbuf
      || !(u=mid_hermes_ll_user_create(idbuf, pkbuf))){
     mid_hermes_ll_buffer_destroy(&idbuf);
+    mid_hermes_ll_buffer_destroy(&pkbuf);
+    return NULL;
+  }
+  return u;
+}
+
+mid_hermes_ll_user_t* mid_hermes_ll_local_user_create_c(const uint8_t* id,
+                                                        const size_t id_length,
+                                                        const uint8_t* sk,
+                                                        const size_t sk_length,
+                                                        const uint8_t* pk,
+                                                        const size_t pk_length){
+  if(!id || !id_length || !sk || !sk_length || !pk || !pk_length){
+    return NULL;
+  }
+  mid_hermes_ll_buffer_t* idbuf=mid_hermes_ll_buffer_create(id, id_length);
+  mid_hermes_ll_buffer_t* pkbuf=mid_hermes_ll_buffer_create(pk, pk_length);
+  mid_hermes_ll_buffer_t* skbuf=mid_hermes_ll_buffer_create(sk, sk_length);
+  mid_hermes_ll_user_t* u=NULL;
+  if(!idbuf
+     || !skbuf
+     || !pkbuf
+     || !(u=mid_hermes_ll_local_user_create(idbuf, skbuf, pkbuf))){
+    mid_hermes_ll_buffer_destroy(&idbuf);
+    mid_hermes_ll_buffer_destroy(&skbuf);
     mid_hermes_ll_buffer_destroy(&pkbuf);
     return NULL;
   }

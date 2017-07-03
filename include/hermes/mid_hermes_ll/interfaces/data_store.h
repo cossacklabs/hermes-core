@@ -29,8 +29,6 @@
 
 typedef struct hermes_data_store_type hermes_data_store_t;
 
-hermes_data_store_t* hermes_data_store_create();
-
 hermes_status_t hermes_data_store_set_block(hermes_data_store_t* ds,
                              uint8_t** id,
                              size_t* id_length,

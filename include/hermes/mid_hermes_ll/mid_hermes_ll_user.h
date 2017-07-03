@@ -47,6 +47,13 @@ mid_hermes_ll_user_t* mid_hermes_ll_user_create_c(const uint8_t* id,
                                                   const uint8_t* pk,
                                                   const size_t pk_length);
 
+mid_hermes_ll_user_t* mid_hermes_ll_local_user_create_c(const uint8_t* id,
+                                                        const size_t id_length,
+                                                        const uint8_t* sk,
+                                                        const size_t sk_length,
+                                                        const uint8_t* pk,
+                                                        const size_t pk_length);
+
 mid_hermes_ll_user_t* mid_hermes_ll_user_copy(mid_hermes_ll_user_t* u);
 
 bool mid_hermes_ll_user_is_equal(const mid_hermes_ll_user_t* u, const mid_hermes_ll_user_t* v);
@@ -61,5 +68,11 @@ mid_hermes_ll_user_t* mid_hermes_ll_user_load(mid_hermes_ll_buffer_t* id,
 mid_hermes_ll_user_t* mid_hermes_ll_user_load_c(const uint8_t* id,
                                                 const size_t id_length,
                                                 hermes_credential_store_t* cs);
+
+mid_hermes_ll_user_t* mid_hermes_ll_local_user_load_c(const uint8_t* id,
+                                            	      const size_t id_length,
+                                                      const uint8_t* sk,
+                                                      const size_t sk_length,
+                                                      hermes_credential_store_t* cs);
 
 #endif //MID_HERMES_LL_USER_H
