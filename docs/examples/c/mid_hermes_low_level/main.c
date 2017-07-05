@@ -22,6 +22,10 @@
 #include <hermes/mid_hermes_ll/interfaces/credential_store.h>
 #include <hermes/mid_hermes_ll/interfaces/data_store.h>
 
+#include "key_store_impl.h"
+#include "credential_store_impl.h"
+#include "data_store_impl.h"
+
 #include <themis/themis.h>
 
 #include <string.h>

@@ -25,6 +25,7 @@
 int upd_block(const char* user_id, const char* user_sk, const char* block_file_name, const char* block_meta_data);
 int add_block(const char* user_id, const char* user_sk, const char* block_file_name, const char* block_meta_data);
 int get_block(const char* user_id, const char* user_sk, const char* block_file_name);
+int del_block(const char* user_id, const char* user_sk, const char* block_file_name);
 int grant_read(const char* user_id, const char* user_sk, const char* block_file_name, const char* for_user_id);
 int grant_update(const char* user_id, const char* user_sk, const char* block_file_name, const char* for_user_id);
 int deny_read(const char* user_id, const char* user_sk, const char* block_file_name, const char* for_user_id);

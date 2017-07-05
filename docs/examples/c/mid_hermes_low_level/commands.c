@@ -45,7 +45,7 @@ int write_block(mid_hermes_ll_block_t* bl, mid_hermes_ll_rights_list_t* rights){
 mid_hermes_ll_user_t* create_user(const char* user_id, const char* user_sk){
   mid_hermes_ll_buffer_t* pk=mid_hermes_ll_buffer_create(NULL,0);
   assert(pk);
-  if(0!=hermes_credential_store_get_public_key(cs, user_id, strlen(user_id)+1, &(pk->data), &(pk->length))){
+  if(0!=hermes_credential_store_get_public_key(cs, (const uint8_t*)user_id, strlen(user_id)+1, &(pk->data), &(pk->length))){
     mid_hermes_ll_buffer_destroy(&pk);
     return NULL;
   }
@@ -58,11 +58,11 @@ mid_hermes_ll_user_t* create_user(const char* user_id, const char* user_sk){
       mid_hermes_ll_buffer_destroy(&pk);
       return NULL;
     }
-    return mid_hermes_ll_local_user_create(mid_hermes_ll_buffer_create(user_id, strlen(user_id)+1),
+    return mid_hermes_ll_local_user_create(mid_hermes_ll_buffer_create((const uint8_t*)user_id, strlen(user_id)+1),
                                            user_sk?mid_hermes_ll_buffer_create(ssk, ssk_length):NULL,
                                            pk);
   }
-  return mid_hermes_ll_user_create(mid_hermes_ll_buffer_create(user_id, strlen(user_id)+1),
+  return mid_hermes_ll_user_create(mid_hermes_ll_buffer_create((const uint8_t*)user_id, strlen(user_id)+1),
                                    pk);  
 }
 
@@ -75,9 +75,9 @@ int add_block(const char* user_id, const char* user_sk, const char* block_file_n
     return 1;
   }
   mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create(u,
-                                                       mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1),
+                                                       mid_hermes_ll_buffer_create((const uint8_t*)block_file_name, strlen(block_file_name)+1),
                                                        data,
-                                                       mid_hermes_ll_buffer_create(block_meta_data, strlen(block_meta_data)+1),
+                                                       mid_hermes_ll_buffer_create((const uint8_t*)block_meta_data, strlen(block_meta_data)+1),
                                                        NULL,
                                                        NULL);
   if(!bl){
@@ -96,8 +96,8 @@ int add_block(const char* user_id, const char* user_sk, const char* block_file_n
 int upd_block(const char* user_id, const char* user_sk, const char* block_file_name, const char* block_meta_data){
   mid_hermes_ll_user_t* u=create_user(user_id, user_sk);
   mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create_empty(u);
-  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1);
-  mid_hermes_ll_buffer_t* new_meta=mid_hermes_ll_buffer_create(block_meta_data, strlen(block_meta_data)+1);
+  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create((const uint8_t*)block_file_name, strlen(block_file_name)+1);
+  mid_hermes_ll_buffer_t* new_meta=mid_hermes_ll_buffer_create((const uint8_t*)block_meta_data, strlen(block_meta_data)+1);
   mid_hermes_ll_buffer_t* new_data=mid_hermes_ll_buffer_create(NULL, 0);
   if(!u
      || !bl
@@ -129,7 +129,7 @@ int upd_block(const char* user_id, const char* user_sk, const char* block_file_n
 int del_block(const char* user_id, const char* user_sk, const char* block_file_name){
   mid_hermes_ll_user_t* u=create_user(user_id, user_sk);
   mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create_empty(u);
-  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1);
+  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create((const uint8_t*)block_file_name, strlen(block_file_name)+1);
   if(!u
      || !bl
      || !block_id
@@ -150,7 +150,7 @@ int get_block(const char* user_id, const char* user_sk, const char* block_file_n
   mid_hermes_ll_user_t* u=create_user(user_id, user_sk);
   assert(u);
   mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create_empty(u);
-  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1);
+  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create((const uint8_t*)block_file_name, strlen(block_file_name)+1);
   assert(bl);
   if(!(bl->load(bl, block_id, ds, ks, cs))){
     mid_hermes_ll_block_destroy(&bl);
@@ -176,7 +176,7 @@ int grant_read(const char* user_id, const char* user_sk, const char* block_file_
   mid_hermes_ll_user_t* u=create_user(user_id, user_sk);
   assert(u);
   mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create_empty(u);
-  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1);
+  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create((const uint8_t*)block_file_name, strlen(block_file_name)+1);
   assert(bl);
   if(!(bl->load(bl, block_id, ds, ks, cs))){
     mid_hermes_ll_block_destroy(&bl);
@@ -204,7 +204,7 @@ int grant_update(const char* user_id, const char* user_sk, const char* block_fil
   mid_hermes_ll_user_t* u=create_user(user_id, user_sk);
   assert(u);
   mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create_empty(u);
-  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1);
+  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create((const uint8_t*)block_file_name, strlen(block_file_name)+1);
   assert(bl);
   if(!(bl->load(bl, block_id, ds, ks, cs))){
     mid_hermes_ll_block_destroy(&bl);
@@ -237,7 +237,7 @@ int deny_read(const char* user_id, const char* user_sk, const char* block_file_n
   mid_hermes_ll_user_t* u=create_user(user_id, user_sk);
   assert(u);
   mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create_empty(u);
-  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1);
+  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create((const uint8_t*)block_file_name, strlen(block_file_name)+1);
   assert(bl);
   if(!(bl->load(bl, block_id, ds, ks, cs))){
     mid_hermes_ll_block_destroy(&bl);
@@ -270,7 +270,7 @@ int deny_update(const char* user_id, const char* user_sk, const char* block_file
   mid_hermes_ll_user_t* u=create_user(user_id, user_sk);
   assert(u);
   mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create_empty(u);
-  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1);
+  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create((const uint8_t*)block_file_name, strlen(block_file_name)+1);
   assert(bl);
   if(!(bl->load(bl, block_id, ds, ks, cs))){
     mid_hermes_ll_block_destroy(&bl);
@@ -303,7 +303,7 @@ int rotate_block(const char* user_id, const char* user_sk, const char* block_fil
   mid_hermes_ll_user_t* u=create_user(user_id, user_sk);
   assert(u);
   mid_hermes_ll_block_t* bl=mid_hermes_ll_block_create_empty(u);
-  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create(block_file_name, strlen(block_file_name)+1);
+  mid_hermes_ll_buffer_t* block_id=mid_hermes_ll_buffer_create((const uint8_t*)block_file_name, strlen(block_file_name)+1);
   assert(bl);
   if(!(bl->load(bl, block_id, ds, ks, cs))){
     mid_hermes_ll_block_destroy(&bl);
