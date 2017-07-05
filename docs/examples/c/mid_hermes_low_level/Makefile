@@ -11,8 +11,9 @@ UTILS_OBJ_PATH = $(SRC_PATH)/obj
 UTILS_SRC = $(wildcard $(UTILS_SRC_PATH)/*.c)
 UTILS_OBJ = $(patsubst $(UTILS_SRC_PATH)/%.c, $(UTILS_OBJ_PATH)/%.o, $(UTILS_SRC))
 
-CFLAGS += -I../../../../include
-LDFLAGS += -L../../../../build -lsoter -lmid_hermes_ll -lthemis
+#CFLAGS += -I../../../../include
+LDFLAGS += -lsoter -lhermes_mid_hermes_ll -lthemis
+#-L../../../../build -lsoter -lhermes_mid_hermes_ll -lthemis
 
 all: $(UTILS_OBJ) $(OBJ) 
 	$(CC) -g $(OBJ) $(UTILS_OBJ) $(LDFLAGS) -o hermes_client_ll

@@ -22,4 +22,4 @@ RPC_SRC = $(wildcard $(SRC_PATH)/rpc/*.c)
 
 RPC_OBJ = $(patsubst $(SRC_PATH)/%.c,$(OBJ_PATH)/%.o, $(RPC_SRC))
 
-RPC_BIN = rpc
+RPC_BIN = hermes_rpc
