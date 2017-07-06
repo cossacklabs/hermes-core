@@ -38,4 +38,14 @@ uint32_t hm_key_store_client_sync_call_get_rtoken(hm_key_store_client_sync_t* c,
 uint32_t hm_key_store_client_sync_call_get_wtoken(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, uint8_t** wtoken, size_t* wtoken_length, uint8_t** owner_id, size_t* owner_id_length);
 uint32_t hm_key_store_client_sync_call_del_rtoken(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length);
 uint32_t hm_key_store_client_sync_call_del_wtoken(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length);
+
+typedef struct hm_key_store_client_sync_buffers_list_type hm_key_store_client_sync_buffers_list_t;
+size_t hm_key_store_client_sync_buffers_list_get_count(hm_key_store_client_sync_buffers_list_t* l);
+uint8_t* hm_key_store_client_sync_buffers_list_get_data(hm_key_store_client_sync_buffers_list_t* l, size_t index);
+size_t hm_key_store_client_sync_buffers_list_get_size(hm_key_store_client_sync_buffers_list_t* l, size_t index);
+
+uint32_t hm_key_store_client_sync_buffers_list_destroy(hm_key_store_client_sync_buffers_list_t** l);
+
+hm_key_store_client_sync_buffers_list_t* hm_key_store_client_sync_call_get_tokens_for_block(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length);
+
 #endif //HERMES_KEY_STORE_CLIENT_H

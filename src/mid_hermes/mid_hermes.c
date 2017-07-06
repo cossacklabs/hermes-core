@@ -187,8 +187,8 @@ hermes_status_t mid_hermes_update_block(mid_hermes_t* mh,
     return 1;
   }
   if(!bl->save(bl, NULL, mh->ds, mh->ks)){
-    return 1;
     mid_hermes_ll_block_destroy(&bl);
+    return 1;
   }
   mid_hermes_ll_block_destroy(&bl);
   return 0;
@@ -208,7 +208,7 @@ hermes_status_t mid_hermes_delete_block(mid_hermes_t* mh,
     return HM_FAIL;
   }
   mid_hermes_ll_buffer_t* bl_id=mid_hermes_ll_buffer_create(block_id, block_id_length);
-  if(!block_id
+  if(!bl_id
      || !(bl->load(bl, bl_id, mh->ds, mh->ks, mh->cs))){
     mid_hermes_ll_buffer_destroy(&bl_id);
     mid_hermes_ll_block_destroy(&bl);
@@ -264,7 +264,7 @@ hermes_status_t mid_hermes_grant_read_access(mid_hermes_t* mh,
   mid_hermes_ll_user_t* bl_user=mid_hermes_ll_user_copy(mh->user);
   mid_hermes_ll_block_t* bl=NULL;
   if(!bl_user
-     || (bl=mid_hermes_ll_block_create_empty(bl_user))){
+     || !(bl=mid_hermes_ll_block_create_empty(bl_user))){
     mid_hermes_ll_user_destroy(&bl_user);
     return HM_FAIL;
   }

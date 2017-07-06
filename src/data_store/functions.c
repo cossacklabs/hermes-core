@@ -31,6 +31,13 @@ uint32_t hm_data_store_create_block(hm_ds_db_t* db, const uint8_t* block, const 
   return db->create_block(db->user_data, block, block_length, meta, meta_length, mac, mac_length, id, id_length);
 }
 
+uint32_t hm_data_store_create_block_with_id(hm_ds_db_t* db, const uint8_t* id, const size_t id_length, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length, const uint8_t* mac, const size_t mac_length){
+  if(!db || !(db->user_data) || !(db->create_block) || !block || !block_length || !meta || !meta_length || !mac || !mac_length || !id || !id_length){
+    return HM_INVALID_PARAMETER;
+  }
+  return db->create_block_with_id(db->user_data, id, id_length, block, block_length, meta, meta_length, mac, mac_length);
+}
+
 uint32_t hm_data_store_read_block(hm_ds_db_t* db, const uint8_t* id, const size_t id_length, uint8_t** block, size_t*  block_length, uint8_t** meta, size_t*  meta_length){
   if(!db || !(db->user_data) || !(db->read_block) || !id ||!id_length || !block || !meta){
     return HM_INVALID_PARAMETER;
@@ -98,6 +105,28 @@ uint32_t hm_data_store_create_block_sync_proxy(hm_rpc_client_sync_t* c, const ui
   }
   return HM_SUCCESS;
 }
+
+uint32_t hm_data_store_create_block_with_id_sync_proxy(hm_rpc_client_sync_t* c, const uint8_t* id, const size_t id_length, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length, const uint8_t* mac, const size_t mac_length){
+  if(!c || !block || !block_length || !meta || !meta_length || !mac || !mac_length || !id || !id_length){
+    return HM_INVALID_PARAMETER;
+  }
+  hm_param_pack_t* in=HM_PARAM_PACK(HM_PARAM_BUFFER_C(id, id_length), HM_PARAM_BUFFER_C(block, block_length), HM_PARAM_BUFFER_C(meta, meta_length), HM_PARAM_BUFFER_C(mac, mac_length));
+  if(!in){
+    return HM_FAIL;
+  }
+  hm_param_pack_t* out=NULL;
+  uint32_t status, res;
+  if(HM_SUCCESS!=(res=hm_rpc_client_sync_call(c, (const uint8_t*)hm_data_store_create_block_with_id_NAME, sizeof(hm_data_store_create_block_with_id_NAME), in, &status, &(out)))){
+    hm_param_pack_destroy(&in);
+    return res;
+  }
+  hm_param_pack_destroy(&in);
+  if(HM_SUCCESS!=status){
+    return status;
+  }
+  return HM_SUCCESS;
+}
+
 
 uint32_t hm_data_store_read_block_sync_proxy(hm_rpc_client_sync_t* c, const uint8_t* id, const size_t id_length, uint8_t** block, size_t*  block_length, uint8_t** meta, size_t*  meta_length){
   if(!c || !id || !id_length || !block || !meta){
@@ -183,6 +212,19 @@ uint32_t hm_data_store_create_block_stub(hm_param_pack_t* in, hm_param_pack_t** 
     return HM_FAIL;
   }
   return HM_SUCCESS;
+}
+
+uint32_t hm_data_store_create_block_with_id_stub(hm_param_pack_t* in, hm_param_pack_t** out, void* user_data){
+  if(!user_data || !in || !out){
+    return HM_INVALID_PARAMETER;
+  }
+  uint8_t *id=NULL, *block=NULL, *meta=NULL, *mac=NULL;
+  size_t id_length=0, block_length=0, meta_length=0, mac_length=0;
+  uint32_t res;
+  if(HM_SUCCESS!=(res=HM_PARAM_EXTRACT(in, HM_PARAM_BUFFER(&id, &id_length), HM_PARAM_BUFFER(&block, &block_length), HM_PARAM_BUFFER(&meta, &meta_length), HM_PARAM_BUFFER(&mac, &mac_length)))){
+    return res;
+  }
+  return hm_data_store_create_block_with_id((hm_ds_db_t*)user_data, id, id_length, block, block_length, meta, meta_length, mac, mac_length);
 }
 
 uint32_t hm_data_store_read_block_stub(hm_param_pack_t* in, hm_param_pack_t** out, void* user_data){
