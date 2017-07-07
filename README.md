@@ -1,29 +1,22 @@
 # Hermes core library 0.5 PoC
 
+_description_
+
 Hermes is a cryptography-based method of providing protected data storage and sharing that allows enforcing cryptographically checked CRUD permissions to data blocks and doesn't let server that's running Hermes do anything worse than DoS. 
+
+_link to paper and docs and tutorials_
 
 Scientific paper and a number of descriptive documents are in progress. Meanwhile, you can read [wiki](https://github.com/cossacklabs/hermes-core/wiki) for a simplistic description.
 
+_repository status_
 This repository holds public proof-of-concept version, which should be used to study and verify the methodology and cryptographic backend. 
 
+_license_
 There is a separate, commercial licensed Hermes version for industrial use (its core crypto code is similar to this repository, yet it holds additional convenience interfaces and services). 
 
-Hermes is a part of backend protection suite called [Toughbase](https://www.cossacklabs.com/toughbase/).
+# Installing
 
-# Building
-
-Requirements:
-
-To build Hermes, you only need to install the standard build environment (in Debian you need to install ‘build-essential’ package) and our crypto SDK [Themis](https://www.github.com/cossacklabs/themis/). This open-source version of Hermes is only checked to work on Linux. 
-
-To build and install Hermes:
-
-```
-make
-make install
-```
-
-Hermes is ready to use.
+_easy scenario - package server or packages from github_
 
 # Using Hermes:
 
@@ -65,3 +58,21 @@ pyhermes.py -[u|p|c|d|b|cc|uu|r] <parameters>
 	-uu – user id to grant/deny access
 	-r – rights mask (1 for read-only access, 2 for read-write access)
 ```
+
+# Building from the source
+
+_serious scenario_
+
+Requirements:
+
+To build Hermes, you only need to install the standard build environment (in Debian you need to install ‘build-essential’ package) and our crypto SDK [Themis](https://www.github.com/cossacklabs/themis/). This open-source version of Hermes is only checked to work on Linux. 
+
+To build and install Hermes:
+
+```
+make
+make install
+```
+
+Hermes is ready to use.
+
