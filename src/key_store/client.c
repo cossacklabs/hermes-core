@@ -97,15 +97,9 @@ uint32_t hm_key_store_client_sync_call_del_wtoken(hm_key_store_client_sync_t* c,
   return hm_key_store_del_wtoken_sync_proxy(c->c, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length); 
 }
 
-struct hm_key_store_client_sync_buffers_list_type{
-  int a;
-};
-
-uint32_t hm_key_store_client_sync_buffers_list_destroy(hm_key_store_client_sync_buffers_list_t** l){
-  return HM_FAIL;
-}
-
 hm_key_store_client_sync_buffers_list_t* hm_key_store_client_sync_call_get_tokens_for_block(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length){
   return NULL;
 }
-
+uint32_t hm_key_store_client_sync_buffers_list_detroy(hm_key_store_client_sync_buffers_list_t** bl){
+  return HM_FAIL;
+}

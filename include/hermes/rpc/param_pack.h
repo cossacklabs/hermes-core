@@ -33,6 +33,7 @@ typedef uint32_t (*send_rouitine_t)(void* user_data, const uint8_t* buffer_to_se
 typedef uint32_t (*recv_rouitine_t)(void* user_data, uint8_t* buffer_to_receive, const size_t buffer_to_receive_length); //if really readed less than buffer_to_receive_length bytes need return error!!!
 
 hm_param_pack_t* hm_param_pack_create();
+
 hm_param_pack_t* hm_param_pack_create_(void* unused, ...);
 uint32_t hm_param_pack_extract_(hm_param_pack_t* p, ...);
 uint32_t hm_param_pack_destroy(hm_param_pack_t** p);
@@ -55,11 +56,14 @@ hm_param_pack_t* hm_param_pack_receive(hm_rpc_transport_t* transport);
 #define HM_PARAM_TYPE_BUFFER_C 0x26048029   //buffer without putting ownership to param_pack
                                             //buffer must be destroyed separately with param_pack
 
+#define HM_PARAM_TYPE_BUFFERS_LIST 0x26048030
+
 /* end of constatnt definitions*/
 
 #define HM_PARAM_INT32(p) (uint32_t)HM_PARAM_PACK_MAGIC, (uint32_t)HM_PARAM_TYPE_INT32, p
 #define HM_PARAM_BUFFER(p, p_len) (uint32_t)HM_PARAM_PACK_MAGIC, (uint32_t)HM_PARAM_TYPE_BUFFER, p, p_len
 #define HM_PARAM_BUFFER_C(p, p_len) (uint32_t)HM_PARAM_PACK_MAGIC, (uint32_t)HM_PARAM_TYPE_BUFFER_C, p, p_len
+#define HM_PARAM_BUFFERS_LIST(p) (uint32_t)HM_PARAM_PACK_MAGIC, (uint32_t)HM_PARAM_TYPE_BUFFERS_LIST, p
 
 #define HM_PARAM_PACK(...) hm_param_pack_create_((void*)NULL, __VA_ARGS__, (uint32_t)0)
 #define HM_PARAM_EXTRACT(p, ...) hm_param_pack_extract_(p, __VA_ARGS__, (uint32_t)0)

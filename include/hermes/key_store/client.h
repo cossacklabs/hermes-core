@@ -46,6 +46,14 @@ size_t hm_key_store_client_sync_buffers_list_get_size(hm_key_store_client_sync_b
 
 uint32_t hm_key_store_client_sync_buffers_list_destroy(hm_key_store_client_sync_buffers_list_t** l);
 
+typedef struct hm_key_store_client_sync_buffers_list_type{
+  void* impl;
+  size_t(*get_size)(hm_key_store_client_sync_buffers_list_t* bl);
+  size_t(*get_item_size)(hm_key_store_client_sync_buffers_list_t* bl, size_t index);
+  uint8_t*(*get_item_data)(hm_key_store_client_sync_buffers_list_t* bl, size_t index);  
+}hm_key_store_client_sync_buffers_list_t;
+
 hm_key_store_client_sync_buffers_list_t* hm_key_store_client_sync_call_get_tokens_for_block(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length);
+uint32_t hm_key_store_client_sync_buffers_list_detroy(hm_key_store_client_sync_buffers_list_t** bl);
 
 #endif //HERMES_KEY_STORE_CLIENT_H

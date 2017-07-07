@@ -22,6 +22,7 @@
 #include <hermes/rpc/transport.h>
 #include <hermes/common/errors.h>
 #include <hermes/rpc/param_pack.h>
+#include <hermes/rpc/buffers_list.h>
 
 #include <stdarg.h>
 #include <string.h>
@@ -79,6 +80,10 @@ hm_param_pack_t* hm_param_pack_create_(void* unused, ...){
       res->nodes[res->param_count].data.buf_val=va_arg(va, uint8_t*);
       res->nodes[res->param_count].data_length=va_arg(va, size_t);
       break;
+    case HM_PARAM_TYPE_BUFFERS_LIST:
+      res->nodes[res->param_count].type=type;
+      res->nodes[res->param_count].data_length=hm_buffers_list_to_buf(va_arg(va, hm_buffers_list_t*), &(res->nodes[res->param_count].data.buf_val));
+      break;
     default:
       hm_param_pack_destroy(&res);
       va_end(va);
@@ -101,6 +106,7 @@ uint32_t hm_param_pack_destroy(hm_param_pack_t** p){
   } else {
     while((*p)->param_count){
       switch((*p)->nodes[(*p)->param_count-1].type){
+      case HM_PARAM_TYPE_BUFFERS_LIST:
       case HM_PARAM_TYPE_BUFFER:
         free((*p)->nodes[(*p)->param_count-1].data.buf_val);
         break;
@@ -136,6 +142,9 @@ uint32_t hm_param_pack_extract_(hm_param_pack_t* p, ...){
     case HM_PARAM_TYPE_INT32:
       (*(va_arg(va, int32_t*)))=p->nodes[curr_node].data.int_val;
       break;
+    case HM_PARAM_TYPE_BUFFERS_LIST:
+      *(va_arg(va, hm_buffers_list_t**))=hm_buffers_list_extract(p->nodes[curr_node].data.buf_val, p->nodes[curr_node].data_length);
+      break;
     case HM_PARAM_TYPE_BUFFER:
     case HM_PARAM_TYPE_BUFFER_C:
       *(va_arg(va, uint8_t**))=p->nodes[curr_node].data.buf_val;
@@ -165,6 +174,7 @@ uint32_t hm_param_pack_get_whole_length_(const hm_param_pack_t* p){
     case HM_PARAM_TYPE_INT32:
       whole_length+=2*sizeof(uint32_t);
       break;
+    case HM_PARAM_TYPE_BUFFERS_LIST:
     case HM_PARAM_TYPE_BUFFER:
     case HM_PARAM_TYPE_BUFFER_C:
       whole_length+=2*sizeof(uint32_t);
@@ -201,6 +211,7 @@ uint32_t hm_param_pack_write(hm_param_pack_t* p, uint8_t* buffer, size_t *buffer
       memcpy(buffer+curr_pos+sizeof(uint32_t), (uint8_t*)(&(p->nodes[curr_node].data.int_val)), sizeof(uint32_t)); //value
       curr_pos+=2*sizeof(uint32_t);
       break;
+    case HM_PARAM_TYPE_BUFFERS_LIST:
     case HM_PARAM_TYPE_BUFFER:
     case HM_PARAM_TYPE_BUFFER_C:{
       uint32_t t=HM_PARAM_TYPE_BUFFER;
@@ -245,6 +256,7 @@ uint32_t hm_param_pack_send(const hm_param_pack_t* p, hm_rpc_transport_t* transp
         return res;
       }
       break;
+    case HM_PARAM_TYPE_BUFFERS_LIST:
     case HM_PARAM_TYPE_BUFFER:
     case HM_PARAM_TYPE_BUFFER_C:{
       uint32_t t=HM_PARAM_TYPE_BUFFER;
@@ -287,6 +299,7 @@ bool hm_param_pack_check_buf_(const uint8_t* buffer, size_t buffer_length){
       }
       buffer+=sizeof(int32_t);
       break;
+    case HM_PARAM_TYPE_BUFFERS_LIST:      
     case HM_PARAM_TYPE_BUFFER_C:
     case HM_PARAM_TYPE_BUFFER:{
       if((buffer+sizeof(uint32_t))>buffer_end){
@@ -330,6 +343,7 @@ hm_param_pack_t* hm_param_pack_read(uint8_t* buffer, size_t buffer_length){
       memcpy(&(res->nodes[curr_param].data.int_val), buf, sizeof(int32_t));
       buf+=sizeof(int32_t);
       break;
+    case HM_PARAM_TYPE_BUFFERS_LIST:      
     case HM_PARAM_TYPE_BUFFER:
     case HM_PARAM_TYPE_BUFFER_C:
       res->nodes[curr_param].data_length=*((uint32_t*)buf);
