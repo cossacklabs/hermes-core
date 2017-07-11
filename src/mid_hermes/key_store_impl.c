@@ -278,6 +278,7 @@ size_t hermes_key_store_iterator_get_wtoken_owner_length(hermes_key_store_iterat
     return i->current_user_id_length;
   }
   return 0;
+
 }
 
 hermes_status_t hermes_key_store_iterator_destroy(hermes_key_store_iterator_t** i){

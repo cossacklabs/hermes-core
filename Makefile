@@ -211,6 +211,16 @@ install_shared_libs: err all make_install_dirs
 
 install: install_headers install_static_libs install_shared_libs
 
+ll_example: CMD = make docs/examples/c/mid_hermes_low_level/Makefile
+
+ll_example: static_core
+	@echo -n "make midHermes lowLevel example"
+	@$(BUILD_CMD_)
+
+
+examples: static_core ll_example hermes_example
+	
+
 uninstall: CMD = rm -rf $(PREFIX)/include/hermes && rm -f $(PREFIX)/lib/libhermes*.a && rm -f $(PREFIX)/lib/libhermes*.so
 
 uninstall:

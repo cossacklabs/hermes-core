@@ -68,14 +68,16 @@ mid_hermes_ll_user_t* mid_hermes_ll_user_load(mid_hermes_ll_buffer_t* id,
     return NULL;
   }
   mid_hermes_ll_user_t* u=NULL;
-  mid_hermes_ll_buffer_t* u_pk=mid_hermes_ll_buffer_create(NULL, 0);
-  if(!u_pk
-     || (HM_SUCCESS!=hermes_credential_store_get_public_key(cs,
-                                                            id->data,
-                                                            id->length,
-                                                            &(u_pk->data),
-                                                            &(u_pk->length)))
-     || !(u=mid_hermes_ll_user_create(id, u_pk))){
+  uint8_t* pk=NULL;
+  size_t pk_length=0;
+  mid_hermes_ll_buffer_t* u_pk=NULL;//mid_hermes_ll_buffer_create(NULL, 0);
+  if((HM_SUCCESS!=hermes_credential_store_get_public_key(cs,
+                                                         id->data,
+                                                         id->length, 
+                                                         &pk,
+                                                         &pk_length))
+    || !(u_pk=mid_hermes_ll_buffer_create(pk, pk_length)) 
+    || !(u=mid_hermes_ll_user_create(id, u_pk))){
     mid_hermes_ll_buffer_destroy(&u_pk);
     return NULL;
   }
@@ -113,6 +115,7 @@ mid_hermes_ll_user_t* mid_hermes_ll_local_user_load_c(const uint8_t* id,
      || !(u=mid_hermes_ll_user_load(b_id, cs))){
     mid_hermes_ll_buffer_destroy(&b_id);
     mid_hermes_ll_buffer_destroy(&b_sk);
+    return NULL;
   }
   u->sk=b_sk;
   return u;

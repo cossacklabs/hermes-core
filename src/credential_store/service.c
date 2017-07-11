@@ -60,7 +60,6 @@ uint32_t hm_credential_store_service_start(hm_credential_store_service_t* s){
     if(s->finish){
       return HM_SUCCESS;
     }
-    //TODO logging
     if(HM_SUCCESS!=hm_credential_store_server_call(s->s)){
       return HM_FAIL;
     }

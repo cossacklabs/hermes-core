@@ -19,17 +19,12 @@
  */
 
 
-#ifndef HM_KEY_STORE_SERVICE
-#define HM_KEY_STORE_SERVICE
+#ifndef DB_H
+#define DB_H
 
-#include <hermes/rpc/transport.h>
-#include <hermes/key_store/db.h>
+#include <hermes/data_store/db.h>
 
-typedef struct hm_key_server_service_type hm_key_store_service_t;
+hm_ds_db_t* db_create();
+uint32_t db_destroy(hm_ds_db_t** db);
 
-hm_key_store_service_t* hm_key_store_service_create(hm_rpc_transport_t* transport, hm_ks_db_t* db);
-uint32_t hm_key_store_service_destroy(hm_key_store_service_t** s);
-uint32_t hm_key_store_service_start(hm_key_store_service_t* s);
-uint32_t hm_key_store_service_stop(hm_key_store_service_t* s); 
-
-#endif //HM_KEY_STORE_SERVICE
+#endif //DB_H

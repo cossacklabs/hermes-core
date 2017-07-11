@@ -146,9 +146,14 @@ uint32_t hm_param_pack_extract_(hm_param_pack_t* p, ...){
       *(va_arg(va, hm_buffers_list_t**))=hm_buffers_list_extract(p->nodes[curr_node].data.buf_val, p->nodes[curr_node].data_length);
       break;
     case HM_PARAM_TYPE_BUFFER:
-    case HM_PARAM_TYPE_BUFFER_C:
-      *(va_arg(va, uint8_t**))=p->nodes[curr_node].data.buf_val;
+    case HM_PARAM_TYPE_BUFFER_C:{
+      uint8_t** a=va_arg(va, uint8_t**);
+      *a=malloc(p->nodes[curr_node].data_length);
+//
+      memcpy(*a, p->nodes[curr_node].data.buf_val, p->nodes[curr_node].data_length);
+//
       *(va_arg(va, size_t*))=p->nodes[curr_node].data_length;
+    }
       break;
     default:
       va_end(va);

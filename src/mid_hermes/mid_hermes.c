@@ -97,7 +97,7 @@ hermes_status_t mid_hermes_create_block(mid_hermes_t* mh,
   if(!bl_data
      || !bl_user
      || !bl_meta
-     || (bl=mid_hermes_ll_block_create(bl_user, bl_id, bl_data, bl_meta, NULL, NULL))){
+     || !(bl=mid_hermes_ll_block_create(bl_user, bl_id, bl_data, bl_meta, NULL, NULL))){
     mid_hermes_ll_buffer_destroy(&bl_id);
     mid_hermes_ll_buffer_destroy(&bl_data);
     mid_hermes_ll_buffer_destroy(&bl_meta);
