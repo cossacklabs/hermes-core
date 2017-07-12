@@ -22,23 +22,78 @@
 #ifndef MID_HERMES_H
 #define MID_HERMES_H
 
+#include <hermes/common/errors.h>
+#include <hermes/rpc/transport.h>
+
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <hermes/rpc/transport.h>
-
 typedef struct mid_hermes_type mid_hermes_t;
 
-mid_hermes_t* mid_hermes_create(const uint8_t* id, const size_t id_length, const uint8_t* sk, const size_t sk_len, hm_rpc_transport_t* cs_transport, hm_rpc_transport_t* ks_transport, hm_rpc_transport_t* ds_transport);
-uint32_t mid_hermes_destroy(mid_hermes_t** mh);
+mid_hermes_t* mid_hermes_create(const uint8_t* user_id,
+                                const size_t user_id_length,
+                                const uint8_t* sk,
+                                const size_t sk_len,
+                                hm_rpc_transport_t* ks_transport,
+                                hm_rpc_transport_t* ds_transport,
+                                hm_rpc_transport_t* cs_transport);
 
-uint32_t mid_hermes_create_block(mid_hermes_t* mh, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length, uint8_t** id, size_t* id_length);
-uint32_t mid_hermes_read_block(mid_hermes_t* mh, const uint8_t* block_id, const size_t block_id_length, uint8_t** block, size_t* block_length, uint8_t** meta, size_t* meta_length);
-uint32_t mid_hermes_update_block(mid_hermes_t* mh, const uint8_t* block_id, const size_t block_id_length, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length);
-uint32_t mid_hermes_delete_block(mid_hermes_t* mh, const uint8_t* block_id, const size_t block_id_length);
+hermes_status_t mid_hermes_destroy(mid_hermes_t** mh);
 
-uint32_t grant_read_access(mid_hermes_t* mh, const uint8_t* block_id, const size_t bloc_id_length, const uint8_t* user_id, const size_t user_id_length);
-uint32_t grant_update_access(mid_hermes_t* mh, const uint8_t* block_id, const size_t bloc_id_length, const uint8_t* user_id, const size_t user_id_length);
-uint32_t deny_read_access(mid_hermes_t* mh, const uint8_t* block_id, const size_t bloc_id_length, const uint8_t* user_id, const size_t user_id_length);
-uint32_t deny_update_access(mid_hermes_t* mh, const uint8_t* block_id, const size_t bloc_id_length, const uint8_t* user_id, const size_t user_id_length);
+hermes_status_t mid_hermes_create_block(mid_hermes_t* mh,
+                                        uint8_t** id,
+                                        size_t* id_length,
+                                        const uint8_t* block,
+                                        const size_t block_length,
+                                        const uint8_t* meta,
+                                        const size_t meta_length);
+
+hermes_status_t mid_hermes_read_block(mid_hermes_t* mh,
+                                      const uint8_t* block_id,
+                                      const size_t block_id_length,
+                                      uint8_t** block,
+                                      size_t* block_length,
+                                      uint8_t** meta,
+                                      size_t* meta_length);
+
+hermes_status_t mid_hermes_update_block(mid_hermes_t* mh,
+                                        const uint8_t* block_id,
+                                        const size_t block_id_length,
+                                        const uint8_t* block,
+                                        const size_t block_length,
+                                        const uint8_t* meta,
+                                        const size_t meta_length);
+
+hermes_status_t mid_hermes_delete_block(mid_hermes_t* mh,
+                                        const uint8_t* block_id,
+                                        const size_t block_id_length);
+
+hermes_status_t mid_hermes_rotate_block(mid_hermes_t* mh,
+                                        const uint8_t* block_id,
+                                        const size_t block_id_length);
+
+hermes_status_t mid_hermes_grant_read_access(mid_hermes_t* mh,
+                                             const uint8_t* block_id,
+                                             const size_t bloc_id_length,
+                                             const uint8_t* user_id,
+                                             const size_t user_id_length);
+
+hermes_status_t mid_hermes_grant_update_access(mid_hermes_t* mh,
+                                               const uint8_t* block_id,
+                                               const size_t bloc_id_length,
+                                               const uint8_t* user_id,
+                                               const size_t user_id_length);
+
+hermes_status_t mid_hermes_deny_read_access(mid_hermes_t* mh,
+                                            const uint8_t* block_id,
+                                            const size_t bloc_id_length,
+                                            const uint8_t* user_id,
+                                            const size_t user_id_length);
+
+hermes_status_t mid_hermes_deny_update_access(mid_hermes_t* mh,
+                                              const uint8_t* block_id,
+                                              const size_t bloc_id_length,
+                                              const uint8_t* user_id,
+                                              const size_t user_id_length);
+
 #endif //MID_HERMES_H

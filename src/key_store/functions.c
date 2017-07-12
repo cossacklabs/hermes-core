@@ -96,6 +96,12 @@ uint32_t hm_key_store_del_wtoken(hm_ks_db_t* db, const uint8_t* block_id, const 
   return db->del_wtoken(db->user_data, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length);  
 }
 
+uint32_t hm_key_store_get_indexed_rights(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const size_t index, uint8_t** user_id, size_t* user_id_length, uint32_t* rights_mask){
+  if(!db || !(db->user_data) || !(db->get_wtoken) || !(db->del_wtoken) || !block_id || !block_id_length || !user_id || !user_id_length ){
+    return HM_INVALID_PARAMETER;
+  }
+  return db->get_indexed_rights(db->user_data, block_id, block_id_length, index, user_id, user_id_length, rights_mask);
+}
 
 //proxies
 
@@ -217,6 +223,31 @@ uint32_t hm_key_store_del_wtoken_sync_proxy(hm_rpc_client_sync_t* c, const uint8
   return status;
 }
 
+uint32_t hm_key_store_get_indexed_rights_proxy(hm_rpc_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const size_t index, uint8_t** user_id, size_t* user_id_length, uint32_t* rights_mask){
+  if(!c || block_id || !block_id_length || !user_id || !user_id_length || !rights_mask){
+    return HM_INVALID_PARAMETER;
+  }
+  hm_param_pack_t* in=HM_PARAM_PACK(HM_PARAM_BUFFER_C(block_id, block_id_length), HM_PARAM_INT32(index));
+  if(!in){
+    return HM_FAIL;
+  }
+  uint32_t status, res;
+  hm_param_pack_t* out=NULL;
+  if(HM_SUCCESS!=(res=hm_rpc_client_sync_call(c, (const uint8_t*)hm_key_store_get_indexed_rights_NAME, sizeof(hm_key_store_get_indexed_rights_NAME), in, &status, &(out)))){
+    hm_param_pack_destroy(&in);
+    return res;
+  }
+  hm_param_pack_destroy(&in);
+  if(HM_SUCCESS!=status){
+    return status;
+  }
+  if(HM_SUCCESS!=(res=HM_PARAM_EXTRACT(out, HM_PARAM_BUFFER(user_id, user_id_length), HM_PARAM_INT32(rights_mask)))){
+    hm_param_pack_destroy(&out);
+    return res;
+  }
+  return HM_SUCCESS;
+}
+
 //stubs
 uint32_t hm_key_store_set_rtoken_stub(hm_param_pack_t* in, hm_param_pack_t** out, void* user_data){
   if(!user_data || !in || !out){
@@ -308,4 +339,25 @@ uint32_t hm_key_store_del_wtoken_stub(hm_param_pack_t* in, hm_param_pack_t** out
     return res;
   }
   return hm_key_store_del_wtoken((hm_ks_db_t*)user_data, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length);
+}
+
+uint32_t hm_key_store_get_indexed_rights_stub(hm_param_pack_t* in, hm_param_pack_t** out, void* user_data){
+  if(!user_data || !in || !out){
+    return HM_INVALID_PARAMETER;
+  }
+  uint8_t *block_id=NULL, *user_id=NULL;
+  size_t block_id_length=0, user_id_length=0;
+  uint32_t res, rights_mask;
+  int32_t index;
+  if(HM_SUCCESS!=(res=HM_PARAM_EXTRACT(in, HM_PARAM_BUFFER(&block_id, &block_id_length), HM_PARAM_INT32(&index)))){
+    return res;
+  }
+  if(HM_SUCCESS!=(res=hm_key_store_get_indexed_rights((hm_ks_db_t*)user_data, block_id, block_id_length, index, &user_id, &user_id_length, &rights_mask))){
+    return res;
+  }
+  *out=HM_PARAM_PACK(HM_PARAM_BUFFER(user_id, user_id_length), HM_PARAM_INT32(rights_mask));
+  if(!(*out)){
+    return HM_FAIL;
+  }
+  return HM_SUCCESS;
 }

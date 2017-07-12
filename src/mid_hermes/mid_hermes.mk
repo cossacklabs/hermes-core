@@ -23,4 +23,4 @@ MID_HERMES_SRC = $(wildcard $(SRC_PATH)/mid_hermes/*.c)
 
 MID_HERMES_OBJ = $(patsubst $(SRC_PATH)/%.c,$(OBJ_PATH)/%.o, $(MID_HERMES_SRC))
 
-MID_HERMES_BIN = mid_hermes
+MID_HERMES_BIN = hermes_mid_hermes

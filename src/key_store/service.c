@@ -24,7 +24,7 @@
 #include <assert.h>
 #include <stdbool.h>
 
-struct hm_credential_server_service_type{
+struct hm_key_server_service_type{
   hm_key_store_server_t* s;
   bool finish;
 };

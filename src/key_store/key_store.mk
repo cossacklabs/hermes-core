@@ -22,4 +22,4 @@ KEY_STORE_SRC = $(wildcard $(SRC_PATH)/key_store/*.c)
 
 KEY_STORE_OBJ = $(patsubst $(SRC_PATH)/%.c,$(OBJ_PATH)/%.o, $(KEY_STORE_SRC))
 
-KEY_STORE_BIN = key_store
+KEY_STORE_BIN = hermes_key_store

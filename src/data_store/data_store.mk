@@ -22,4 +22,4 @@ DATA_STORE_SRC = $(wildcard $(SRC_PATH)/data_store/*.c)
 
 DATA_STORE_OBJ = $(patsubst $(SRC_PATH)/%.c,$(OBJ_PATH)/%.o, $(DATA_STORE_SRC))
 
-DATA_STORE_BIN = data_store
+DATA_STORE_BIN = hermes_data_store

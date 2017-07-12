@@ -69,6 +69,7 @@ include src/rpc/rpc.mk
 include src/credential_store/credential_store.mk
 include src/data_store/data_store.mk
 include src/key_store/key_store.mk
+include src/mid_hermes_ll/mid_hermes_ll.mk
 include src/mid_hermes/mid_hermes.mk
 endif
 
@@ -94,7 +95,7 @@ rpc_static: common_static $(RPC_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-rpc_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(RPC_BIN).$(SHARED_EXT) $(RPC_OBJ) $(LDFLAGS) -lcommon
+rpc_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(RPC_BIN).$(SHARED_EXT) $(RPC_OBJ) $(LDFLAGS) -l$(COMMON_BIN)
 
 rpc_shared: common_static $(RPC_OBJ)
 	@echo -n "link "
@@ -106,7 +107,7 @@ credential_store_static: common_static rpc_static $(CREDENTIAL_STORE_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-credential_store_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(CREDENTIAL_STORE_BIN).$(SHARED_EXT) $(CREDENTIAL_STORE_OBJ) $(LDFLAGS) -lcommon -lrpc
+credential_store_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(CREDENTIAL_STORE_BIN).$(SHARED_EXT) $(CREDENTIAL_STORE_OBJ) $(LDFLAGS) -l$(COMMON_BIN) -l$(RPC_BIN)
 
 credential_store_shared: common_static rpc_shared $(CREDENTIAL_STORE_OBJ)
 	@echo -n "link "
@@ -118,7 +119,7 @@ data_store_static: common_static rpc_static $(DATA_STORE_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-data_store_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(DATA_STORE_BIN).$(SHARED_EXT) $(DATA_STORE_OBJ) $(LDFLAGS) -lcommon -lrpc
+data_store_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(DATA_STORE_BIN).$(SHARED_EXT) $(DATA_STORE_OBJ) $(LDFLAGS) -l$(COMMON_BIN) -l$(RPC_BIN)
 
 data_store_shared: common_static rpc_shared $(DATA_STORE_OBJ)
 	@echo -n "link "
@@ -130,7 +131,7 @@ key_store_static: common_static rpc_static $(KEY_STORE_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-key_store_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(KEY_STORE_BIN).$(SHARED_EXT) $(KEY_STORE_OBJ) $(LDFLAGS) -lcommon -lrpc
+key_store_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(KEY_STORE_BIN).$(SHARED_EXT) $(KEY_STORE_OBJ) $(LDFLAGS) -l$(COMMON_BIN) -l$(RPC_BIN)
 
 key_store_shared: common_static rpc_shared $(KEY_STORE_OBJ)
 	@echo -n "link "
@@ -138,13 +139,25 @@ key_store_shared: common_static rpc_shared $(KEY_STORE_OBJ)
 
 mid_hermes_static: CMD = $(AR) rcs $(BIN_PATH)/lib$(MID_HERMES_BIN).a $(MID_HERMES_OBJ)
 
-mid_hermes_static: common_static rpc_static $(MID_HERMES_OBJ) 
+mid_hermes_static: mid_hermes_ll_static rpc_static $(MID_HERMES_OBJ) 
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-mid_hermes_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(MID_HERMES_BIN).$(SHARED_EXT) $(MID_HERMES_OBJ) $(LDFLAGS) -lcommon -lrpc
+mid_hermes_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(MID_HERMES_BIN).$(SHARED_EXT) $(MID_HERMES_OBJ) $(LDFLAGS) -l$(MID_HERMES_LL_BIN) -l$(RPC_BIN)
 
-mid_hermes_shared: common_static rpc_shared $(MID_HERMES_OBJ)
+mid_hermes_shared: mid_hermes_ll_shared rpc_shared $(MID_HERMES_OBJ)
+	@echo -n "link "
+	@$(BUILD_CMD)
+
+mid_hermes_ll_static: CMD = $(AR) rcs $(BIN_PATH)/lib$(MID_HERMES_LL_BIN).a $(MID_HERMES_LL_OBJ)
+
+mid_hermes_ll_static: common_static $(MID_HERMES_LL_OBJ) 
+	@echo -n "link "
+	@$(BUILD_CMD)
+
+mid_hermes_ll_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(MID_HERMES_LL_BIN).$(SHARED_EXT) $(MID_HERMES_LL_OBJ) $(LDFLAGS) -l$(COMMON_BIN)
+
+mid_hermes_ll_shared: common_static $(MID_HERMES_LL_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
@@ -171,3 +184,45 @@ clean: CMD = rm -rf $(BIN_PATH)
 
 clean:
 	@$(BUILD_CMD)
+
+make_install_dirs: CMD = mkdir -p $(PREFIX)/include/hermes $(PREFIX)/lib
+
+make_install_dirs:
+	@echo -n "making dirs for install "
+	@$(BUILD_CMD_)
+
+install_headers: CMD = cp -r include/hermes $(PREFIX)/include
+
+install_headers: err all make_install_dirs
+	@echo -n "install soter headers "
+	@$(BUILD_CMD_)
+
+install_static_libs: CMD = install $(BIN_PATH)/*.a $(PREFIX)/lib
+
+install_static_libs: err all make_install_dirs
+	@echo -n "install static libraries "
+	@$(BUILD_CMD_)
+
+install_shared_libs: CMD = install $(BIN_PATH)/*.$(SHARED_EXT) $(PREFIX)/lib
+
+install_shared_libs: err all make_install_dirs
+	@echo -n "install shared libraries "
+	@$(BUILD_CMD_)
+
+install: install_headers install_static_libs install_shared_libs
+
+ll_example: CMD = make docs/examples/c/mid_hermes_low_level/Makefile
+
+ll_example: static_core
+	@echo -n "make midHermes lowLevel example"
+	@$(BUILD_CMD_)
+
+
+examples: static_core ll_example hermes_example
+	
+
+uninstall: CMD = rm -rf $(PREFIX)/include/hermes && rm -f $(PREFIX)/lib/libhermes*.a && rm -f $(PREFIX)/lib/libhermes*.so
+
+uninstall:
+	@echo -n "themis uninstall "
+	@$(BUILD_CMD_)

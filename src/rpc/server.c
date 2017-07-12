@@ -91,23 +91,44 @@ uint32_t hm_rpc_server_call_func(hm_rpc_server_t* s, const uint8_t* func_signatu
   }
   hm_server_func_t* func=NULL;
   size_t func_length=sizeof(hm_server_func_t);
+#ifdef DEBUG
+  fprintf(stderr, "calling %s...", (const char*)func_signature);
+#endif
   if(HM_SUCCESS!=hm_hash_table_get(s->func_table, func_signature, func_signature_length, (uint8_t**)&func, &func_length)){
     hm_rpc_server_send_error(s, HM_FAIL);
+#ifdef DEBUG
+#define ANSI_COLOR_RED     "\033[1m\033[31m"
+#define ANSI_COLOR_GREEN   "\033[1m\033[32m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+    fprintf(stderr, ANSI_COLOR_RED "FAIL(1)\n" ANSI_COLOR_RESET);
+#endif
     return HM_FAIL;    
   }
   hm_param_pack_t* pack=hm_param_pack_receive(s->transport);
   if(!pack){
     hm_rpc_server_send_error(s, HM_FAIL);
+#ifdef DEBUG
+    fprintf(stderr, ANSI_COLOR_RED "FAIL(2)\n" ANSI_COLOR_RESET);
+#endif
     return HM_FAIL;
   }
   hm_param_pack_t* out_pack=NULL;
   uint32_t res=(*func)(pack, &out_pack, user_data);
   hm_param_pack_destroy(&pack);
   if(HM_SUCCESS!=res){
+#ifdef DEBUG
+#define ANSI_COLOR_RED     "\033[1m\033[31m"
+#define ANSI_COLOR_GREEN   "\033[1m\033[32m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+    fprintf(stderr, ANSI_COLOR_RED "FAIL(3)\n" ANSI_COLOR_RESET);
+#endif
     return hm_rpc_server_send_error(s, res);
   }
   res=hm_rpc_server_send(s, out_pack);
   hm_param_pack_destroy(&out_pack);
+#ifdef DEBUG
+  fprintf(stderr, ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET);
+#endif
   return res;
 }
 

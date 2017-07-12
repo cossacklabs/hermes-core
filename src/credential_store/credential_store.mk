@@ -22,4 +22,4 @@ CREDENTIAL_STORE_SRC = $(wildcard $(SRC_PATH)/credential_store/*.c)
 
 CREDENTIAL_STORE_OBJ = $(patsubst $(SRC_PATH)/%.c,$(OBJ_PATH)/%.o, $(CREDENTIAL_STORE_SRC))
 
-CREDENTIAL_STORE_BIN = credential_store
+CREDENTIAL_STORE_BIN = hermes_credential_store

@@ -48,6 +48,10 @@ hm_data_store_server_t* hm_data_store_server_create(hm_rpc_transport_t* transpor
     hm_data_store_server_destroy(&s);
     return NULL;
   }
+  if(HM_SUCCESS!=(res=HM_RPC_SERVER_REG_FUNC(s->s, hm_data_store_create_block_with_id))){
+    hm_data_store_server_destroy(&s);
+    return NULL;
+  }
   if(HM_SUCCESS!=(res=HM_RPC_SERVER_REG_FUNC(s->s, hm_data_store_read_block))){
     hm_data_store_server_destroy(&s);
     return NULL;

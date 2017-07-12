@@ -68,6 +68,10 @@ hm_key_store_server_t* hm_key_store_server_create(hm_rpc_transport_t* transport,
     hm_key_store_server_destroy(&s);
     return NULL;
   }
+  if(HM_SUCCESS!=(res=HM_RPC_SERVER_REG_FUNC(s->s, hm_key_store_get_indexed_rights))){
+    hm_key_store_server_destroy(&s);
+    return NULL;
+  }
   s->db=db;
   return s;
 }

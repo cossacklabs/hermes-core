@@ -61,6 +61,13 @@ uint32_t hm_data_store_client_sync_call_create_block(hm_data_store_client_sync_t
   return hm_data_store_create_block_sync_proxy(c->c, block, block_length, meta, meta_length, mac,  mac_length, id, id_length);
 }
 
+uint32_t hm_data_store_client_sync_call_create_block_with_id(hm_data_store_client_sync_t* c, const uint8_t* id, const size_t id_length, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length, const uint8_t* mac, const size_t mac_length){
+  if(!c || !block || !block_length || !meta || !meta_length || !mac || !mac_length || !id || !id_length){
+    return HM_INVALID_PARAMETER;
+  }
+  return hm_data_store_create_block_with_id_sync_proxy(c->c, id, id_length, block, block_length, meta, meta_length, mac,  mac_length);
+}
+
 uint32_t hm_data_store_client_sync_call_read_block(hm_data_store_client_sync_t* c, const uint8_t* id, const size_t id_length, uint8_t** block, size_t*  block_length, uint8_t** meta, size_t* meta_length){
   if(!c || !id || !id_length || !block || !meta){
     return HM_INVALID_PARAMETER;

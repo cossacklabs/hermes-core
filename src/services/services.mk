@@ -23,5 +23,5 @@ SERVICES_SRC = $(wildcard $(SRC_PATH)/services/*.c)
 
 SERVICES_OBJ = $(patsubst $(SRC_PATH)/%.c,$(OBJ_PATH)/%.o, $(SERVICES_SRC))
 
-SERVICES_BIN = services
+SERVICES_BIN = hermes_services
 
