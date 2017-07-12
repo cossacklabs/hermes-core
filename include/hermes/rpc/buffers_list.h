@@ -43,13 +43,13 @@ hm_buffers_list_t *hm_buffers_list_create();
 
 hm_buffers_list_t *hm_buffers_list_extract(const uint8_t *data, const size_t length);
 
-size_t hm_buffers_list_to_buf(hm_buffers_list_t *list, uint8_t **data);
+size_t hm_buffers_list_to_buf(hm_buffers_list_t *buffers_list, uint8_t **data);
 
-hermes_status_t hm_buffers_list_add(hm_buffers_list_t *list, uint8_t *data, size_t length);
+hermes_status_t hm_buffers_list_add(hm_buffers_list_t *buffers_list, uint8_t *data, size_t length);
 
-hermes_status_t hm_buffers_list_add_c(hm_buffers_list_t *list, const uint8_t *data, const size_t length);
+hermes_status_t hm_buffers_list_add_c(hm_buffers_list_t *buffers_list, const uint8_t *data, const size_t length);
 
-hermes_status_t hm_buffers_list_destroy(hm_buffers_list_t **list);
+hermes_status_t hm_buffers_list_destroy(hm_buffers_list_t **buffers_list);
 
 typedef struct hm_buffers_list_iterator_type hm_buffers_list_iterator_t;
 
@@ -63,7 +63,7 @@ struct hm_buffers_list_iterator_type {
     bool (*next)(hm_buffers_list_iterator_t *iterator);
 };
 
-hm_buffers_list_iterator_t *hm_buffers_list_iterator_create(hm_buffers_list_t *list);
+hm_buffers_list_iterator_t *hm_buffers_list_iterator_create(hm_buffers_list_t *buffers_list);
 
 hermes_status_t hm_buffers_list_iterator_destroy(hm_buffers_list_iterator_t **iterator);
 
