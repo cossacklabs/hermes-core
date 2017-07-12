@@ -29,14 +29,17 @@
 #define HM_SC_PARAM_STR HM_SC_PARAM_MAGIC+2
 #define HM_SC_PARAM_BUF HM_SC_PARAM_MAGIC+3
 
-int write_data_to_pipe(int pipe, const uint8_t* data, uint32_t data_length);
-int read_data_from_pipe(int pipe, uint8_t* data, uint32_t data_length);
+int write_data_to_pipe(int pipe, const uint8_t *data, uint32_t data_length);
+
+int read_data_from_pipe(int pipe, uint8_t *data, uint32_t data_length);
+
 int read_from_pipe(int pipe, ...);
+
 int write_to_pipe(int pipe, ...);
 
 #define HM_SC_INT(p) HM_SC_PARAM_MAGIC, HM_SC_PARAM_INT, (p)
-#define HM_SC_STR(p) HM_SC_PARAM_MAGIC, HM_SC_PARAM_STR, (p) 
-#define HM_SC_BUF(p, len) HM_SC_PARAM_MAGIC, HM_SC_PARAM_BUF, (p), (len) 
+#define HM_SC_STR(p) HM_SC_PARAM_MAGIC, HM_SC_PARAM_STR, (p)
+#define HM_SC_BUF(p, len) HM_SC_PARAM_MAGIC, HM_SC_PARAM_BUF, (p), (len)
 
 #define HM_SC_READ(pipe, ...)                   \
   read_from_pipe(pipe, __VA_ARGS__, (void*)NULL)
