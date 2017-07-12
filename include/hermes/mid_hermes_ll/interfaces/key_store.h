@@ -88,7 +88,7 @@ uint8_t *hermes_key_store_iterator_get_wtoken_owner(hermes_key_store_iterator_t 
 
 size_t hermes_key_store_iterator_get_wtoken_owner_length(hermes_key_store_iterator_t *iterator);
 
-hermes_status_t hermes_key_store_iterator_destroy(hermes_key_store_iterator_t **i);
+hermes_status_t hermes_key_store_iterator_destroy(hermes_key_store_iterator_t **iterator);
 
 
 #endif //HERMES_KEY_STORE_H

@@ -31,7 +31,7 @@ typedef struct hm_data_store_client_sync_type hm_data_store_client_sync_t;
 
 hm_data_store_client_sync_t *hm_data_store_client_sync_create(hm_rpc_transport_t *transport);
 
-uint32_t hm_data_store_client_sync_destroy(hm_data_store_client_sync_t **c);
+uint32_t hm_data_store_client_sync_destroy(hm_data_store_client_sync_t **client);
 
 uint32_t hm_data_store_client_sync_call_create_block(
         hm_data_store_client_sync_t *client,

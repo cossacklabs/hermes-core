@@ -23,36 +23,40 @@
 
 #include <hermes/credential_store/client.h>
 
-struct hermes_credential_store_type{
-  hm_credential_store_client_sync_t* cl;
+struct hermes_credential_store_type {
+    hm_credential_store_client_sync_t *cl;
 };
 
-hermes_credential_store_t* hermes_credential_store_create(hm_rpc_transport_t* transport){
-  if(!transport){
-    return NULL;
-  }
-  hermes_credential_store_t* cs=calloc(1, sizeof(hermes_credential_store_t));
-  if(!cs
-     || !(cs->cl=hm_credential_store_client_sync_create(transport))){
-    hermes_credential_store_destroy(&cs);
-    return NULL;
-  }
-  return cs;
+hermes_credential_store_t *hermes_credential_store_create(hm_rpc_transport_t *transport) {
+    if (!transport) {
+        return NULL;
+    }
+    hermes_credential_store_t *credential_store = calloc(1, sizeof(hermes_credential_store_t));
+    if (!credential_store
+        || !(credential_store->cl = hm_credential_store_client_sync_create(transport))) {
+        hermes_credential_store_destroy(&credential_store);
+        return NULL;
+    }
+    return credential_store;
 }
 
-hermes_status_t hermes_credential_store_get_public_key(hermes_credential_store_t* cs, const uint8_t* user_id, const size_t user_id_length, uint8_t** pub_key, size_t* pub_key_length){
-  if(!cs || !user_id || !user_id_length || !pub_key || !pub_key_length){
-    return HM_INVALID_PARAMETER;
-  }
-  return hm_credential_store_client_sync_call_get_pub_key_by_id(cs->cl, user_id, user_id_length, pub_key, pub_key_length);
+hermes_status_t hermes_credential_store_get_public_key(
+        hermes_credential_store_t *credential_store,
+        const uint8_t *user_id, const size_t user_id_length,
+        uint8_t **public_key, size_t *public_key_length) {
+    if (!credential_store || !user_id || !user_id_length || !public_key || !public_key_length) {
+        return HM_INVALID_PARAMETER;
+    }
+    return hm_credential_store_client_sync_call_get_pub_key_by_id(
+            credential_store->cl, user_id, user_id_length, public_key, public_key_length);
 }
 
-hermes_status_t hermes_credential_store_destroy(hermes_credential_store_t** cs){
-  if(!cs || !(*cs)){
-    return HM_INVALID_PARAMETER;
-  }
-  hm_credential_store_client_sync_destroy(&((*cs)->cl));
-  free(*cs);
-  *cs=NULL;
-  return HM_SUCCESS;
+hermes_status_t hermes_credential_store_destroy(hermes_credential_store_t **credential_store) {
+    if (!credential_store || !(*credential_store)) {
+        return HM_INVALID_PARAMETER;
+    }
+    hm_credential_store_client_sync_destroy(&((*credential_store)->cl));
+    free(*credential_store);
+    *credential_store = NULL;
+    return HM_SUCCESS;
 }

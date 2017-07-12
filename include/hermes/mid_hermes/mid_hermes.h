@@ -32,10 +32,10 @@ typedef struct mid_hermes_type mid_hermes_t;
 
 mid_hermes_t *mid_hermes_create(
         const uint8_t *user_id, const size_t user_id_length,
-        const uint8_t *private_key, const size_t private_key_len,
+        const uint8_t *private_key, const size_t private_key_length,
         hm_rpc_transport_t *key_store_transport,
         hm_rpc_transport_t *data_store_transport,
-        hm_rpc_transport_t *crendetial_store_transport);
+        hm_rpc_transport_t *credential_store_transport);
 
 hermes_status_t mid_hermes_destroy(mid_hermes_t **mh);
 
