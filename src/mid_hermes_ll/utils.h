@@ -28,11 +28,31 @@
 #define HM_TOKEN_LEN 64
 #define HM_MAC_LEN 16
 
-uint32_t hm_encrypt(const uint8_t* key, const size_t key_len, const uint8_t* data, const size_t data_len, const uint8_t* context, const size_t context_len, uint8_t** encrypted_data, size_t* encrypted_data_len);
-uint32_t hm_decrypt(const uint8_t* key, const size_t key_len, const uint8_t* encrypted_data, const size_t encrypted_data_len, const uint8_t* context, const size_t context_len, uint8_t** data, size_t* data_len);
-uint32_t hm_mac_create(const uint8_t* key, const size_t key_len, const uint8_t* data, const size_t data_len, const uint8_t* context, const size_t context_len, uint8_t** mac, size_t* mac_len);
-uint32_t hm_asym_encrypt(const uint8_t* sk, const size_t sk_len, const uint8_t* pk, const size_t pk_len, const uint8_t* data, const size_t data_len, uint8_t** encrypted_data, size_t* encrypted_data_len);
-uint32_t hm_asym_decrypt(const uint8_t* sk, const size_t sk_len, const uint8_t* pk, const size_t pk_len, const uint8_t* encrypted_data, const size_t encrypted_data_len, uint8_t** data, size_t* data_len);
+uint32_t hm_encrypt(
+        const uint8_t* key, const size_t key_length,
+        const uint8_t* data, const size_t data_length,
+        const uint8_t* context, const size_t context_length,
+        uint8_t** encrypted_data, size_t* encrypted_data_length);
+uint32_t hm_decrypt(
+        const uint8_t* key, const size_t key_length,
+        const uint8_t* encrypted_data, const size_t encrypted_data_length,
+        const uint8_t* context, const size_t context_length,
+        uint8_t** data, size_t* data_length);
+uint32_t hm_mac_create(
+        const uint8_t* key, const size_t key_length,
+        const uint8_t* data, const size_t data_length,
+        const uint8_t* context, const size_t context_length,
+        uint8_t** mac, size_t* mac_length);
+uint32_t hm_asym_encrypt(
+        const uint8_t* private_key, const size_t private_key_length,
+        const uint8_t* public_key, const size_t public_key_len,
+        const uint8_t* data, const size_t data_length,
+        uint8_t** encrypted_data, size_t* encrypted_data_length);
+uint32_t hm_asym_decrypt(
+        const uint8_t* private_key, const size_t private_key_len,
+        const uint8_t* public_key, const size_t public_key_len,
+        const uint8_t* encrypted_data, const size_t encrypted_data_length,
+        uint8_t** data, size_t* data_length);
 
 #endif //MID_HERMES_UTILS_H
 

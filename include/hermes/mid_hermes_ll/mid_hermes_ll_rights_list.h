@@ -38,7 +38,7 @@ typedef struct mid_hermes_ll_rights_list_node_type {
 mid_hermes_ll_rights_list_node_t *mid_hermes_ll_rights_list_node_create(
         mid_hermes_ll_user_t *user, mid_hermes_ll_token_t *read_token, mid_hermes_ll_token_t *write_token);
 
-hermes_status_t mid_hermes_ll_rights_list_node_destroy(mid_hermes_ll_rights_list_node_t **n);
+hermes_status_t mid_hermes_ll_rights_list_node_destroy(mid_hermes_ll_rights_list_node_t **node);
 
 typedef struct mid_hermes_ll_rights_list_type {
     mid_hermes_ll_rights_list_node_t *head;
@@ -49,31 +49,31 @@ typedef struct mid_hermes_ll_rights_list_type {
 mid_hermes_ll_rights_list_t *mid_hermes_ll_rights_list_create();
 
 hermes_status_t mid_hermes_ll_rights_list_rpush(
-        mid_hermes_ll_rights_list_t *list, mid_hermes_ll_rights_list_node_t *node);
+        mid_hermes_ll_rights_list_t *rights_list, mid_hermes_ll_rights_list_node_t *rights_node);
 
 hermes_status_t mid_hermes_ll_rights_list_rpush_val(
-        mid_hermes_ll_rights_list_t *list, mid_hermes_ll_user_t *user,
+        mid_hermes_ll_rights_list_t *rights_list, mid_hermes_ll_user_t *user,
         mid_hermes_ll_token_t *read_token, mid_hermes_ll_token_t *write_token);
 
-mid_hermes_ll_rights_list_node_t *mid_hermes_ll_rights_list_rpop(mid_hermes_ll_rights_list_t *list);
+mid_hermes_ll_rights_list_node_t *mid_hermes_ll_rights_list_rpop(mid_hermes_ll_rights_list_t *rights_list);
 
 mid_hermes_ll_rights_list_node_t *mid_hermes_ll_rights_list_find(
-        mid_hermes_ll_rights_list_t *list, mid_hermes_ll_buffer_t *user_id);
+        mid_hermes_ll_rights_list_t *rights_list, mid_hermes_ll_buffer_t *user_id);
 
 hermes_status_t mid_hermes_ll_rights_list_remove(
-        mid_hermes_ll_rights_list_t *list, mid_hermes_ll_rights_list_node_t *node);
+        mid_hermes_ll_rights_list_t *rights_list, mid_hermes_ll_rights_list_node_t *rights_node);
 
-hermes_status_t mid_hermes_ll_rights_list_destroy(mid_hermes_ll_rights_list_t **list);
+hermes_status_t mid_hermes_ll_rights_list_destroy(mid_hermes_ll_rights_list_t **rights_list);
 
 typedef struct {
     mid_hermes_ll_rights_list_node_t *next;
 } mid_hermes_ll_rights_list_iterator_t;
 
 
-mid_hermes_ll_rights_list_iterator_t *mid_hermes_ll_rights_list_iterator_create(mid_hermes_ll_rights_list_t *list);
+mid_hermes_ll_rights_list_iterator_t *mid_hermes_ll_rights_list_iterator_create(mid_hermes_ll_rights_list_t *rights_list);
 
 mid_hermes_ll_rights_list_node_t *mid_hermes_ll_rights_list_iterator_next(mid_hermes_ll_rights_list_iterator_t *iterator);
 
-hermes_status_t mid_hermes_ll_rights_list_iterator_destroy(mid_hermes_ll_rights_list_iterator_t **self);
+hermes_status_t mid_hermes_ll_rights_list_iterator_destroy(mid_hermes_ll_rights_list_iterator_t **iterator);
 
 #endif //MID_HERMES_LL_RIGHTS_LIST_H
