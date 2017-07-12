@@ -98,10 +98,11 @@ hermes_status_t hermes_key_store_set_rtoken(hermes_key_store_t* ks,
                                             const size_t token_length,
                                             const uint8_t* owner_id,
                                             const size_t owner_id_length){
-  if(!ks || !user_id || !user_id_length || !block_id || !block_id_length || !token || !token_length || !owner_id || !owner_id_length){
+  if(!ks || !user_id || !user_id_length || !block_id || !block_id_length){
     return HM_INVALID_PARAMETER;
   }
-  return hm_key_store_client_sync_call_set_rtoken(ks->cl,
+  if(token && token_length){
+      return hm_key_store_client_sync_call_set_rtoken(ks->cl,
                                                   block_id,
                                                   block_id_length,
                                                   user_id,
@@ -110,6 +111,14 @@ hermes_status_t hermes_key_store_set_rtoken(hermes_key_store_t* ks,
                                                   owner_id_length,
                                                   token,
                                                   token_length);
+  }
+  return hm_key_store_client_sync_call_del_rtoken(ks->cl,
+                                                  block_id,
+                                                  block_id_length,
+                                                  user_id,
+                                                  user_id_length,
+                                                  owner_id,
+                                                  owner_id_length);
 }
 
 hermes_status_t hermes_key_store_set_wtoken(hermes_key_store_t* ks,
@@ -121,18 +130,27 @@ hermes_status_t hermes_key_store_set_wtoken(hermes_key_store_t* ks,
                                             const size_t token_length,
                                             const uint8_t* owner_id,
                                             const size_t owner_id_length){
-  if(!ks || !user_id || !user_id_length || !block_id || !block_id_length || !token || !token_length || !owner_id || !owner_id_length){
+  if(!ks || !user_id || !user_id_length || !block_id || !block_id_length){
     return HM_INVALID_PARAMETER;
   }
-  return hm_key_store_client_sync_call_set_wtoken(ks->cl,
+  if(token && token_length){
+    return hm_key_store_client_sync_call_set_wtoken(ks->cl,
+                                                    block_id,
+                                                    block_id_length,
+                                                    user_id,
+                                                    user_id_length,
+                                                    owner_id,
+                                                    owner_id_length,
+                                                    token,
+                                                    token_length);
+  }
+  return hm_key_store_client_sync_call_del_wtoken(ks->cl,
                                                   block_id,
                                                   block_id_length,
                                                   user_id,
                                                   user_id_length,
                                                   owner_id,
-                                                  owner_id_length,
-                                                  token,
-                                                  token_length);
+                                                  owner_id_length);
 }
 
 hermes_status_t hermes_key_store_destroy(hermes_key_store_t** ks){

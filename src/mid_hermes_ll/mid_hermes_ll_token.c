@@ -189,18 +189,18 @@ hermes_status_t mid_hermes_ll_token_del(const mid_hermes_ll_user_t* user,
                                                   bl_id->length,
                                                   NULL,
                                                   0,
-                                                  NULL,
-                                                  0);
+                                                  user->id->data,
+                                                  user->id->length);
   if(!is_update){
     return hermes_key_store_set_rtoken(ks,
-                                 user->id->data,
-                                 user->id->length,
-                                 bl_id->data,
-                                 bl_id->length,
-                                 NULL,
-                                 0,
-                                 NULL,
-                                 0);
+                                       user->id->data,
+                                       user->id->length,
+                                       bl_id->data,
+                                       bl_id->length,
+                                       NULL,
+                                       0,
+                                       user->id->data,
+                                       user->id->length);
   }
   return res;
 }

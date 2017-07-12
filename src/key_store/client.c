@@ -87,7 +87,7 @@ uint32_t hm_key_store_client_sync_call_del_rtoken(hm_key_store_client_sync_t* c,
   if(!c){
     return HM_INVALID_PARAMETER;
   }
-  return hm_key_store_del_rtoken_sync_proxy(c->c, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length); 
+  return hm_key_store_del_rtoken_sync_proxy(c->c, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length);
 }
 
 uint32_t hm_key_store_client_sync_call_del_wtoken(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length){

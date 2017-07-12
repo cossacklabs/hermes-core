@@ -306,7 +306,7 @@ hermes_status_t mid_hermes_grant_update_access(mid_hermes_t* mh,
   mid_hermes_ll_user_t* bl_user=mid_hermes_ll_user_copy(mh->user);
   mid_hermes_ll_block_t* bl=NULL;
   if(!bl_user
-     || (bl=mid_hermes_ll_block_create_empty(bl_user))){
+     || !(bl=mid_hermes_ll_block_create_empty(bl_user))){
     mid_hermes_ll_user_destroy(&bl_user);
     return HM_FAIL;
   }
@@ -390,7 +390,7 @@ hermes_status_t mid_hermes_deny_update_access(mid_hermes_t* mh,
   mid_hermes_ll_user_t* bl_user=mid_hermes_ll_user_copy(mh->user);
   mid_hermes_ll_block_t* bl=NULL;
   if(!bl_user
-     || (bl=mid_hermes_ll_block_create_empty(bl_user))){
+     || !(bl=mid_hermes_ll_block_create_empty(bl_user))){
     mid_hermes_ll_user_destroy(&bl_user);
     return HM_FAIL;
   }

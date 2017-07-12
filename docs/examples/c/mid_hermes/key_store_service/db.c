@@ -159,11 +159,11 @@ uint32_t  db_get_indexed_rights(void* db, const uint8_t* block_id, const size_t 
 
 
 uint32_t db_del_rtoken(void* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length){
-  return db_set_rtoken(db, user_id, user_id_length, block_id, block_id_length, NULL, 0, owner_id, owner_id_length);
+  return db_set_rtoken(db,  block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length, NULL, 0);
 }
 
 uint32_t db_del_wtoken(void* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length){
-  return db_set_wtoken(db, user_id, user_id_length, block_id, block_id_length, NULL, 0, owner_id, owner_id_length);
+  return db_set_wtoken(db,  block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length, NULL, 0);
 }
 
 hm_ks_db_t* db_create(){
