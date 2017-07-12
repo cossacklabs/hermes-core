@@ -31,7 +31,7 @@
 typedef struct hm_data_store_server_type hm_data_store_server_t;
 
 hm_data_store_server_t* hm_data_store_server_create(hm_rpc_transport_t* transport, hm_ds_db_t* db);
-uint32_t hm_data_store_server_destroy(hm_data_store_server_t** s);
-uint32_t hm_data_store_server_call(hm_data_store_server_t* s);
+uint32_t hm_data_store_server_destroy(hm_data_store_server_t** server);
+uint32_t hm_data_store_server_call(hm_data_store_server_t* server);
 
 #endif //HERMES_DATA_STORE_SERVER_H

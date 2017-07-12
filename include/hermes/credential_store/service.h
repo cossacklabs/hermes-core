@@ -27,9 +27,12 @@
 
 typedef struct hm_credential_server_service_type hm_credential_store_service_t;
 
-hm_credential_store_service_t* hm_credential_store_service_create(hm_rpc_transport_t* transport, hm_cs_db_t* db);
-uint32_t hm_credential_store_service_destroy(hm_credential_store_service_t** s);
-uint32_t hm_credential_store_service_start(hm_credential_store_service_t* s);
-uint32_t hm_credential_store_service_stop(hm_credential_store_service_t* s); 
+hm_credential_store_service_t *hm_credential_store_service_create(hm_rpc_transport_t *transport, hm_cs_db_t *db);
+
+uint32_t hm_credential_store_service_destroy(hm_credential_store_service_t **service);
+
+uint32_t hm_credential_store_service_start(hm_credential_store_service_t *service);
+
+uint32_t hm_credential_store_service_stop(hm_credential_store_service_t *service);
 
 #endif //HM_CREDENTIAL_STORE_SERVICE

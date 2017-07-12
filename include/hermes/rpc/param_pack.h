@@ -30,18 +30,19 @@
 typedef struct hm_param_pack_type hm_param_pack_t;
 
 typedef uint32_t (*send_rouitine_t)(void* user_data, const uint8_t* buffer_to_send, const size_t buffer_to_send_length);
-typedef uint32_t (*recv_rouitine_t)(void* user_data, uint8_t* buffer_to_receive, const size_t buffer_to_receive_length); //if really readed less than buffer_to_receive_length bytes need return error!!!
+// if really readed less than buffer_to_receive_length bytes need return error!!!
+typedef uint32_t (*recv_rouitine_t)(void* user_data, uint8_t* buffer_to_receive, const size_t buffer_to_receive_length);
 
 hm_param_pack_t* hm_param_pack_create();
 
 hm_param_pack_t* hm_param_pack_create_(void* unused, ...);
-uint32_t hm_param_pack_extract_(hm_param_pack_t* p, ...);
-uint32_t hm_param_pack_destroy(hm_param_pack_t** p);
+uint32_t hm_param_pack_extract_(hm_param_pack_t* pack, ...);
+uint32_t hm_param_pack_destroy(hm_param_pack_t** pack);
 
-uint32_t hm_param_pack_write(hm_param_pack_t* p, uint8_t* buffer, size_t *buffer_length);
+uint32_t hm_param_pack_write(hm_param_pack_t* pack, uint8_t* buffer, size_t *buffer_length);
 hm_param_pack_t* hm_param_pack_read(uint8_t* buffer, size_t buffer_length);
 
-uint32_t hm_param_pack_send(const hm_param_pack_t* p, hm_rpc_transport_t* transport);
+uint32_t hm_param_pack_send(const hm_param_pack_t* pack, hm_rpc_transport_t* transport);
 hm_param_pack_t* hm_param_pack_receive(hm_rpc_transport_t* transport);
 
 

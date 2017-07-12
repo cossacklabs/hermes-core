@@ -26,12 +26,12 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-typedef uint32_t(*hm_cs_db_get_pub_by_id_t)(void* db, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length);
+typedef uint32_t(*hm_cs_db_get_pub_by_id_t)(void *db, const uint8_t *id, const size_t id_length, uint8_t **key, size_t *key_length);
 
-typedef struct hm_cs_db_type{
-    void* user_data;
+typedef struct hm_cs_db_type {
+    void *user_data;
     hm_cs_db_get_pub_by_id_t get_pub;
-}hm_cs_db_t;
+} hm_cs_db_t;
 
 
 #endif //HERMES_CREDENTIAL_STORE_DB_H

@@ -28,8 +28,8 @@
 typedef struct hm_credential_server_service_type hm_data_store_service_t;
 
 hm_data_store_service_t* hm_data_store_service_create(hm_rpc_transport_t* transport, hm_ds_db_t* db);
-uint32_t hm_data_store_service_destroy(hm_data_store_service_t** s);
-uint32_t hm_data_store_service_start(hm_data_store_service_t* s);
-uint32_t hm_data_store_service_stop(hm_data_store_service_t* s); 
+uint32_t hm_data_store_service_destroy(hm_data_store_service_t** service);
+uint32_t hm_data_store_service_start(hm_data_store_service_t* service);
+uint32_t hm_data_store_service_stop(hm_data_store_service_t* service);
 
 #endif //HM_DATA_STORE_SERVICE

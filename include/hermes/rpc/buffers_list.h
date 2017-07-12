@@ -29,33 +29,42 @@
 
 typedef struct hm_buffers_list_node_type hm_buffers_list_node_t;
 
-struct hm_buffers_list_node_type{
-  uint8_t* data;
-  size_t length;
-  hm_buffers_list_node_t* next;
+struct hm_buffers_list_node_type {
+    uint8_t *data;
+    size_t length;
+    hm_buffers_list_node_t *next;
 };
 
-typedef struct hm_buffers_list_type{
-  hm_buffers_list_node_t* first;
-}hm_buffers_list_t;
+typedef struct hm_buffers_list_type {
+    hm_buffers_list_node_t *first;
+} hm_buffers_list_t;
 
-hm_buffers_list_t* hm_buffers_list_create();
-hm_buffers_list_t* hm_buffers_list_extract(const uint8_t* data, const size_t length);
-size_t hm_buffers_list_to_buf(hm_buffers_list_t* l, uint8_t** data);
-hermes_status_t hm_buffers_list_add(hm_buffers_list_t* l, uint8_t* data, size_t length);
-hermes_status_t hm_buffers_list_add_c(hm_buffers_list_t* l, const uint8_t* data, const size_t length);
-hermes_status_t hm_buffers_list_destroy(hm_buffers_list_t** l);
+hm_buffers_list_t *hm_buffers_list_create();
+
+hm_buffers_list_t *hm_buffers_list_extract(const uint8_t *data, const size_t length);
+
+size_t hm_buffers_list_to_buf(hm_buffers_list_t *list, uint8_t **data);
+
+hermes_status_t hm_buffers_list_add(hm_buffers_list_t *list, uint8_t *data, size_t length);
+
+hermes_status_t hm_buffers_list_add_c(hm_buffers_list_t *list, const uint8_t *data, const size_t length);
+
+hermes_status_t hm_buffers_list_destroy(hm_buffers_list_t **list);
 
 typedef struct hm_buffers_list_iterator_type hm_buffers_list_iterator_t;
 
-struct hm_buffers_list_iterator_type{
-  hm_buffers_list_node_t* curr;
-  const uint8_t*(*data)(hm_buffers_list_iterator_t* i);
-  const size_t(*size)(hm_buffers_list_iterator_t* i);
-  bool(*next)(hm_buffers_list_iterator_t* i);
+struct hm_buffers_list_iterator_type {
+    hm_buffers_list_node_t *curr;
+
+    const uint8_t *(*data)(hm_buffers_list_iterator_t *iterator);
+
+    const size_t (*size)(hm_buffers_list_iterator_t *iterator);
+
+    bool (*next)(hm_buffers_list_iterator_t *iterator);
 };
 
-hm_buffers_list_iterator_t* hm_buffers_list_iterator_create(hm_buffers_list_t* l);
-hermes_status_t hm_buffers_list_iterator_destroy(hm_buffers_list_iterator_t** i);
+hm_buffers_list_iterator_t *hm_buffers_list_iterator_create(hm_buffers_list_t *list);
+
+hermes_status_t hm_buffers_list_iterator_destroy(hm_buffers_list_iterator_t **iterator);
 
 #endif //BUFFERS_LIST_H

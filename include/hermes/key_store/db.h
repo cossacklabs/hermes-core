@@ -28,10 +28,24 @@
 
 #include <hermes/rpc/buffers_list.h>
 
-typedef uint32_t(*hm_ks_db_set_token)(void* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length, const uint8_t* rtoken, const size_t rtoken_length);
-typedef uint32_t(*hm_ks_db_get_token)(void* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, uint8_t** wtoken, size_t* wtoken_id_length, uint8_t** owner_id, size_t* owner_id_length);
-typedef uint32_t(*hm_ks_db_del_token)(void* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length);
-typedef uint32_t(*hm_ks_db_get_indexed_rights)(void* db, const uint8_t* block_id, const size_t block_id_length, const size_t index, uint8_t** user_id, size_t* user_id_length, uint32_t* rights_mask);
+typedef uint32_t(*hm_ks_db_set_token)(
+        void* db, const uint8_t* block_id, const size_t block_id_length,
+        const uint8_t* user_id, const size_t user_id_length,
+        const uint8_t* owner_id, const size_t owner_id_length,
+        const uint8_t* read_token, const size_t read_token_length);
+typedef uint32_t(*hm_ks_db_get_token)(
+        void* db, const uint8_t* block_id, const size_t block_id_length,
+        const uint8_t* user_id, const size_t user_id_length,
+        uint8_t** write_token, size_t* write_token_id_length,
+        uint8_t** owner_id, size_t* owner_id_length);
+typedef uint32_t(*hm_ks_db_del_token)(
+        void* db, const uint8_t* block_id, const size_t block_id_length,
+        const uint8_t* user_id, const size_t user_id_length,
+        const uint8_t* owner_id, const size_t owner_id_length);
+typedef uint32_t(*hm_ks_db_get_indexed_rights)(
+        void* db, const uint8_t* block_id, const size_t block_id_length,
+        const size_t index, uint8_t** user_id,
+        size_t* user_id_length, uint32_t* rights_mask);
 
 typedef struct hm_ks_db_type{
     void* user_data;

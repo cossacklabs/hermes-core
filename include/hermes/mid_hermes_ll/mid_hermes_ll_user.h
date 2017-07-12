@@ -28,51 +28,45 @@
 
 #include <stdbool.h>
 
-typedef struct mid_hermes_ll_user_type{
-  mid_hermes_ll_buffer_t* id;
-  mid_hermes_ll_buffer_t* sk;
-  mid_hermes_ll_buffer_t* pk;
-  uint32_t count;
+typedef struct mid_hermes_ll_user_type {
+    mid_hermes_ll_buffer_t *id;
+    mid_hermes_ll_buffer_t *sk;
+    mid_hermes_ll_buffer_t *pk;
+    uint32_t count;
 } mid_hermes_ll_user_t;
 
-mid_hermes_ll_user_t* mid_hermes_ll_local_user_create(mid_hermes_ll_buffer_t* id,
-                                                      mid_hermes_ll_buffer_t* sk,
-                                                      mid_hermes_ll_buffer_t* pk);
+mid_hermes_ll_user_t *mid_hermes_ll_local_user_create(
+        mid_hermes_ll_buffer_t *id, mid_hermes_ll_buffer_t *private_key, mid_hermes_ll_buffer_t *public_key);
 
-mid_hermes_ll_user_t* mid_hermes_ll_user_create(mid_hermes_ll_buffer_t* id,
-                                                mid_hermes_ll_buffer_t* pk);
+mid_hermes_ll_user_t *mid_hermes_ll_user_create(mid_hermes_ll_buffer_t *id, mid_hermes_ll_buffer_t *public_key);
 
-mid_hermes_ll_user_t* mid_hermes_ll_user_create_c(const uint8_t* id,
-                                                  const size_t id_length,
-                                                  const uint8_t* pk,
-                                                  const size_t pk_length);
+mid_hermes_ll_user_t *mid_hermes_ll_user_create_c(
+        const uint8_t *id, const size_t id_length,
+        const uint8_t *public_key, const size_t public_key_length);
 
-mid_hermes_ll_user_t* mid_hermes_ll_local_user_create_c(const uint8_t* id,
-                                                        const size_t id_length,
-                                                        const uint8_t* sk,
-                                                        const size_t sk_length,
-                                                        const uint8_t* pk,
-                                                        const size_t pk_length);
+mid_hermes_ll_user_t *mid_hermes_ll_local_user_create_c(
+        const uint8_t *id, const size_t id_length,
+        const uint8_t *private_key, const size_t private_key_length,
+        const uint8_t *public_key, const size_t public_key_length);
 
-mid_hermes_ll_user_t* mid_hermes_ll_user_copy(mid_hermes_ll_user_t* u);
+mid_hermes_ll_user_t *mid_hermes_ll_user_copy(mid_hermes_ll_user_t *user);
 
-bool mid_hermes_ll_user_is_equal(const mid_hermes_ll_user_t* u, const mid_hermes_ll_user_t* v);
+bool mid_hermes_ll_user_is_equal(const mid_hermes_ll_user_t *user1, const mid_hermes_ll_user_t *user2);
 
-hermes_status_t mid_hermes_ll_user_forse_destroy(mid_hermes_ll_user_t** u);
-hermes_status_t mid_hermes_ll_user_destroy(mid_hermes_ll_user_t** u);
+hermes_status_t mid_hermes_ll_user_forse_destroy(mid_hermes_ll_user_t **user);
+
+hermes_status_t mid_hermes_ll_user_destroy(mid_hermes_ll_user_t **user);
 
 //store dependent
-mid_hermes_ll_user_t* mid_hermes_ll_user_load(mid_hermes_ll_buffer_t* id,
-                                              hermes_credential_store_t* cs);
+mid_hermes_ll_user_t *mid_hermes_ll_user_load(mid_hermes_ll_buffer_t *id, hermes_credential_store_t *credential_store);
 
-mid_hermes_ll_user_t* mid_hermes_ll_user_load_c(const uint8_t* id,
-                                                const size_t id_length,
-                                                hermes_credential_store_t* cs);
+mid_hermes_ll_user_t *mid_hermes_ll_user_load_c(
+        const uint8_t *id, const size_t id_length,
+        hermes_credential_store_t *credential_store);
 
-mid_hermes_ll_user_t* mid_hermes_ll_local_user_load_c(const uint8_t* id,
-                                            	      const size_t id_length,
-                                                      const uint8_t* sk,
-                                                      const size_t sk_length,
-                                                      hermes_credential_store_t* cs);
+mid_hermes_ll_user_t *mid_hermes_ll_local_user_load_c(
+        const uint8_t *id, const size_t id_length,
+        const uint8_t *private_key, const size_t private_key_length,
+        hermes_credential_store_t *credential_store);
 
 #endif //MID_HERMES_LL_USER_H

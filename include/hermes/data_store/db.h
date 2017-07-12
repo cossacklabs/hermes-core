@@ -26,11 +26,29 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-typedef uint32_t(*hm_ds_db_insert_block)(void* db, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length, const uint8_t* mac, const size_t mac_length, uint8_t** id, size_t* id_length);
-typedef uint32_t(*hm_ds_db_insert_block_with_id)(void* db, const uint8_t* id, const size_t id_length, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length, const uint8_t* mac, const size_t mac_length);
-typedef uint32_t(*hm_ds_db_get_block)(void* db, const uint8_t* id, const size_t id_length, uint8_t** block, size_t*  block_length, uint8_t** meta, size_t*  meta_length);
-typedef uint32_t(*hm_ds_db_update_block)(void* db, const uint8_t* id, const size_t id_length, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length, const uint8_t* mac, const size_t mac_length, const uint8_t* old_mac, const size_t old_mac_length);
-typedef uint32_t(*hm_ds_db_rem_block)(void* db, const uint8_t* id, const size_t id_length, const uint8_t* old_mac, const size_t old_mac_length);
+typedef uint32_t(*hm_ds_db_insert_block)(
+        void* db, const uint8_t* block, const size_t block_length,
+        const uint8_t* meta, const size_t meta_length,
+        const uint8_t* mac, const size_t mac_length,
+        uint8_t** id, size_t* id_length);
+typedef uint32_t(*hm_ds_db_insert_block_with_id)(
+        void* db, const uint8_t* id, const size_t id_length,
+        const uint8_t* block, const size_t block_length,
+        const uint8_t* meta, const size_t meta_length,
+        const uint8_t* mac, const size_t mac_length);
+typedef uint32_t(*hm_ds_db_get_block)(
+        void* db, const uint8_t* id, const size_t id_length,
+        uint8_t** block, size_t*  block_length,
+        uint8_t** meta, size_t*  meta_length);
+typedef uint32_t(*hm_ds_db_update_block)(
+        void* db, const uint8_t* id, const size_t id_length,
+        const uint8_t* block, const size_t block_length,
+        const uint8_t* meta, const size_t meta_length,
+        const uint8_t* mac, const size_t mac_length,
+        const uint8_t* old_mac, const size_t old_mac_length);
+typedef uint32_t(*hm_ds_db_rem_block)(
+        void* db, const uint8_t* id, const size_t id_length,
+        const uint8_t* old_mac, const size_t old_mac_length);
 
 typedef struct hm_ds_db_type{
     void* user_data;

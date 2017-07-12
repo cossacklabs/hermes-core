@@ -25,15 +25,17 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-typedef uint32_t(*hm_rpc_transport_send_t)(void* transport, const uint8_t* buffer, const size_t buffer_length);
-typedef uint32_t(*hm_rpc_transport_recv_t)(void* transport, uint8_t* buffer, size_t buffer_length);
-typedef uint32_t(*hm_rpc_transport_get_remote_id_t)(void* transport, uint8_t** id, size_t* id_length);
+typedef uint32_t(*hm_rpc_transport_send_t)(void *transport, const uint8_t *buffer, const size_t buffer_length);
 
-typedef struct hm_rpc_transport_type{
+typedef uint32_t(*hm_rpc_transport_recv_t)(void *transport, uint8_t *buffer, size_t buffer_length);
+
+typedef uint32_t(*hm_rpc_transport_get_remote_id_t)(void *transport, uint8_t **id, size_t *id_length);
+
+typedef struct hm_rpc_transport_type {
     hm_rpc_transport_send_t send;
     hm_rpc_transport_recv_t recv;
     hm_rpc_transport_get_remote_id_t get_remote_id;
-    void* user_data;
+    void *user_data;
 } hm_rpc_transport_t;
 
 

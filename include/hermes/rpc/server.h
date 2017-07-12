@@ -26,15 +26,25 @@
 #include <hermes/rpc/transport.h>
 
 typedef struct hm_rpc_server_type hm_rpc_server_t;
-typedef uint32_t(*hm_server_func_t)(hm_param_pack_t* in_params, hm_param_pack_t** out_params, void* useer_data);
+
+typedef uint32_t(*hm_server_func_t)(hm_param_pack_t *in_params, hm_param_pack_t **out_params, void *user_data);
 
 
-hm_rpc_server_t* hm_rpc_server_create(hm_rpc_transport_t* transport);
-uint32_t hm_rpc_server_destroy(hm_rpc_server_t** s);
+hm_rpc_server_t *hm_rpc_server_create(hm_rpc_transport_t *transport);
 
-uint32_t hm_rpc_server_reg_func(hm_rpc_server_t* s, const uint8_t* func_signature, const size_t func_signature_length, hm_server_func_t func);
-uint32_t hm_rpc_server_call_func(hm_rpc_server_t* s, const uint8_t* func_signature, const size_t func_signature_length, void* user_data);
-uint32_t hm_rpc_server_call(hm_rpc_server_t* s, void* user_data);
+uint32_t hm_rpc_server_destroy(hm_rpc_server_t **server);
+
+uint32_t hm_rpc_server_reg_func(
+        hm_rpc_server_t *server,
+        const uint8_t *func_signature, const size_t func_signature_length,
+        hm_server_func_t func);
+
+uint32_t hm_rpc_server_call_func(
+        hm_rpc_server_t *server,
+        const uint8_t *func_signature, const size_t func_signature_length,
+        void *user_data);
+
+uint32_t hm_rpc_server_call(hm_rpc_server_t *server, void *user_data);
 
 #define HM_RPC_SERVER_REG_FUNC(s, func) hm_rpc_server_reg_func(s, (const uint8_t*)func##_NAME, sizeof(func##_NAME), func##_stub)
 

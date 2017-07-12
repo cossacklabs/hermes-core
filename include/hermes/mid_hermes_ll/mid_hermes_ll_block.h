@@ -33,73 +33,58 @@
 
 typedef struct mid_hermes_ll_block_type mid_hermes_ll_block_t;
 
-struct mid_hermes_ll_block_type{
-  mid_hermes_ll_user_t* user;
-  mid_hermes_ll_buffer_t* id;
-  mid_hermes_ll_buffer_t* block;
-  mid_hermes_ll_buffer_t* data;
-  mid_hermes_ll_buffer_t* meta;
-  mid_hermes_ll_buffer_t* old_mac;
-  mid_hermes_ll_buffer_t* mac;
-  mid_hermes_ll_token_t* rtoken;
-  mid_hermes_ll_token_t* wtoken;
+struct mid_hermes_ll_block_type {
+    mid_hermes_ll_user_t *user;
+    mid_hermes_ll_buffer_t *id;
+    mid_hermes_ll_buffer_t *block;
+    mid_hermes_ll_buffer_t *data;
+    mid_hermes_ll_buffer_t *meta;
+    mid_hermes_ll_buffer_t *old_mac;
+    mid_hermes_ll_buffer_t *mac;
+    mid_hermes_ll_token_t *rtoken;
+    mid_hermes_ll_token_t *wtoken;
 
-  mid_hermes_ll_block_t*(*init_empty)(mid_hermes_ll_block_t* bl,
-                                      mid_hermes_ll_user_t* user);
-  
-  mid_hermes_ll_block_t*(*init)(mid_hermes_ll_block_t* bl,
-                                mid_hermes_ll_user_t* user,
-                                mid_hermes_ll_buffer_t* id,
-                                mid_hermes_ll_buffer_t* block,
-                                mid_hermes_ll_buffer_t* meta,
-                                mid_hermes_ll_token_t* rtoken,
-                                mid_hermes_ll_token_t* wtoken);
+    mid_hermes_ll_block_t *(*init_empty)(mid_hermes_ll_block_t *block, mid_hermes_ll_user_t *user);
 
-  mid_hermes_ll_block_t*(*update)(mid_hermes_ll_block_t* bl,
-                                  mid_hermes_ll_buffer_t* block,
-                                  mid_hermes_ll_buffer_t* meta);
-  
-  mid_hermes_ll_block_t*(*rotate)(mid_hermes_ll_block_t* bl,
-                                  mid_hermes_ll_rights_list_t* rights);
+    mid_hermes_ll_block_t *(*init)(
+            mid_hermes_ll_block_t *block, mid_hermes_ll_user_t *user, mid_hermes_ll_buffer_t *id,
+            mid_hermes_ll_buffer_t *block_buffer, mid_hermes_ll_buffer_t *meta, mid_hermes_ll_token_t *read_token,
+            mid_hermes_ll_token_t *write_token);
+
+    mid_hermes_ll_block_t *(*update)(
+            mid_hermes_ll_block_t *block, mid_hermes_ll_buffer_t *block_buffer, mid_hermes_ll_buffer_t *meta);
+
+    mid_hermes_ll_block_t *(*rotate)(mid_hermes_ll_block_t *block, mid_hermes_ll_rights_list_t *rights);
 
 
-  mid_hermes_ll_token_t*(*rtoken_for)(mid_hermes_ll_block_t* bl,
-                                      mid_hermes_ll_user_t* for_user);
+    mid_hermes_ll_token_t *(*rtoken_for)(mid_hermes_ll_block_t *block, mid_hermes_ll_user_t *for_user);
 
-  mid_hermes_ll_token_t*(*wtoken_for)(mid_hermes_ll_block_t* bl,
-                                      mid_hermes_ll_user_t* for_user);
+    mid_hermes_ll_token_t *(*wtoken_for)(mid_hermes_ll_block_t *block, mid_hermes_ll_user_t *for_user);
 
-  //store dependent functions
-  mid_hermes_ll_rights_list_t*(*access_rights)(mid_hermes_ll_block_t* bl,
-                                               hermes_key_store_t* ks,
-                                               hermes_credential_store_t* cs);
-  
-  mid_hermes_ll_block_t*(*load)(mid_hermes_ll_block_t* bl, 
-                                mid_hermes_ll_buffer_t* id,
-                                hermes_data_store_t* ds,
-                                hermes_key_store_t* ks,
-                                hermes_credential_store_t* cs);
-  
-  mid_hermes_ll_block_t*(*save)(mid_hermes_ll_block_t* bl,
-                                mid_hermes_ll_rights_list_t* rights,
-                                hermes_data_store_t* ds,
-                                hermes_key_store_t* ks);
+    //store dependent functions
+    mid_hermes_ll_rights_list_t *(*access_rights)(
+            mid_hermes_ll_block_t *block, hermes_key_store_t *key_store, hermes_credential_store_t *credential_store);
 
-  mid_hermes_ll_block_t*(*delete)(mid_hermes_ll_block_t* bl,
-                                  mid_hermes_ll_rights_list_t* rights,
-                                  hermes_data_store_t* ds,
-                                  hermes_key_store_t* ks);
+    mid_hermes_ll_block_t *(*load)(
+            mid_hermes_ll_block_t *block, mid_hermes_ll_buffer_t *id,
+            hermes_data_store_t *data_store, hermes_key_store_t *key_store,
+            hermes_credential_store_t *credential_store);
+
+    mid_hermes_ll_block_t *(*save)(
+            mid_hermes_ll_block_t *block, mid_hermes_ll_rights_list_t *rights,
+            hermes_data_store_t *data_store, hermes_key_store_t *key_store);
+
+    mid_hermes_ll_block_t *(*delete)(
+            mid_hermes_ll_block_t *block, mid_hermes_ll_rights_list_t *rights,
+            hermes_data_store_t *data_store, hermes_key_store_t *key_store);
 };
 
-mid_hermes_ll_block_t* mid_hermes_ll_block_create_empty(mid_hermes_ll_user_t* user);
+mid_hermes_ll_block_t *mid_hermes_ll_block_create_empty(mid_hermes_ll_user_t *user);
 
-mid_hermes_ll_block_t* mid_hermes_ll_block_create(mid_hermes_ll_user_t* user,
-                                                  mid_hermes_ll_buffer_t* id,
-                                                  mid_hermes_ll_buffer_t* block,
-                                                  mid_hermes_ll_buffer_t* meta,
-                                                  mid_hermes_ll_token_t* rtoken,
-                                                  mid_hermes_ll_token_t* wtoken);
+mid_hermes_ll_block_t *mid_hermes_ll_block_create(
+        mid_hermes_ll_user_t *user, mid_hermes_ll_buffer_t *id, mid_hermes_ll_buffer_t *block,
+        mid_hermes_ll_buffer_t *meta, mid_hermes_ll_token_t *read_token, mid_hermes_ll_token_t *write_token);
 
-hermes_status_t mid_hermes_ll_block_destroy(mid_hermes_ll_block_t** b);
+hermes_status_t mid_hermes_ll_block_destroy(mid_hermes_ll_block_t **block);
 
 #endif //MID_HERMES_LL_BLOCK_H
