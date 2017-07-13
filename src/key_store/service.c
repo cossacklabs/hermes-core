@@ -24,54 +24,54 @@
 #include <assert.h>
 #include <stdbool.h>
 
-struct hm_key_server_service_type{
-  hm_key_store_server_t* s;
-  bool finish;
+struct hm_key_server_service_type {
+    hm_key_store_server_t *s;
+    bool finish;
 };
 
-hm_key_store_service_t* hm_key_store_service_create(hm_rpc_transport_t* transport, hm_ks_db_t* db){
-  if(!transport || !db){
-    return NULL;
-  }
-  hm_key_store_service_t* s=calloc(sizeof(hm_key_store_service_t), 1);
-  assert(s);
-  if(!(s->s=hm_key_store_server_create(transport, db))){
-    free(s);
-    return NULL;
-  }
-  return s;
-}
-
-uint32_t hm_key_store_service_destroy(hm_key_store_service_t** s){
-  if(!s || !(*s)){
-    return HM_INVALID_PARAMETER;
-  }
-  hm_key_store_server_destroy(&((*s)->s));
-  free(*s);
-  *s=NULL;
-  return HM_SUCCESS;
-}
-
-uint32_t hm_key_store_service_start(hm_key_store_service_t* s){
-  if(!s){
-    return HM_INVALID_PARAMETER;
-  }
-  while(true){
-    if(s->finish){
-      return HM_SUCCESS;
+hm_key_store_service_t *hm_key_store_service_create(hm_rpc_transport_t *transport, hm_ks_db_t *db) {
+    if (!transport || !db) {
+        return NULL;
     }
-    //TODO logging
-    if(HM_SUCCESS!=hm_key_store_server_call(s->s)){
-      return HM_FAIL;
+    hm_key_store_service_t *service = calloc(sizeof(hm_key_store_service_t), 1);
+    assert(service);
+    if (!(service->s = hm_key_store_server_create(transport, db))) {
+        free(service);
+        return NULL;
     }
-  }
-  return HM_FAIL;
+    return service;
 }
 
-uint32_t hm_key_store_service_stop(hm_key_store_service_t* s){
-  if(!s){
-    return HM_INVALID_PARAMETER;
-  }
-  s->finish=true;
-  return HM_SUCCESS;
+uint32_t hm_key_store_service_destroy(hm_key_store_service_t **service) {
+    if (!service || !(*service)) {
+        return HM_INVALID_PARAMETER;
+    }
+    hm_key_store_server_destroy(&((*service)->s));
+    free(*service);
+    *service = NULL;
+    return HM_SUCCESS;
+}
+
+uint32_t hm_key_store_service_start(hm_key_store_service_t *service) {
+    if (!service) {
+        return HM_INVALID_PARAMETER;
+    }
+    while (true) {
+        if (service->finish) {
+            return HM_SUCCESS;
+        }
+        //TODO logging
+        if (HM_SUCCESS != hm_key_store_server_call(service->s)) {
+            return HM_FAIL;
+        }
+    }
+    return HM_FAIL;
+}
+
+uint32_t hm_key_store_service_stop(hm_key_store_service_t *service) {
+    if (!service) {
+        return HM_INVALID_PARAMETER;
+    }
+    service->finish = true;
+    return HM_SUCCESS;
 }

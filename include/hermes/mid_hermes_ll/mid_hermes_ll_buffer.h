@@ -26,18 +26,23 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdlib.h> 
+#include <stdlib.h>
 
-typedef struct mid_hermes_ll_buffer_type{
-  uint8_t* data;
-  size_t length;
+typedef struct mid_hermes_ll_buffer_type {
+    uint8_t *data;
+    size_t length;
 } mid_hermes_ll_buffer_t;
 
-mid_hermes_ll_buffer_t* mid_hermes_ll_buffer_create(const uint8_t* data, const size_t length);
-mid_hermes_ll_buffer_t* mid_hermes_ll_buffer_copy(mid_hermes_ll_buffer_t* src, mid_hermes_ll_buffer_t* dst);
-bool mid_hermes_ll_buffer_is_empty(mid_hermes_ll_buffer_t* b);
-bool mid_hermes_ll_buffer_is_equal(mid_hermes_ll_buffer_t* b, mid_hermes_ll_buffer_t* c);
-hermes_status_t mid_hermes_ll_buffer_reset(mid_hermes_ll_buffer_t* b, const uint8_t* data, const size_t length);
-hermes_status_t mid_hermes_ll_buffer_destroy(mid_hermes_ll_buffer_t** b);
+mid_hermes_ll_buffer_t *mid_hermes_ll_buffer_create(const uint8_t *data, const size_t length);
+
+mid_hermes_ll_buffer_t *mid_hermes_ll_buffer_copy(mid_hermes_ll_buffer_t *src, mid_hermes_ll_buffer_t *dst);
+
+bool mid_hermes_ll_buffer_is_empty(mid_hermes_ll_buffer_t *buffer);
+
+bool mid_hermes_ll_buffer_is_equal(mid_hermes_ll_buffer_t *buffer1, mid_hermes_ll_buffer_t *buffer2);
+
+hermes_status_t mid_hermes_ll_buffer_reset(mid_hermes_ll_buffer_t *buffer, const uint8_t *data, const size_t length);
+
+hermes_status_t mid_hermes_ll_buffer_destroy(mid_hermes_ll_buffer_t **buffer);
 
 #endif //MID_HERMES_LL_BUFFER_H

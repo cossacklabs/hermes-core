@@ -26,80 +26,124 @@
 
 #include "functions.h"
 
-struct hm_key_store_client_sync_type{
-  hm_rpc_client_sync_t* c;
+struct hm_key_store_client_sync_type {
+    hm_rpc_client_sync_t *c;
 };
 
-hm_key_store_client_sync_t* hm_key_store_client_sync_create(hm_rpc_transport_t* transport){
-  if(!transport){
-    return NULL;
-  }
-  hm_key_store_client_sync_t* c=calloc(sizeof(hm_key_store_client_sync_t), 1);
-  assert(c);
-  c->c = hm_rpc_client_sync_create(transport);
-  if(!(c->c)){
-    hm_key_store_client_sync_destroy(&c);
-    return NULL;
-  }
-  return c;
+hm_key_store_client_sync_t *hm_key_store_client_sync_create(hm_rpc_transport_t *transport) {
+    if (!transport) {
+        return NULL;
+    }
+    hm_key_store_client_sync_t *client = calloc(sizeof(hm_key_store_client_sync_t), 1);
+    assert(client);
+    client->c = hm_rpc_client_sync_create(transport);
+    if (!(client->c)) {
+        hm_key_store_client_sync_destroy(&client);
+        return NULL;
+    }
+    return client;
 }
 
-uint32_t hm_key_store_client_sync_destroy(hm_key_store_client_sync_t** c){
-  if(!c || !(*c)){
-    return HM_INVALID_PARAMETER;
-  }
-  hm_rpc_client_sync_destroy(&((*c)->c));
-  free(*c);
-  *c=NULL;
-  return HM_SUCCESS;
+uint32_t hm_key_store_client_sync_destroy(hm_key_store_client_sync_t **client) {
+    if (!client || !(*client)) {
+        return HM_INVALID_PARAMETER;
+    }
+    hm_rpc_client_sync_destroy(&((*client)->c));
+    free(*client);
+    *client = NULL;
+    return HM_SUCCESS;
 }
 
 
-uint32_t hm_key_store_client_sync_call_set_rtoken(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length, const uint8_t* rtoken, const size_t rtoken_length){
-  if(!c){
-    return HM_INVALID_PARAMETER;
-  }
-  return hm_key_store_set_rtoken_sync_proxy(c->c, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length, rtoken, rtoken_length);
+uint32_t hm_key_store_client_sync_call_set_rtoken(
+        hm_key_store_client_sync_t *client,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *owner_id, const size_t owner_id_length,
+        const uint8_t *read_token, const size_t read_token_length) {
+    if (!client) {
+        return HM_INVALID_PARAMETER;
+    }
+    return hm_key_store_set_rtoken_sync_proxy(
+            client->c, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length,
+            read_token, read_token_length);
 }
 
-uint32_t hm_key_store_client_sync_call_set_wtoken(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length, const uint8_t* wtoken, const size_t wtoken_length){
-  if(!c){
-    return HM_INVALID_PARAMETER;
-  }
-  return hm_key_store_set_wtoken_sync_proxy(c->c, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length, wtoken, wtoken_length);
+uint32_t hm_key_store_client_sync_call_set_wtoken(
+        hm_key_store_client_sync_t *client,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *owner_id, const size_t owner_id_length,
+        const uint8_t *write_token, const size_t write_token_length) {
+    if (!client) {
+        return HM_INVALID_PARAMETER;
+    }
+    return hm_key_store_set_wtoken_sync_proxy(
+            client->c, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length,
+            write_token, write_token_length);
 }
 
-uint32_t hm_key_store_client_sync_call_get_rtoken(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, uint8_t** rtoken, size_t* rtoken_length, uint8_t** owner_id, size_t* owner_id_length){
-  if(!c){
-    return HM_INVALID_PARAMETER;
-  }
-  return hm_key_store_get_rtoken_sync_proxy(c->c, block_id, block_id_length, user_id, user_id_length, rtoken, rtoken_length, owner_id, owner_id_length);
+uint32_t hm_key_store_client_sync_call_get_rtoken(
+        hm_key_store_client_sync_t *client,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        uint8_t **read_token, size_t *read_token_length,
+        uint8_t **owner_id, size_t *owner_id_length) {
+    if (!client) {
+        return HM_INVALID_PARAMETER;
+    }
+    return hm_key_store_get_rtoken_sync_proxy(
+            client->c, block_id, block_id_length, user_id, user_id_length, read_token, read_token_length,
+            owner_id, owner_id_length);
 }
 
-uint32_t hm_key_store_client_sync_call_get_wtoken(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, uint8_t** wtoken, size_t* wtoken_length, uint8_t** owner_id, size_t* owner_id_length){
-  if(!c){
-    return HM_INVALID_PARAMETER;
-  }
-  return hm_key_store_get_wtoken_sync_proxy(c->c, block_id, block_id_length, user_id, user_id_length, wtoken, wtoken_length, owner_id, owner_id_length);
+uint32_t hm_key_store_client_sync_call_get_wtoken(
+        hm_key_store_client_sync_t *client,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        uint8_t **write_token, size_t *write_token_length,
+        uint8_t **owner_id, size_t *owner_id_length) {
+    if (!client) {
+        return HM_INVALID_PARAMETER;
+    }
+    return hm_key_store_get_wtoken_sync_proxy(
+            client->c, block_id, block_id_length, user_id, user_id_length, write_token, write_token_length,
+            owner_id, owner_id_length);
 }
 
-uint32_t hm_key_store_client_sync_call_del_rtoken(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length){
-  if(!c){
-    return HM_INVALID_PARAMETER;
-  }
-  return hm_key_store_del_rtoken_sync_proxy(c->c, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length);
+uint32_t hm_key_store_client_sync_call_del_rtoken(
+        hm_key_store_client_sync_t *client,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *owner_id, const size_t owner_id_length) {
+    if (!client) {
+        return HM_INVALID_PARAMETER;
+    }
+    return hm_key_store_del_rtoken_sync_proxy(
+            client->c, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length);
 }
 
-uint32_t hm_key_store_client_sync_call_del_wtoken(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length){
-  if(!c){
-    return HM_INVALID_PARAMETER;
-  }
-  return hm_key_store_del_wtoken_sync_proxy(c->c, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length); 
+uint32_t hm_key_store_client_sync_call_del_wtoken(
+        hm_key_store_client_sync_t *client,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *owner_id, const size_t owner_id_length) {
+    if (!client) {
+        return HM_INVALID_PARAMETER;
+    }
+    return hm_key_store_del_wtoken_sync_proxy(
+            client->c, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length);
 }
 
-uint32_t hm_key_store_client_sync_call_get_indexed_rights(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const size_t index, uint8_t** user_id, size_t* user_id_length, uint32_t* rights_mask){
-  if(!c){
-    return HM_INVALID_PARAMETER;
-  }
-  return hm_key_store_get_indexed_rights_proxy(c->c, block_id, block_id_length, index, user_id, user_id_length, rights_mask); 
+uint32_t hm_key_store_client_sync_call_get_indexed_rights(
+        hm_key_store_client_sync_t *c,
+        const uint8_t *block_id, const size_t block_id_length,
+        const size_t index,
+        uint8_t **user_id, size_t *user_id_length,
+        uint32_t *rights_mask) {
+    if (!c) {
+        return HM_INVALID_PARAMETER;
+    }
+    return hm_key_store_get_indexed_rights_proxy(
+            c->c, block_id, block_id_length, index, user_id, user_id_length, rights_mask);
 }

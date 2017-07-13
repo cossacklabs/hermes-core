@@ -30,42 +30,125 @@
 #include <stdlib.h>
 
 #define hm_key_store_set_rtoken_NAME "hm_key_store_set_rtoken"
-uint32_t hm_key_store_set_rtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length, const uint8_t* rtoken, const size_t rtoken_length);
+
+uint32_t hm_key_store_set_rtoken(
+        hm_ks_db_t *db,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *owner_id, const size_t owner_id_length,
+        const uint8_t *read_token, const size_t read_token_length);
 
 #define hm_key_store_set_wtoken_NAME "hm_key_store_set_wtoken"
-uint32_t hm_key_store_set_wtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length, const uint8_t* wtoken, const size_t wtoken_length);
+
+uint32_t hm_key_store_set_wtoken(
+        hm_ks_db_t *db,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *owner_id, const size_t owner_id_length,
+        const uint8_t *wtoken, const size_t wtoken_length);
 
 #define hm_key_store_get_rtoken_NAME "hm_key_store_get_rtoken"
-uint32_t hm_key_store_get_rtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, uint8_t** rtoken, size_t* rtoken_length, uint8_t** owner_id, size_t* owner_id_length);
+
+uint32_t hm_key_store_get_rtoken(
+        hm_ks_db_t *db,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        uint8_t **read_token, size_t *read_token_length,
+        uint8_t **owner_id, size_t *owner_id_length);
 
 #define hm_key_store_get_wtoken_NAME "hm_key_store_get_wtoken"
-uint32_t hm_key_store_get_wtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, uint8_t** wtoken, size_t* wtoken_length, uint8_t** owner_id, size_t* owner_id_length);
+
+uint32_t hm_key_store_get_wtoken(
+        hm_ks_db_t *db,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        uint8_t **write_token, size_t *write_token_length,
+        uint8_t **owner_id, size_t *owner_id_length);
 
 #define hm_key_store_del_rtoken_NAME "hm_key_store_del_rtoken"
-uint32_t hm_key_store_del_rtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length);
+
+uint32_t hm_key_store_del_rtoken(
+        hm_ks_db_t *db,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *owner_id, const size_t owner_id_length);
 
 #define hm_key_store_del_wtoken_NAME "hm_key_store_del_wtoken"
-uint32_t hm_key_store_del_wtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length);
+
+uint32_t hm_key_store_del_wtoken(
+        hm_ks_db_t *db,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *owner_id, const size_t owner_id_length);
 
 #define hm_key_store_get_indexed_rights_NAME "hm_key_store_get_indexed_rights"
-uint32_t hm_key_store_get_indexed_rights(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const size_t index, uint8_t** user_id, size_t* user_id_length, uint32_t* rights_mask);
+
+uint32_t hm_key_store_get_indexed_rights(
+        hm_ks_db_t *db,
+        const uint8_t *block_id, const size_t block_id_length,
+        const size_t index, uint8_t **user_id,
+        size_t *user_id_length, uint32_t *rights_mask);
 
 //proxies
-uint32_t hm_key_store_set_rtoken_sync_proxy(hm_rpc_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length, const uint8_t* rtoken, const size_t rtoken_length);
-uint32_t hm_key_store_set_wtoken_sync_proxy(hm_rpc_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length, const uint8_t* wtoken, const size_t wtoken_length);
-uint32_t hm_key_store_get_rtoken_sync_proxy(hm_rpc_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, uint8_t** rtoken, size_t* rtoken_length, uint8_t** owner_id, size_t* owner_id_length);
-uint32_t hm_key_store_get_wtoken_sync_proxy(hm_rpc_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, uint8_t** wtoken, size_t* wtoken_length, uint8_t** owner_id, size_t* owner_id_length);
-uint32_t hm_key_store_del_rtoken_sync_proxy(hm_rpc_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length);
-uint32_t hm_key_store_del_wtoken_sync_proxy(hm_rpc_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length);
-uint32_t hm_key_store_get_indexed_rights_proxy(hm_rpc_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const size_t index, uint8_t** user_id, size_t* user_id_length, uint32_t* rights_mask);
+uint32_t hm_key_store_set_rtoken_sync_proxy(
+        hm_rpc_client_sync_t *client,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *owner_id, const size_t owner_id_length,
+        const uint8_t *read_token, const size_t read_token_length);
+
+uint32_t hm_key_store_set_wtoken_sync_proxy(
+        hm_rpc_client_sync_t *client,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *owner_id, const size_t owner_id_length,
+        const uint8_t *write_token, const size_t write_token_length);
+
+uint32_t hm_key_store_get_rtoken_sync_proxy(
+        hm_rpc_client_sync_t *client,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        uint8_t **read_token, size_t *read_token_length,
+        uint8_t **owner_id, size_t *owner_id_length);
+
+uint32_t hm_key_store_get_wtoken_sync_proxy(
+        hm_rpc_client_sync_t *client,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        uint8_t **write_token, size_t *write_token_length,
+        uint8_t **owner_id, size_t *owner_id_length);
+
+uint32_t hm_key_store_del_rtoken_sync_proxy(
+        hm_rpc_client_sync_t *client,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *owner_id, const size_t owner_id_length);
+
+uint32_t hm_key_store_del_wtoken_sync_proxy(
+        hm_rpc_client_sync_t *client,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *owner_id, const size_t owner_id_length);
+
+uint32_t hm_key_store_get_indexed_rights_proxy(
+        hm_rpc_client_sync_t *client,
+        const uint8_t *block_id, const size_t block_id_length,
+        const size_t index, uint8_t **user_id,
+        size_t *user_id_length, uint32_t *rights_mask);
 
 //stubs
-uint32_t hm_key_store_set_rtoken_stub(hm_param_pack_t* in, hm_param_pack_t** out, void* user_data);
-uint32_t hm_key_store_set_wtoken_stub(hm_param_pack_t* in, hm_param_pack_t** out, void* user_data);
-uint32_t hm_key_store_get_rtoken_stub(hm_param_pack_t* in, hm_param_pack_t** out, void* user_data);
-uint32_t hm_key_store_get_wtoken_stub(hm_param_pack_t* in, hm_param_pack_t** out, void* user_data);
-uint32_t hm_key_store_del_rtoken_stub(hm_param_pack_t* in, hm_param_pack_t** out, void* user_data);
-uint32_t hm_key_store_del_wtoken_stub(hm_param_pack_t* in, hm_param_pack_t** out, void* user_data);
-uint32_t hm_key_store_get_indexed_rights_stub(hm_param_pack_t* in, hm_param_pack_t** out, void* user_data);
+uint32_t hm_key_store_set_rtoken_stub(hm_param_pack_t *in, hm_param_pack_t **out, void *user_data);
+
+uint32_t hm_key_store_set_wtoken_stub(hm_param_pack_t *in, hm_param_pack_t **out, void *user_data);
+
+uint32_t hm_key_store_get_rtoken_stub(hm_param_pack_t *in, hm_param_pack_t **out, void *user_data);
+
+uint32_t hm_key_store_get_wtoken_stub(hm_param_pack_t *in, hm_param_pack_t **out, void *user_data);
+
+uint32_t hm_key_store_del_rtoken_stub(hm_param_pack_t *in, hm_param_pack_t **out, void *user_data);
+
+uint32_t hm_key_store_del_wtoken_stub(hm_param_pack_t *in, hm_param_pack_t **out, void *user_data);
+
+uint32_t hm_key_store_get_indexed_rights_stub(hm_param_pack_t *in, hm_param_pack_t **out, void *user_data);
 
 #endif //HERMES_KEY_STORE_FUNCTION_H

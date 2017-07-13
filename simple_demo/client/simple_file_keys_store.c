@@ -18,16 +18,16 @@
  *
  */
 
-#include <heremes/common/errors.h>
+#include <hermes/common/errors.h>
 #include <hermes/client_interfaces/keys_storage_interface.h>
 
 void usage(const char*  prog_name){
-  prinf("Usage: %s <db file name>\n", prog_name);
+  printf("Usage: %s <db file name>\n", prog_name);
 }
 
 int main(int argc, char* argv[]){
   if(2<argc){
-    usage(arg[0]);
+    usage(argv[0]);
     return -1;
   }
 }

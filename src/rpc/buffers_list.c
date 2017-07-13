@@ -24,169 +24,168 @@
 #include <assert.h>
 #include <string.h>
 
-hm_buffers_list_t* hm_buffers_list_create(){
-  hm_buffers_list_t* l=calloc(1, sizeof(hm_buffers_list_t));
-  assert(l);
-  return l;
+hm_buffers_list_t *hm_buffers_list_create() {
+    hm_buffers_list_t *list = calloc(1, sizeof(hm_buffers_list_t));
+    assert(list);
+    return list;
 }
 
-hm_buffers_list_t* hm_buffers_list_extract(const uint8_t* data, const size_t length){
-  if(!data || !length){
-    return NULL;
-  }
-  hm_buffers_list_t* bl=hm_buffers_list_create();
-  const uint8_t* end=(data+length);
-  while(data!=end){
-    if((data+sizeof(uint32_t))>end){
-      hm_buffers_list_destroy(&bl);
-      return NULL;
+hm_buffers_list_t *hm_buffers_list_extract(const uint8_t *data, const size_t length) {
+    if (!data || !length) {
+        return NULL;
     }
-    uint32_t len=(*((uint32_t*)data));
-    if((data+sizeof(uint32_t)+len)>end
-       || (HM_SUCCESS!=hm_buffers_list_add_c(bl, data+sizeof(uint32_t), len))){
-      hm_buffers_list_destroy(&bl);
-      return NULL;
+    hm_buffers_list_t *buffers_list = hm_buffers_list_create();
+    const uint8_t *end = (data + length);
+    while (data != end) {
+        if ((data + sizeof(uint32_t)) > end) {
+            hm_buffers_list_destroy(&buffers_list);
+            return NULL;
+        }
+        uint32_t len = (*((uint32_t *) data));
+        if ((data + sizeof(uint32_t) + len) > end
+            || (HM_SUCCESS != hm_buffers_list_add_c(buffers_list, data + sizeof(uint32_t), len))) {
+            hm_buffers_list_destroy(&buffers_list);
+            return NULL;
+        }
+        data += sizeof(uint32_t) + len;
     }
-    data+=sizeof(uint32_t)+len;    
-  }
-  return bl;
+    return buffers_list;
 }
 
-size_t hm_buffres_list_get_needed_buffer_size(hm_buffers_list_t* l){
-  if(!l || !(l->first)){
-    return 0;
-  }
-  hm_buffers_list_node_t* curr=l->first;
-  size_t res=0;
-  while(curr){
-    res+=sizeof(uint32_t);
-    res+=curr->length;
-  }
-  return res;
+size_t hm_buffres_list_get_needed_buffer_size(hm_buffers_list_t *buffers_list) {
+    if (!buffers_list || !(buffers_list->first)) {
+        return 0;
+    }
+    hm_buffers_list_node_t *current = buffers_list->first;
+    size_t result = 0;
+    while (current) {
+        result += sizeof(uint32_t);
+        result += current->length;
+    }
+    return result;
 }
 
-size_t hm_buffers_list_to_buf(hm_buffers_list_t* l, uint8_t** data){
-  size_t res=0;
-  if(!l || !data || !(res= hm_buffres_list_get_needed_buffer_size(l))){
-    return 0;
-  }
-  *data=malloc(res);
-  assert(*data);
-  uint8_t* curr_pos=*data;
-  hm_buffers_list_node_t* curr=l->first;
-  while(curr){
-    *((uint32_t*)curr_pos)=(uint32_t)(curr->length);
-    memcpy(curr_pos+sizeof(uint32_t), curr->data, curr->length);
-    curr_pos+=sizeof(uint32_t)+curr->length;
-  }
-  return res;
+size_t hm_buffers_list_to_buf(hm_buffers_list_t *buffers_list, uint8_t **data) {
+    size_t result = 0;
+    if (!buffers_list || !data || !(result = hm_buffres_list_get_needed_buffer_size(buffers_list))) {
+        return 0;
+    }
+    *data = malloc(result);
+    assert(*data);
+    uint8_t *current_position = *data;
+    hm_buffers_list_node_t *current = buffers_list->first;
+    while (current) {
+        *((uint32_t *) current_position) = (uint32_t) (current->length);
+        memcpy(current_position + sizeof(uint32_t), current->data, current->length);
+        current_position += sizeof(uint32_t) + current->length;
+    }
+    return result;
 }
 
 
-hm_buffers_list_node_t* hm_buffers_list_get_last(hm_buffers_list_t* l){
-  if(!l || !(l->first)){
-    return NULL;
-  }
-  hm_buffers_list_node_t* last=l->first;
-  while(last->next){
-    last=last->next;
-  }
-  return last;
+hm_buffers_list_node_t *hm_buffers_list_get_last(hm_buffers_list_t *buffers_list) {
+    if (!buffers_list || !(buffers_list->first)) {
+        return NULL;
+    }
+    hm_buffers_list_node_t *last = buffers_list->first;
+    while (last->next) {
+        last = last->next;
+    }
+    return last;
 }
 
-hermes_status_t hm_buffers_list_add(hm_buffers_list_t* l, uint8_t* data, size_t length){
-  if(!l || !data || !length){
-    return HM_INVALID_PARAMETER;
-  }
-  hm_buffers_list_node_t* new=calloc(1, sizeof(hm_buffers_list_node_t));
-  assert(new);
-  new->data=data;
-  new->length=length;
-  hm_buffers_list_node_t* last=hm_buffers_list_get_last(l);
-  if(!last){
-    l->first=new;
-  }else{
-    last->next=new;
-  }
-  return HM_SUCCESS;
+hermes_status_t hm_buffers_list_add(hm_buffers_list_t *buffers_list, uint8_t *data, size_t length) {
+    if (!buffers_list || !data || !length) {
+        return HM_INVALID_PARAMETER;
+    }
+    hm_buffers_list_node_t *new = calloc(1, sizeof(hm_buffers_list_node_t));
+    assert(new);
+    new->data = data;
+    new->length = length;
+    hm_buffers_list_node_t *last = hm_buffers_list_get_last(buffers_list);
+    if (!last) {
+        buffers_list->first = new;
+    } else {
+        last->next = new;
+    }
+    return HM_SUCCESS;
 }
 
-hermes_status_t hm_buffers_list_add_c(hm_buffers_list_t* l, const uint8_t* data, const size_t length){
-  if(!l || !data || !length){
-    return HM_INVALID_PARAMETER;
-  }
-  hm_buffers_list_node_t* new=calloc(1, sizeof(hm_buffers_list_node_t));
-  assert(new);
-  new->data=malloc(length);
-  assert(new->data);
-  memcpy(new->data, data, length);
-  new->length=length;
-  hm_buffers_list_node_t* last=hm_buffers_list_get_last(l);
-  if(!last){
-    l->first=new;
-  }else{
-    last->next=new;
-  }
-  return HM_SUCCESS;
+hermes_status_t hm_buffers_list_add_c(hm_buffers_list_t *buffers_list, const uint8_t *data, const size_t length) {
+    if (!buffers_list || !data || !length) {
+        return HM_INVALID_PARAMETER;
+    }
+    hm_buffers_list_node_t *new = calloc(1, sizeof(hm_buffers_list_node_t));
+    assert(new);
+    new->data = malloc(length);
+    assert(new->data);
+    memcpy(new->data, data, length);
+    new->length = length;
+    hm_buffers_list_node_t *last = hm_buffers_list_get_last(buffers_list);
+    if (!last) {
+        buffers_list->first = new;
+    } else {
+        last->next = new;
+    }
+    return HM_SUCCESS;
 }
 
-hermes_status_t hm_buffers_list_destroy(hm_buffers_list_t** l){
-  if(!l || !(*l)){
-    return HM_INVALID_PARAMETER;
-  }
-  int i=0;
-  hm_buffers_list_node_t* curr=(*l)->first;
-  while(curr){
-    free(curr->data);
-    hm_buffers_list_node_t* tmp=curr->next;
-    free(curr);
-    curr=tmp;
-  }
-  free(*l);
-  *l=NULL;
-  return HM_SUCCESS;
+hermes_status_t hm_buffers_list_destroy(hm_buffers_list_t **buffers_list) {
+    if (!buffers_list || !(*buffers_list)) {
+        return HM_INVALID_PARAMETER;
+    }
+    hm_buffers_list_node_t *current = (*buffers_list)->first;
+    while (current) {
+        free(current->data);
+        hm_buffers_list_node_t *tmp = current->next;
+        free(current);
+        current = tmp;
+    }
+    free(*buffers_list);
+    *buffers_list = NULL;
+    return HM_SUCCESS;
 }
 
-const uint8_t* hm_buffers_list_iterator_get_data(hm_buffers_list_iterator_t* i){
-  if(!i || !(i->curr)){
-    return NULL;
-  }
-  return i->curr->data;
+const uint8_t *hm_buffers_list_iterator_get_data(hm_buffers_list_iterator_t *iterator) {
+    if (!iterator || !(iterator->curr)) {
+        return NULL;
+    }
+    return iterator->curr->data;
 }
 
-const size_t hm_buffers_list_iterator_get_size(hm_buffers_list_iterator_t* i){
-  if(!i || !(i->curr)){
-    return 0;
-  }
-  return i->curr->length;
+const size_t hm_buffers_list_iterator_get_size(hm_buffers_list_iterator_t *iterator) {
+    if (!iterator || !(iterator->curr)) {
+        return 0;
+    }
+    return iterator->curr->length;
 }
 
-bool hm_buffers_list_iterator_next(hm_buffers_list_iterator_t* i){
-  if(!i || !(i->curr)){
-    return false;
-  }
-  i->curr=i->curr->next;
-  return true;
+bool hm_buffers_list_iterator_next(hm_buffers_list_iterator_t *iterator) {
+    if (!iterator || !(iterator->curr)) {
+        return false;
+    }
+    iterator->curr = iterator->curr->next;
+    return true;
 }
 
-hm_buffers_list_iterator_t* hm_buffers_list_iterator_create(hm_buffers_list_t* l){
-  if(!l || !(l->first)){
-    return NULL;
-  }
-  hm_buffers_list_iterator_t* i=calloc(1, sizeof(hm_buffers_list_iterator_t));
-  assert(i);
-  i->curr=l->first;
-  i->data=hm_buffers_list_iterator_get_data;
-  i->size=hm_buffers_list_iterator_get_size;
-  i->next=hm_buffers_list_iterator_next;
-  return i;
+hm_buffers_list_iterator_t *hm_buffers_list_iterator_create(hm_buffers_list_t *buffers_list) {
+    if (!buffers_list || !(buffers_list->first)) {
+        return NULL;
+    }
+    hm_buffers_list_iterator_t *iterator = calloc(1, sizeof(hm_buffers_list_iterator_t));
+    assert(iterator);
+    iterator->curr = buffers_list->first;
+    iterator->data = hm_buffers_list_iterator_get_data;
+    iterator->size = hm_buffers_list_iterator_get_size;
+    iterator->next = hm_buffers_list_iterator_next;
+    return iterator;
 }
 
-hermes_status_t hm_buffers_list_iterator_destroy(hm_buffers_list_iterator_t** i){
-  if(!i || !(*i)){
-    return HM_INVALID_PARAMETER;
-  }
-  free(*i);
-  *i=NULL;
-  return HM_SUCCESS;
+hermes_status_t hm_buffers_list_iterator_destroy(hm_buffers_list_iterator_t **iterator) {
+    if (!iterator || !(*iterator)) {
+        return HM_INVALID_PARAMETER;
+    }
+    free(*iterator);
+    *iterator = NULL;
+    return HM_SUCCESS;
 }

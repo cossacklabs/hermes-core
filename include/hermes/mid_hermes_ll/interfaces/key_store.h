@@ -31,66 +31,64 @@
 
 typedef struct hermes_key_store_type hermes_key_store_t;
 
-hermes_status_t hermes_key_store_get_rtoken(hermes_key_store_t* ks,
-                              const uint8_t* user_id,
-                              const size_t user_id_length,
-                              const uint8_t* block_id,
-                              const size_t block_id_length,
-                              uint8_t** token,
-                              size_t* token_length,
-                              uint8_t** owner_id,
-                              size_t* owner_id_length);
+hermes_status_t hermes_key_store_get_rtoken(
+        hermes_key_store_t *key_store,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *block_id, const size_t block_id_length,
+        uint8_t **token, size_t *token_length,
+        uint8_t **owner_id, size_t *owner_id_length);
 
-hermes_status_t hermes_key_store_get_wtoken(hermes_key_store_t* ks,
-                              const uint8_t* user_id,
-                              const size_t user_id_length,
-                              const uint8_t* block_id,
-                              const size_t block_id_length,
-                              uint8_t** token,
-                              size_t* token_length,
-                              uint8_t** owner_id,
-                              size_t* owner_id_length);
+hermes_status_t hermes_key_store_get_wtoken(
+        hermes_key_store_t *key_store,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *block_id, const size_t block_id_length,
+        uint8_t **token, size_t *token_length,
+        uint8_t **owner_id, size_t *owner_id_length);
 
-hermes_status_t hermes_key_store_set_rtoken(hermes_key_store_t* ks,
-                              const uint8_t* user_id,
-                              const size_t user_id_length,
-                              const uint8_t* block_id,
-                              const size_t block_id_length,
-                              const uint8_t* token,
-                              const size_t token_length,
-                              const uint8_t* owner_id,
-                              const size_t owner_id_length);
+hermes_status_t hermes_key_store_set_rtoken(
+        hermes_key_store_t *key_store,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *token, const size_t token_length,
+        const uint8_t *owner_id, const size_t owner_id_length);
 
-hermes_status_t hermes_key_store_set_wtoken(hermes_key_store_t* ks,
-                              const uint8_t* user_id,
-                              const size_t user_id_length,
-                              const uint8_t* block_id,
-                              const size_t block_id_length,
-                              const uint8_t* token,
-                              const size_t token_length,
-                              const uint8_t* owner_id,
-                              const size_t owner_id_length);
+hermes_status_t hermes_key_store_set_wtoken(
+        hermes_key_store_t *key_store,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *token, const size_t token_length,
+        const uint8_t *owner_id, const size_t owner_id_length);
 
-hermes_status_t hermes_key_store_destroy(hermes_key_store_t** ks);
+hermes_status_t hermes_key_store_destroy(hermes_key_store_t **key_store);
 
 typedef struct hermes_key_store_iterator_type hermes_key_store_iterator_t;
 
-hermes_key_store_iterator_t* hermes_key_store_iterator_create(hermes_key_store_t* ks, const uint8_t* block_id, const size_t block_id_length);
+hermes_key_store_iterator_t *hermes_key_store_iterator_create(
+        hermes_key_store_t *key_store, const uint8_t *block_id, const size_t block_id_length);
 
-hermes_status_t hermes_key_store_iterator_next(hermes_key_store_iterator_t* i);
+hermes_status_t hermes_key_store_iterator_next(hermes_key_store_iterator_t *iterator);
 
-uint8_t* hermes_key_store_iterator_get_user_id(hermes_key_store_iterator_t* i);
-size_t hermes_key_store_iterator_get_user_id_length(hermes_key_store_iterator_t* i);
-uint8_t* hermes_key_store_iterator_get_rtoken(hermes_key_store_iterator_t* i);
-size_t hermes_key_store_iterator_get_rtoken_length(hermes_key_store_iterator_t* i);
-uint8_t* hermes_key_store_iterator_get_rtoken_owner(hermes_key_store_iterator_t* i);
-size_t hermes_key_store_iterator_get_rtoken_owner_length(hermes_key_store_iterator_t* i);
-uint8_t* hermes_key_store_iterator_get_wtoken(hermes_key_store_iterator_t* i);
-size_t hermes_key_store_iterator_get_wtoken_length(hermes_key_store_iterator_t* i);
-uint8_t* hermes_key_store_iterator_get_wtoken_owner(hermes_key_store_iterator_t* i);
-size_t hermes_key_store_iterator_get_wtoken_owner_length(hermes_key_store_iterator_t* i);
+uint8_t *hermes_key_store_iterator_get_user_id(hermes_key_store_iterator_t *iterator);
 
-hermes_status_t hermes_key_store_iterator_destroy(hermes_key_store_iterator_t** i);
+size_t hermes_key_store_iterator_get_user_id_length(hermes_key_store_iterator_t *iterator);
+
+uint8_t *hermes_key_store_iterator_get_rtoken(hermes_key_store_iterator_t *iterator);
+
+size_t hermes_key_store_iterator_get_rtoken_length(hermes_key_store_iterator_t *iterator);
+
+uint8_t *hermes_key_store_iterator_get_rtoken_owner(hermes_key_store_iterator_t *iterator);
+
+size_t hermes_key_store_iterator_get_rtoken_owner_length(hermes_key_store_iterator_t *iterator);
+
+uint8_t *hermes_key_store_iterator_get_wtoken(hermes_key_store_iterator_t *iterator);
+
+size_t hermes_key_store_iterator_get_wtoken_length(hermes_key_store_iterator_t *iterator);
+
+uint8_t *hermes_key_store_iterator_get_wtoken_owner(hermes_key_store_iterator_t *iterator);
+
+size_t hermes_key_store_iterator_get_wtoken_owner_length(hermes_key_store_iterator_t *iterator);
+
+hermes_status_t hermes_key_store_iterator_destroy(hermes_key_store_iterator_t **iterator);
 
 
 #endif //HERMES_KEY_STORE_H

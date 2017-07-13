@@ -25,6 +25,6 @@
 #include <hermes/mid_hermes_ll/interfaces/key_store.h>
 #include <hermes/rpc/transport.h>
 
-hermes_key_store_t* hermes_key_store_create(hm_rpc_transport_t* transport);
+hermes_key_store_t *hermes_key_store_create(hm_rpc_transport_t *transport);
 
 #endif //KEY_STORE_IMPL_H

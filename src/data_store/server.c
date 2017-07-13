@@ -27,62 +27,62 @@
 
 #include "functions.h"
 
-struct hm_data_store_server_type{
-  hm_rpc_server_t* s;
-  hm_ds_db_t* db;
+struct hm_data_store_server_type {
+    hm_rpc_server_t *s;
+    hm_ds_db_t *db;
 };
 
-hm_data_store_server_t* hm_data_store_server_create(hm_rpc_transport_t* transport, hm_ds_db_t* db){
-  if(!transport || !db){
-    return NULL;
-  }
-  hm_data_store_server_t* s=calloc(sizeof(hm_data_store_server_t),1);
-  assert(s);
-  s->s=hm_rpc_server_create(transport);
-  if(!(s->s)){
-    hm_data_store_server_destroy(&s);
-    return NULL;
-  }
-  uint32_t res=HM_RPC_SERVER_REG_FUNC(s->s, hm_data_store_create_block);
-  if(HM_SUCCESS!=res){
-    hm_data_store_server_destroy(&s);
-    return NULL;
-  }
-  if(HM_SUCCESS!=(res=HM_RPC_SERVER_REG_FUNC(s->s, hm_data_store_create_block_with_id))){
-    hm_data_store_server_destroy(&s);
-    return NULL;
-  }
-  if(HM_SUCCESS!=(res=HM_RPC_SERVER_REG_FUNC(s->s, hm_data_store_read_block))){
-    hm_data_store_server_destroy(&s);
-    return NULL;
-  }
-  if(HM_SUCCESS!=(res=HM_RPC_SERVER_REG_FUNC(s->s, hm_data_store_update_block))){
-    hm_data_store_server_destroy(&s);
-    return NULL;
-  }
-  if(HM_SUCCESS!=(res=HM_RPC_SERVER_REG_FUNC(s->s, hm_data_store_delete_block))){
-    hm_data_store_server_destroy(&s);
-    return NULL;
-  }  
-  s->db=db;
-  return s;
+hm_data_store_server_t *hm_data_store_server_create(hm_rpc_transport_t *transport, hm_ds_db_t *db) {
+    if (!transport || !db) {
+        return NULL;
+    }
+    hm_data_store_server_t *server = calloc(sizeof(hm_data_store_server_t), 1);
+    assert(server);
+    server->s = hm_rpc_server_create(transport);
+    if (!(server->s)) {
+        hm_data_store_server_destroy(&server);
+        return NULL;
+    }
+    uint32_t res = HM_RPC_SERVER_REG_FUNC(server->s, hm_data_store_create_block);
+    if (HM_SUCCESS != res) {
+        hm_data_store_server_destroy(&server);
+        return NULL;
+    }
+    if (HM_SUCCESS != (res = HM_RPC_SERVER_REG_FUNC(server->s, hm_data_store_create_block_with_id))) {
+        hm_data_store_server_destroy(&server);
+        return NULL;
+    }
+    if (HM_SUCCESS != (res = HM_RPC_SERVER_REG_FUNC(server->s, hm_data_store_read_block))) {
+        hm_data_store_server_destroy(&server);
+        return NULL;
+    }
+    if (HM_SUCCESS != (res = HM_RPC_SERVER_REG_FUNC(server->s, hm_data_store_update_block))) {
+        hm_data_store_server_destroy(&server);
+        return NULL;
+    }
+    if (HM_SUCCESS != (res = HM_RPC_SERVER_REG_FUNC(server->s, hm_data_store_delete_block))) {
+        hm_data_store_server_destroy(&server);
+        return NULL;
+    }
+    server->db = db;
+    return server;
 }
 
-uint32_t hm_data_store_server_destroy(hm_data_store_server_t** s){
-  if(!s || !(*s)){
-    return HM_INVALID_PARAMETER;
-  }
-  hm_rpc_server_destroy(&((*s)->s));
-  free(*s);
-  *s=NULL;
-  return HM_SUCCESS; 
+uint32_t hm_data_store_server_destroy(hm_data_store_server_t **server) {
+    if (!server || !(*server)) {
+        return HM_INVALID_PARAMETER;
+    }
+    hm_rpc_server_destroy(&((*server)->s));
+    free(*server);
+    *server = NULL;
+    return HM_SUCCESS;
 }
 
-uint32_t hm_data_store_server_call(hm_data_store_server_t* s){
-  if(!s){
-    return HM_INVALID_PARAMETER;
-  }
-  return hm_rpc_server_call(s->s, (void*)(s->db));
+uint32_t hm_data_store_server_call(hm_data_store_server_t *server) {
+    if (!server) {
+        return HM_INVALID_PARAMETER;
+    }
+    return hm_rpc_server_call(server->s, (void *) (server->db));
 }
 
 

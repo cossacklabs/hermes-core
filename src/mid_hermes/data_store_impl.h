@@ -25,7 +25,7 @@
 #include <hermes/mid_hermes_ll/interfaces/data_store.h>
 #include <hermes/rpc/transport.h>
 
-hermes_data_store_t* hermes_data_store_create(hm_rpc_transport_t* transport);
+hermes_data_store_t *hermes_data_store_create(hm_rpc_transport_t *transport);
 
 
 #endif //DATA_STORE_IMPL_H

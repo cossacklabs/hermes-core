@@ -33,15 +33,47 @@
 
 typedef struct hm_key_store_client_sync_type hm_key_store_client_sync_t;
 
-hm_key_store_client_sync_t* hm_key_store_client_sync_create(hm_rpc_transport_t* transport);
-uint32_t hm_key_store_client_sync_destroy(hm_key_store_client_sync_t** c);
+hm_key_store_client_sync_t *hm_key_store_client_sync_create(hm_rpc_transport_t *transport);
 
-uint32_t hm_key_store_client_sync_call_set_rtoken(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length, const uint8_t* rtoken, const size_t rtoken_length);
-uint32_t hm_key_store_client_sync_call_set_wtoken(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length, const uint8_t* wtoken, const size_t wtoken_length);
-uint32_t hm_key_store_client_sync_call_get_rtoken(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, uint8_t** rtoken, size_t* rtoken_length, uint8_t** owner_id, size_t* owner_id_length);
-uint32_t hm_key_store_client_sync_call_get_wtoken(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, uint8_t** wtoken, size_t* wtoken_length, uint8_t** owner_id, size_t* owner_id_length);
-uint32_t hm_key_store_client_sync_call_del_rtoken(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length);
-uint32_t hm_key_store_client_sync_call_del_wtoken(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length);
-uint32_t hm_key_store_client_sync_call_get_indexed_rights(hm_key_store_client_sync_t* c, const uint8_t* block_id, const size_t block_id_length, const size_t index, uint8_t** user_id, size_t* user_id_length, uint32_t* rights_mask);
+uint32_t hm_key_store_client_sync_destroy(hm_key_store_client_sync_t **client);
+
+uint32_t hm_key_store_client_sync_call_set_rtoken(
+        hm_key_store_client_sync_t *client, const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *owner_id, const size_t owner_id_length,
+        const uint8_t *read_token, const size_t read_token_length);
+
+uint32_t hm_key_store_client_sync_call_set_wtoken(
+        hm_key_store_client_sync_t *client, const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *owner_id, const size_t owner_id_length,
+        const uint8_t *write_token, const size_t write_token_length);
+
+uint32_t hm_key_store_client_sync_call_get_rtoken(
+        hm_key_store_client_sync_t *client, const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        uint8_t **read_token, size_t *read_token_length,
+        uint8_t **owner_id, size_t *owner_id_length);
+
+uint32_t hm_key_store_client_sync_call_get_wtoken(
+        hm_key_store_client_sync_t *client, const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        uint8_t **write_token, size_t *write_token_length,
+        uint8_t **owner_id, size_t *owner_id_length);
+
+uint32_t hm_key_store_client_sync_call_del_rtoken(
+        hm_key_store_client_sync_t *client, const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *owner_id, const size_t owner_id_length);
+
+uint32_t hm_key_store_client_sync_call_del_wtoken(
+        hm_key_store_client_sync_t *client, const uint8_t *block_id, const size_t block_id_length,
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *owner_id, const size_t owner_id_length);
+
+uint32_t hm_key_store_client_sync_call_get_indexed_rights(
+        hm_key_store_client_sync_t *client, const uint8_t *block_id, const size_t block_id_length,
+        const size_t index, uint8_t **user_id,
+        size_t *user_id_length, uint32_t *rights_mask);
 
 #endif //HERMES_KEY_STORE_CLIENT_H

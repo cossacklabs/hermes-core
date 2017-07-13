@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Cossack Labs Limited
+ * Copyright (client) 2017 Cossack Labs Limited
  *
  * This file is part of Hermes.
  *
@@ -28,8 +28,13 @@
 typedef struct hm_rpc_client_sync_type hm_rpc_client_sync_t;
 
 hm_rpc_client_sync_t* hm_rpc_client_sync_create(hm_rpc_transport_t* transport);
-uint32_t hm_rpc_client_sync_destroy(hm_rpc_client_sync_t** c);
+uint32_t hm_rpc_client_sync_destroy(hm_rpc_client_sync_t** client);
 
-uint32_t hm_rpc_client_sync_call(hm_rpc_client_sync_t* c, const uint8_t* func_name, const size_t func_name_length, hm_param_pack_t* in_params, uint32_t *error, hm_param_pack_t** out_params);
+uint32_t hm_rpc_client_sync_call(
+        hm_rpc_client_sync_t* client,
+        const uint8_t* func_name, const size_t func_name_length,
+        hm_param_pack_t* in_params,
+        uint32_t *error,
+        hm_param_pack_t** out_params);
 
 #endif //HERMES_RPC_SYNC_CLIENT_H

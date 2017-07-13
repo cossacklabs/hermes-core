@@ -31,12 +31,14 @@
 
 #define hm_credential_store_get_pub_key_by_id_NAME "hm_credential_store_get_pub_key_by_id"
 
-uint32_t hm_credential_store_get_pub_key_by_id(hm_cs_db_t* db, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length);
+uint32_t hm_credential_store_get_pub_key_by_id(
+        hm_cs_db_t *db, const uint8_t *id, const size_t id_length, uint8_t **key, size_t *key_length);
 
 //proxies
-uint32_t hm_credential_store_get_pub_key_by_id_sync_proxy(hm_rpc_client_sync_t* c, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length);
+uint32_t hm_credential_store_get_pub_key_by_id_sync_proxy(
+        hm_rpc_client_sync_t *client, const uint8_t *id, const size_t id_length, uint8_t **key, size_t *key_length);
 
 //stubs
-uint32_t hm_credential_store_get_pub_key_by_id_stub(hm_param_pack_t* in, hm_param_pack_t** out, void* user_data);
+uint32_t hm_credential_store_get_pub_key_by_id_stub(hm_param_pack_t *in, hm_param_pack_t **out, void *user_data);
 
 #endif //HERMES_CREDENTIAL_STORE_FUNCTION_H

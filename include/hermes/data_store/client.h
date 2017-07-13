@@ -29,12 +29,41 @@
 
 typedef struct hm_data_store_client_sync_type hm_data_store_client_sync_t;
 
-hm_data_store_client_sync_t* hm_data_store_client_sync_create(hm_rpc_transport_t* transport);
-uint32_t hm_data_store_client_sync_destroy(hm_data_store_client_sync_t** c);
-uint32_t hm_data_store_client_sync_call_create_block(hm_data_store_client_sync_t* c, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length, const uint8_t* mac, const size_t mac_length, uint8_t** id, size_t* id_length);
-uint32_t hm_data_store_client_sync_call_create_block_with_id(hm_data_store_client_sync_t* c, const uint8_t* id, const size_t id_length, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length, const uint8_t* mac, const size_t mac_length);
-uint32_t hm_data_store_client_sync_call_read_block(hm_data_store_client_sync_t* c, const uint8_t* id, const size_t id_length, uint8_t** block, size_t*  block_length, uint8_t** meta, size_t* meta_length);
-uint32_t hm_data_store_client_sync_call_update_block(hm_data_store_client_sync_t* c, const uint8_t* id, const size_t id_length, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length, const uint8_t* mac, const size_t mac_length, const uint8_t* old_mac, const size_t old_mac_length);
-uint32_t hm_data_store_client_sync_call_delete_block(hm_data_store_client_sync_t* c, const uint8_t* id, const size_t id_length, const uint8_t* old_mac, const size_t old_mac_length);
+hm_data_store_client_sync_t *hm_data_store_client_sync_create(hm_rpc_transport_t *transport);
+
+uint32_t hm_data_store_client_sync_destroy(hm_data_store_client_sync_t **client);
+
+uint32_t hm_data_store_client_sync_call_create_block(
+        hm_data_store_client_sync_t *client,
+        const uint8_t *block, const size_t block_length,
+        const uint8_t *meta, const size_t meta_length,
+        const uint8_t *mac, const size_t mac_length,
+        uint8_t **id, size_t *id_length);
+
+uint32_t hm_data_store_client_sync_call_create_block_with_id(
+        hm_data_store_client_sync_t *client,
+        const uint8_t *id, const size_t id_length,
+        const uint8_t *block, const size_t block_length,
+        const uint8_t *meta, const size_t meta_length,
+        const uint8_t *mac, const size_t mac_length);
+
+uint32_t hm_data_store_client_sync_call_read_block(
+        hm_data_store_client_sync_t *client,
+        const uint8_t *id, const size_t id_length,
+        uint8_t **block, size_t *block_length,
+        uint8_t **meta, size_t *meta_length);
+
+uint32_t hm_data_store_client_sync_call_update_block(
+        hm_data_store_client_sync_t *client,
+        const uint8_t *id, const size_t id_length,
+        const uint8_t *block, const size_t block_length,
+        const uint8_t *meta, const size_t meta_length,
+        const uint8_t *mac, const size_t mac_length,
+        const uint8_t *old_mac, const size_t old_mac_length);
+
+uint32_t hm_data_store_client_sync_call_delete_block(
+        hm_data_store_client_sync_t *client,
+        const uint8_t *id, const size_t id_length,
+        const uint8_t *old_mac, const size_t old_mac_length);
 
 #endif //HERMES_DATA_STORE_CLIENT_H

@@ -25,7 +25,7 @@
 #include <hermes/mid_hermes_ll/interfaces/credential_store.h>
 #include <hermes/rpc/transport.h>
 
-hermes_credential_store_t* hermes_credential_store_create(hm_rpc_transport_t* transport);
+hermes_credential_store_t *hermes_credential_store_create(hm_rpc_transport_t *transport);
 
 
 #endif //CREDENTIAL_STORE_IMPL_H

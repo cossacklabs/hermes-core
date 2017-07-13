@@ -24,18 +24,18 @@
 #include <string.h>
 
 mid_hermes_ll_buffer_t* mid_hermes_ll_buffer_create(const uint8_t* data, const size_t length){
-  mid_hermes_ll_buffer_t *b=calloc(1, sizeof(mid_hermes_ll_buffer_t));
-  assert(b);
+  mid_hermes_ll_buffer_t *buffer=calloc(1, sizeof(mid_hermes_ll_buffer_t));
+  assert(buffer);
   if(!data && !length){
-    return b;
+    return buffer;
   }
-  b->data=malloc(length);
-  assert(b->data);
+  buffer->data=malloc(length);
+  assert(buffer->data);
   if(data){
-    memcpy(b->data, data, length);
+    memcpy(buffer->data, data, length);
   }
-  b->length=length;
-  return b;
+  buffer->length=length;
+  return buffer;
 }
 
 mid_hermes_ll_buffer_t* mid_hermes_ll_buffer_copy(mid_hermes_ll_buffer_t* src, mid_hermes_ll_buffer_t* dst){
@@ -47,56 +47,56 @@ mid_hermes_ll_buffer_t* mid_hermes_ll_buffer_copy(mid_hermes_ll_buffer_t* src, m
   return dst;
 }
 
-bool mid_hermes_ll_buffer_is_empty(mid_hermes_ll_buffer_t* b){
-  assert(b);
-  if(!(b->data) || !(b->length)){
+bool mid_hermes_ll_buffer_is_empty(mid_hermes_ll_buffer_t* buffer){
+  assert(buffer);
+  if(!(buffer->data) || !(buffer->length)){
     return true;
   }
   return false;
 }
 
-bool mid_hermes_ll_buffer_is_equal(mid_hermes_ll_buffer_t* b, mid_hermes_ll_buffer_t* c){
-  assert(b);
-  assert(c);
-  if((c->length)!=(b->length) || 0!=memcmp(b->data, c->data, b->length)){
+bool mid_hermes_ll_buffer_is_equal(mid_hermes_ll_buffer_t* buffer1, mid_hermes_ll_buffer_t* buffer2){
+  assert(buffer1);
+  assert(buffer2);
+  if((buffer2->length)!=(buffer1->length) || 0!=memcmp(buffer1->data, buffer2->data, buffer1->length)){
     return false;
   }
   return true;
 }
 
-hermes_status_t mid_hermes_ll_buffer_reset(mid_hermes_ll_buffer_t* b, const uint8_t* data, const size_t length){
-  HERMES_CHECK_IN_PARAM(b);
-  if(b->data){
+hermes_status_t mid_hermes_ll_buffer_reset(mid_hermes_ll_buffer_t* buffer, const uint8_t* data, const size_t length){
+  HERMES_CHECK_IN_PARAM(buffer);
+  if(buffer->data){
     if(data){
-      if(b->length<length){
-        b->data=realloc(b->data, length);
-        assert(b->data);
+      if(buffer->length<length){
+        buffer->data=realloc(buffer->data, length);
+        assert(buffer->data);
       }
-      memcpy(b->data, data, length);
-      b->length=length;
+      memcpy(buffer->data, data, length);
+      buffer->length=length;
       return HM_SUCCESS;
     }
-    free(b->data);
-    b->data=NULL;
-    b->length=0;
+    free(buffer->data);
+    buffer->data=NULL;
+    buffer->length=0;
     return HM_SUCCESS;
   }
   if(data){
-    b->data=malloc(length);
-    b->length=length;
+    buffer->data=malloc(length);
+    buffer->length=length;
     return HM_SUCCESS;
   }
-  b->data=NULL;
-  b->length=0;
+  buffer->data=NULL;
+  buffer->length=0;
   return HM_SUCCESS;
 }
 
-hermes_status_t mid_hermes_ll_buffer_destroy(mid_hermes_ll_buffer_t** b){
-  HERMES_CHECK_IN_PARAM(b);
-  HERMES_CHECK_IN_PARAM(*b);
-  free((*b)->data);
-  free(*b);
-  *b=NULL;
+hermes_status_t mid_hermes_ll_buffer_destroy(mid_hermes_ll_buffer_t** buffer){
+  HERMES_CHECK_IN_PARAM(buffer);
+  HERMES_CHECK_IN_PARAM(*buffer);
+  free((*buffer)->data);
+  free(*buffer);
+  *buffer=NULL;
   return HM_SUCCESS;
 }
 

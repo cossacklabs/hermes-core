@@ -24,51 +24,58 @@
 
 #include <assert.h>
 
-struct hm_rpc_client_sync_type{
-  hm_rpc_transport_t* transport;
+struct hm_rpc_client_sync_type {
+    hm_rpc_transport_t *transport;
 };
 
-hm_rpc_client_sync_t* hm_rpc_client_sync_create(hm_rpc_transport_t* transport){
-  if(!transport){
-    return NULL;
-  }
-  hm_rpc_client_sync_t* res = calloc(sizeof(hm_rpc_client_sync_t), 1);
-  assert(res);
-  res->transport=transport;
-  return res;
-}
-
-uint32_t hm_rpc_client_sync_destroy(hm_rpc_client_sync_t** c){
-  if(!c || !(*c)){
-    return HM_INVALID_PARAMETER;
-  }
-  free(*c);
-  *c=NULL;
-  return HM_SUCCESS;
-}
-
-uint32_t hm_rpc_client_sync_call(hm_rpc_client_sync_t* c, const uint8_t* func_name, const size_t func_name_length, hm_param_pack_t* in_params, uint32_t *error, hm_param_pack_t** out_params){
-  if(!c || !func_name || !func_name_length || !in_params){
-    return HM_INVALID_PARAMETER;
-  }
-  uint32_t res=HM_SUCCESS;
-  if(HM_SUCCESS!=(res=c->transport->send(c->transport->user_data, (const uint8_t*)(&func_name_length), sizeof(uint32_t)))){
-    return res;
-  }
-  if(HM_SUCCESS!=(res=c->transport->send(c->transport->user_data, func_name, func_name_length))){
-    return res;
-  }
-  if(HM_SUCCESS!=(res=hm_param_pack_send(in_params, c->transport))){
-    return res;
-  }
-  if(HM_SUCCESS!=(res=c->transport->recv(c->transport->user_data, (uint8_t*)error, sizeof(uint32_t)))){
-    return res;
-  }
-  if(HM_SUCCESS==(*error) && out_params){
-    (*out_params)=hm_param_pack_receive(c->transport);
-    if(!*out_params){
-      return HM_FAIL;
+hm_rpc_client_sync_t *hm_rpc_client_sync_create(hm_rpc_transport_t *transport) {
+    if (!transport) {
+        return NULL;
     }
-  }
-  return HM_SUCCESS;
+    hm_rpc_client_sync_t *client = calloc(sizeof(hm_rpc_client_sync_t), 1);
+    assert(client);
+    client->transport = transport;
+    return client;
+}
+
+uint32_t hm_rpc_client_sync_destroy(hm_rpc_client_sync_t **client) {
+    if (!client || !(*client)) {
+        return HM_INVALID_PARAMETER;
+    }
+    free(*client);
+    *client = NULL;
+    return HM_SUCCESS;
+}
+
+uint32_t hm_rpc_client_sync_call(
+        hm_rpc_client_sync_t *client,
+        const uint8_t *func_name, const size_t func_name_length,
+        hm_param_pack_t *in_params,
+        uint32_t *error,
+        hm_param_pack_t **out_params) {
+    if (!client || !func_name || !func_name_length || !in_params) {
+        return HM_INVALID_PARAMETER;
+    }
+    uint32_t res = HM_SUCCESS;
+    if (HM_SUCCESS != (res = client->transport->send(
+            client->transport->user_data, (const uint8_t *) (&func_name_length), sizeof(uint32_t)))) {
+        return res;
+    }
+    if (HM_SUCCESS != (res = client->transport->send(client->transport->user_data, func_name, func_name_length))) {
+        return res;
+    }
+    if (HM_SUCCESS != (res = hm_param_pack_send(in_params, client->transport))) {
+        return res;
+    }
+    if (HM_SUCCESS !=
+        (res = client->transport->recv(client->transport->user_data, (uint8_t *) error, sizeof(uint32_t)))) {
+        return res;
+    }
+    if (HM_SUCCESS == (*error) && out_params) {
+        (*out_params) = hm_param_pack_receive(client->transport);
+        if (!*out_params) {
+            return HM_FAIL;
+        }
+    }
+    return HM_SUCCESS;
 }

@@ -30,6 +30,8 @@
 typedef struct hm_credential_store_client_sync_type hm_credential_store_client_sync_t;
 
 hm_credential_store_client_sync_t* hm_credential_store_client_sync_create(hm_rpc_transport_t* transport);
-uint32_t hm_credential_store_client_sync_destroy(hm_credential_store_client_sync_t** c);
-uint32_t hm_credential_store_client_sync_call_get_pub_key_by_id(hm_credential_store_client_sync_t* c, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length);
+uint32_t hm_credential_store_client_sync_destroy(hm_credential_store_client_sync_t** client);
+uint32_t hm_credential_store_client_sync_call_get_pub_key_by_id(
+        hm_credential_store_client_sync_t* client, const uint8_t* id, const size_t id_length,
+        uint8_t** key, size_t* key_length);
 #endif //HERMES_CREDENTIAL_STORE_CLIENT_H

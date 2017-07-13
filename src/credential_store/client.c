@@ -26,38 +26,40 @@
 
 #include "functions.h"
 
-struct hm_credential_store_client_sync_type{
-  hm_rpc_client_sync_t* c;
+struct hm_credential_store_client_sync_type {
+    hm_rpc_client_sync_t *c;
 };
 
-hm_credential_store_client_sync_t* hm_credential_store_client_sync_create(hm_rpc_transport_t* transport){
-  if(!transport){
-    return NULL;
-  }
-  hm_credential_store_client_sync_t* c=calloc(sizeof(hm_credential_store_client_sync_t), 1);
-  assert(c);
-  c->c = hm_rpc_client_sync_create(transport);
-  if(!(c->c)){
-    hm_credential_store_client_sync_destroy(&c);
-    return NULL;
-  }
-  return c;
+hm_credential_store_client_sync_t *hm_credential_store_client_sync_create(hm_rpc_transport_t *transport) {
+    if (!transport) {
+        return NULL;
+    }
+    hm_credential_store_client_sync_t *client = calloc(sizeof(hm_credential_store_client_sync_t), 1);
+    assert(client);
+    client->c = hm_rpc_client_sync_create(transport);
+    if (!(client->c)) {
+        hm_credential_store_client_sync_destroy(&client);
+        return NULL;
+    }
+    return client;
 }
 
-uint32_t hm_credential_store_client_sync_destroy(hm_credential_store_client_sync_t** c){
-  if(!c || !(*c)){
-    return HM_INVALID_PARAMETER;
-  }
-  hm_rpc_client_sync_destroy(&((*c)->c));
-  free(*c);
-  *c=NULL;
-  return HM_SUCCESS;
+uint32_t hm_credential_store_client_sync_destroy(hm_credential_store_client_sync_t **c) {
+    if (!c || !(*c)) {
+        return HM_INVALID_PARAMETER;
+    }
+    hm_rpc_client_sync_destroy(&((*c)->c));
+    free(*c);
+    *c = NULL;
+    return HM_SUCCESS;
 }
 
-uint32_t hm_credential_store_client_sync_call_get_pub_key_by_id(hm_credential_store_client_sync_t* c, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length){
-  if(!c || !id || !id_length || !key){
-    return HM_INVALID_PARAMETER;
-  }
-  return hm_credential_store_get_pub_key_by_id_sync_proxy(c->c, id, id_length, key, key_length);
+uint32_t hm_credential_store_client_sync_call_get_pub_key_by_id(
+        hm_credential_store_client_sync_t *client, const uint8_t *id, const size_t id_length,
+        uint8_t **key, size_t *key_length) {
+    if (!client || !id || !id_length || !key) {
+        return HM_INVALID_PARAMETER;
+    }
+    return hm_credential_store_get_pub_key_by_id_sync_proxy(client->c, id, id_length, key, key_length);
 }
 
