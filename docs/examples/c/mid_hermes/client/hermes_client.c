@@ -155,7 +155,7 @@ int main(int argc, char** argv){
      || !ds_transport
      || !ks_transport
      || !(sk_length=base64_decode(sk, argv[3], sk_length))
-     || !(mh=mid_hermes_create(argv[2], strlen(argv[2])+1, sk, sk_length, ks_transport, ds_transport, cs_transport))){
+     || !(mh=mid_hermes_create(argv[2], strlen(argv[2]), sk, sk_length, ks_transport, ds_transport, cs_transport))){
     transport_destroy(&cs_transport);
     transport_destroy(&ds_transport);
     transport_destroy(&ks_transport);
@@ -167,7 +167,7 @@ int main(int argc, char** argv){
   case COMMAND_GET_BLOCK:{
     uint8_t *data=NULL, *meta=NULL;
     size_t data_length=0, meta_length=0;
-    if(argc!=5 || 0!=mid_hermes_read_block(mh, argv[4], strlen(argv[4])+1, &data, &data_length, &meta, &meta_length)){
+    if(argc!=5 || 0!=mid_hermes_read_block(mh, argv[4], strlen(argv[4]), &data, &data_length, &meta, &meta_length)){
       fprintf(stderr, "error: block getting error\n");
       break;
     }
@@ -178,12 +178,12 @@ int main(int argc, char** argv){
   }
     break;
   case COMMAND_ADD_BLOCK:{
-    size_t id_length=strlen(argv[4])+1;
+    size_t id_length=strlen(argv[4]);
     uint8_t* block=NULL;
     size_t block_length=0;
     if(argc!=6
        || (SUCCESS!=read_whole_file(argv[4], &block, &block_length))
-       || (0!=mid_hermes_create_block(mh,(uint8_t**)&(argv[4]), &id_length, block, block_length, argv[5], strlen(argv[5])+1))){
+       || (0!=mid_hermes_create_block(mh,(uint8_t**)&(argv[4]), &id_length, block, block_length, argv[5], strlen(argv[5])))){
       free(block);
       fprintf(stderr, "error: block adding error\n");
       break;
@@ -196,7 +196,7 @@ int main(int argc, char** argv){
     size_t block_length=0;
     if(argc!=6
        || (SUCCESS!=read_whole_file(argv[4], &block, &block_length))
-       || (0!=mid_hermes_update_block(mh, argv[4], strlen(argv[4])+1, block, block_length, argv[5], strlen(argv[5])+1))){
+       || (0!=mid_hermes_update_block(mh, argv[4], strlen(argv[4]), block, block_length, argv[5], strlen(argv[5])))){
       free(block);
       fprintf(stderr, "error: block adding error\n");
       break;
@@ -206,38 +206,38 @@ int main(int argc, char** argv){
     break;    
   case COMMAND_DEL_BLOCK:{
     if(argc!=5
-       || 0!=mid_hermes_delete_block(mh, argv[4], strlen(argv[4])+1)){
+       || 0!=mid_hermes_delete_block(mh, argv[4], strlen(argv[4]))){
       fprintf(stderr, "error: block deleting error\n");
     }
     break;
   }
   case COMMAND_GRANT_READ:
     if(argc!=6
-       || 0!=mid_hermes_grant_read_access(mh, argv[4], strlen(argv[4])+1, argv[5], strlen(argv[5])+1)){
+       || 0!=mid_hermes_grant_read_access(mh, argv[4], strlen(argv[4]), argv[5], strlen(argv[5]))){
       fprintf(stderr, "error: block read access granting error\n");
     }
     break;
   case COMMAND_GRANT_UPDATE:
     if(argc!=6
-       || 0!=mid_hermes_grant_update_access(mh, argv[4], strlen(argv[4])+1, argv[5], strlen(argv[5])+1)){
+       || 0!=mid_hermes_grant_update_access(mh, argv[4], strlen(argv[4]), argv[5], strlen(argv[5]))){
       fprintf(stderr, "error: block update access granting error\n");
     }
     break;
   case COMMAND_DENY_READ:
     if(argc!=6
-       || 0!=mid_hermes_deny_read_access(mh, argv[4], strlen(argv[4])+1, argv[5], strlen(argv[5])+1)){
+       || 0!=mid_hermes_deny_read_access(mh, argv[4], strlen(argv[4]), argv[5], strlen(argv[5]))){
       fprintf(stderr, "error: block read access denying error\n");
     }
     break;
   case COMMAND_DENY_UPDATE:
     if(argc!=6
-       || 0!=mid_hermes_deny_update_access(mh, argv[4], strlen(argv[4])+1, argv[5], strlen(argv[5])+1)){
+       || 0!=mid_hermes_deny_update_access(mh, argv[4], strlen(argv[4]), argv[5], strlen(argv[5]))){
       fprintf(stderr, "error: block update access denying error\n");
     }
     break;
   case COMMAND_ROTATE:
     if(argc!=5
-       || 0!=mid_hermes_rotate_block(mh, argv[4], strlen(argv[4])+1)){
+       || 0!=mid_hermes_rotate_block(mh, argv[4], strlen(argv[4]))){
       fprintf(stderr, "error: block rotate error\n");
     }
     break;
