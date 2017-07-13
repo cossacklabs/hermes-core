@@ -20,6 +20,7 @@
 #
 
 import argparse
+
 import pyhermes
 
 if __name__ == '__main__':

@@ -25,6 +25,6 @@
 #include <hermes/rpc/transport.h>
 
 hm_rpc_transport_t* transport_create(int socket);
-uint32_t transport_destroy(hm_rpc_transport_t** t);
+uint32_t transport_destroy(hm_rpc_transport_t** transport);
 
 #endif //TRANSPORT_H
