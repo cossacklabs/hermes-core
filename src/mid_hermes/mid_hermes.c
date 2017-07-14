@@ -280,7 +280,7 @@ hermes_status_t mid_hermes_grant_read_access(
     }
     mid_hermes_ll_block_destroy(&bl);
     mid_hermes_ll_token_destroy(&read_token);
-    return HM_FAIL;
+    return HM_SUCCESS;
 }
 
 hermes_status_t mid_hermes_grant_update_access(
@@ -321,7 +321,7 @@ hermes_status_t mid_hermes_grant_update_access(
     }
     mid_hermes_ll_block_destroy(&bl);
     mid_hermes_ll_token_destroy(&write_token);
-    return HM_FAIL;
+    return HM_SUCCESS;
 }
 
 hermes_status_t mid_hermes_deny_read_access(
@@ -360,7 +360,7 @@ hermes_status_t mid_hermes_deny_read_access(
     }
     mid_hermes_ll_block_destroy(&bl);
     mid_hermes_ll_token_destroy(&wtoken);
-    return HM_FAIL;
+    return HM_SUCCESS;
 }
 
 hermes_status_t mid_hermes_deny_update_access(
@@ -402,7 +402,7 @@ hermes_status_t mid_hermes_deny_update_access(
     }
     mid_hermes_ll_block_destroy(&bl);
     mid_hermes_ll_token_destroy(&write_token);
-    return HM_FAIL;
+    return HM_SUCCESS;
 
 }
 
