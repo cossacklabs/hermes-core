@@ -72,10 +72,12 @@ static PyObject *MidHermes_new(PyTypeObject *type, PyObject *args, PyObject *kwd
     pyhermes_MidHermesObject *self;
     self = (pyhermes_MidHermesObject *) type->tp_alloc(type, 0);
     if (!self) {
-        Py_RETURN_NONE;
+        PyErr_SetString(HermesError, "MidHermes memory allocation error");
+        return NULL;
     }
     if (0 != MidHermes_init(self, args, kwds)) {
-        Py_RETURN_NONE;
+        PyErr_SetString(HermesError, "MidHermes object creation error");
+        return NULL;
     }
     return (PyObject *) self;
 }
