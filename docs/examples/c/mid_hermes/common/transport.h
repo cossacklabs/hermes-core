@@ -18,27 +18,13 @@
  *
  */
 
-#include <hermes/common/errors.h>
-#include <hermes/client_interfaces/keys_storage_interface.h>
 
-void usage(const char*  prog_name){
-  printf("Usage: %s <db file name>\n", prog_name);
-}
+#ifndef TRANSPORT_H
+#define TRANSPORT_H
 
-int main(int argc, char* argv[]){
-  if(2<argc){
-    usage(argv[0]);
-    return -1;
-  }
-}
+#include <hermes/rpc/transport.h>
 
+hm_rpc_transport_t* transport_create(int socket);
+uint32_t transport_destroy(hm_rpc_transport_t** t);
 
-
-
-
-
-
-
-
-
-}
+#endif //TRANSPORT_H
