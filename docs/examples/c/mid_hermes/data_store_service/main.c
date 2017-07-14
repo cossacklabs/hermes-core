@@ -19,7 +19,7 @@
  */
 
 #include <hermes/data_store/service.h>
-#include "transport.h"
+#include "../common/transport.h"
 #include "db.h"
 
 #include<sys/socket.h>

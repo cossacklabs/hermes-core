@@ -45,15 +45,15 @@ int main(int argc, char* argv[]){
     }
     fwrite(public_key, 1, public_key_length, pu);
     fclose(pu);
-    for(i=0;i<private_key_length;++i){
-	fprintf(stdout, "0x%02x, ", private_key[i]);
+//    for(i=0;i<private_key_length;++i){
+//	fprintf(stdout, "0x%02x, ", private_key[i]);
 //	fprintf(stdout, "%c", private_key[i]);
-    }
-    fprintf(stdout, "\n");
-    for(i=0;i<public_key_length;++i){
-	fprintf(stderr, "0x%02x, ", public_key[i]);
+//    }
+//    fprintf(stdout, "\n");
+//    for(i=0;i<public_key_length;++i){
+//	fprintf(stderr, "0x%02x, ", public_key[i]);
 //	fprintf(stderr, "%c", public_key[i]);
-    }
+//    }
     free(private_key);
     free(public_key);
     return 0;
