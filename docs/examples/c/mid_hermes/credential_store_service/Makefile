@@ -1,2 +1,2 @@
 all:
-	gcc -g -I../../../../../include -L../../../../../build  main.c transport.c db.c ../../utils/utils.c ../../utils/base64.c -lhermes_credential_store -lhermes_rpc -lpthread -lhermes_common -o cs
+	gcc -g -I../../../../../include -L../../../../../build  main.c ../common/transport.c db.c ../../utils/utils.c ../../utils/base64.c -lhermes_credential_store -lhermes_rpc -lpthread -lhermes_common -o cs
