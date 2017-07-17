@@ -19,7 +19,6 @@ COMMON_TEST_OBJ = $(patsubst $(TEST_SRC_PATH)/%.c,$(TEST_OBJ_PATH)/%.o, $(COMMON
 
 include tests/rpc/rpc.mk
 include tests/credential_store/credential_store.mk
-include tests/data_store/data_store.mk
 include tests/key_store/key_store.mk
 
 rpc_test: CMD = $(CC) -o $(TEST_BIN_PATH)/rpc_test $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lrpc -lcommon -lsoter $(COVERLDFLAGS) -lpthread
@@ -34,19 +33,13 @@ credential_store_test: credential_store_static rpc_static $(CREDENTIAL_STORE_TES
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-data_store_test: CMD = $(CC) -o $(TEST_BIN_PATH)/data_store_test $(DATA_STORE_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -ldata_store -lrpc -lcommon -lsoter $(COVERLDFLAGS) -lpthread
-
-data_store_test: data_store_static rpc_static $(DATA_STORE_TEST_OBJ) $(COMMON_TEST_OBJ)
-	@echo -n "link "
-	@$(BUILD_CMD)
-
 key_store_test: CMD = $(CC) -o $(TEST_BIN_PATH)/key_store_test $(KEY_STORE_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lkey_store -lrpc -lcommon -lsoter $(COVERLDFLAGS) -lpthread
 
 key_store_test: key_store_static rpc_static $(KEY_STORE_TEST_OBJ) $(COMMON_TEST_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-test: rpc_test credential_store_test data_store_test key_store_test
+test: rpc_test credential_store_test key_store_test
 
 check: 
 	$(TEST_BIN_PATH)/rpc_test

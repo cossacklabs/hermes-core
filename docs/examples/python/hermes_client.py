@@ -1,4 +1,4 @@
-#!usr/bin/python
+#!/usr/bin/python
 
 #
 # Copyright (c) 2017 Cossack Labs Limited

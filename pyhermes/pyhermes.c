@@ -150,6 +150,23 @@ static PyObject *MidHermes_getBlock(pyhermes_MidHermesObject *self, PyObject *ar
     return Py_BuildValue("s#s#", block, block_length, meta, meta_length);
 }
 
+static PyObject *MidHermes_rotateBlock(pyhermes_MidHermesObject *self, PyObject *args, PyObject *kwds) {
+    const char *block_id = NULL, *block = NULL, *meta = NULL;
+    size_t block_id_length = 0, block_length = 0, meta_length = 0;
+    static char *kwlist[] = {"id", NULL};
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s#", kwlist, &block_id, &block_id_length)) {
+        PyErr_SetString(HermesError, "MidHermes.rotateBlock invalid parameters");
+        return NULL;
+    }
+    if (0 != mid_hermes_rotate_block(
+            self->mid_hermes, (const uint8_t *) block_id, block_id_length, (uint8_t **) (&block), &block_length,
+            (uint8_t **) (&meta), &meta_length)) {
+        PyErr_SetString(HermesError, "MidHermes.rotateBlock error");
+        return NULL;
+    }
+    Py_RETURN_NONE;
+}
+
 static PyObject *MidHermes_grantReadAccess(pyhermes_MidHermesObject *self, PyObject *args, PyObject *kwds) {
     const char *block_id = NULL, *user_id = NULL;
     size_t block_id_length = 0, user_id_length = 0;
@@ -224,6 +241,7 @@ static PyMethodDef MidHermes_methods[] = {
         {"getBlock", (PyCFunction)MidHermes_getBlock, METH_VARARGS|METH_KEYWORDS, "return (block, meta) from hermes"},
         {"updBlock", (PyCFunction)MidHermes_updBlock, METH_VARARGS|METH_KEYWORDS, "update (block, meta) in hermes"},
         {"delBlock", (PyCFunction)MidHermes_delBlock, METH_VARARGS|METH_KEYWORDS, "delete (block, meta) from hermes"},
+        {"rotateBlock", (PyCFunction)MidHermes_rotateBlock, METH_VARARGS|METH_KEYWORDS, "rotete block in hermes"},
         {"grantReadAccess", (PyCFunction)MidHermes_grantReadAccess, METH_VARARGS|METH_KEYWORDS, "grant read access to user for block"},
         {"grantUpdateAccess", (PyCFunction)MidHermes_grantUpdateAccess, METH_VARARGS|METH_KEYWORDS, "grant update access to user for block"},
         {"denyReadAccess", (PyCFunction)MidHermes_denyReadAccess, METH_VARARGS|METH_KEYWORDS, "deny read access to user for block"},
