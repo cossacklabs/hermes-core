@@ -54,8 +54,29 @@ parser = argparse.ArgumentParser(description='Hermes client example.')
 parser.add_argument('--id', dest='id', required=True, help='user identificator')
 parser.add_argument('--sk', dest='sk', required=True,
                     help='base64 encoded user private key)')
-parser.add_argument('--command', dest='command', required=True,
-                    help='command [ba|br|bu|bd|rgr|rgu|rdr|rdu])')
+
+parser.add_argument('--add', '-a', action='store_true', default=False,
+                    dest='add')
+parser.add_argument('--read', '-r', action='store_true', default=False,
+                    dest='read')
+parser.add_argument('--update', '-u', action='store_true', default=False,
+                    dest='update')
+parser.add_argument('--delete', '-d', action='store_true', default=False,
+                    dest='delete')
+
+parser.add_argument('--rotate', '-rt', action='store_true', default=False,
+                    dest='rotate')
+
+parser.add_argument('--grant_read', '-gr', action='store_true', default=False,
+                    dest='grant_read')
+parser.add_argument('--grant_update', '-gu', action='store_true', default=False,
+                    dest='grant_update')
+parser.add_argument('--revoke_read', '-rr', action='store_true', default=False,
+                    dest='revoke_read')
+parser.add_argument('--revoke_update', '-ru', action='store_true', default=False,
+                    dest='revoke_update')
+
+
 parser.add_argument('--doc', dest='doc_file_name', required=True,
                     help='document file name')
 parser.add_argument('--meta', dest='meta', help='document meta data')
@@ -71,27 +92,35 @@ mid_hermes = hermes.MidHermes(
     args.id, base64.b64decode(args.sk), credential_store_transport,
     data_store_transport, key_store_transport)
 
-if args.command == "ba" and args.meta is not None:
+if not (args.add or args.read or args.update or args.delete or
+            args.grant_read or args.grant_update or args.revoke_update or
+            args.revoke_read):
+    print("choose any command add|read|update|delete|grant_read|grant_update|"
+          "revoke_read|revoke_update")
+    exit(1)
+
+if args.add and args.meta is not None:
     block = open(args.doc_file_name, 'rb').read()
     mid_hermes.addBlock(args.doc_file_name.encode(), block, args.meta.encode())
-elif args.command == "br":
+elif args.read:
     print(mid_hermes.getBlock(args.doc_file_name.encode()))
-elif args.command == "bu":
+elif args.update:
+    block = open(args.doc_file_name, 'rb').read()
     mid_hermes.updBlock(args.doc_file_name.encode(), block, args.meta.encode())
-elif args.command == "bd":
+elif args.delete:
     mid_hermes.delBlock(args.doc_file_name.encode())
-elif args.command == "u":
+elif args.rotate:
     mid_hermes.rotateBlock(args.doc_file_name.encode())
-elif args.command == "rgr":
+elif args.grant_read:
     mid_hermes.grantReadAccess(
         args.doc_file_name.encode(), args.for_user.encode())
-elif args.command == "rgu":
+elif args.grant_update:
     mid_hermes.grantUpdateAccess(
         args.doc_file_name.encode(), args.for_user.encode())
-elif args.command == "rdr":
+elif args.revoke_read:
     mid_hermes.denyReadAccess(
         args.doc_file_name.encode(), args.for_user.encode())
-elif args.command == "rdu":
+elif args.revoke_update:
     mid_hermes.denyUpdateAccess(
         args.doc_file_name.encode(), args.for_user.encode())
 
