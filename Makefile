@@ -224,5 +224,5 @@ examples: static_core ll_example hermes_example
 uninstall: CMD = rm -rf $(PREFIX)/include/hermes && rm -f $(PREFIX)/lib/libhermes*.a && rm -f $(PREFIX)/lib/libhermes*.so
 
 uninstall:
-	@echo -n "themis uninstall "
+	@echo -n "hermes uninstall "
 	@$(BUILD_CMD_)
