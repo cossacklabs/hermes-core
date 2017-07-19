@@ -175,12 +175,13 @@ hermes_status_t hermes_key_store_iterator_next(hermes_key_store_iterator_t *iter
         return HM_INVALID_PARAMETER;
     }
     free(iterator->current_user_id);
+    iterator->current_user_id=NULL;
     if (HM_SUCCESS != hm_key_store_client_sync_call_get_indexed_rights(
             iterator->ks->cl, iterator->block_id, iterator->block_id_length, ++(iterator->current_index),
             &(iterator->current_user_id), &(iterator->current_user_id_length), &(iterator->current_rights_mask))) {
-        return HM_SUCCESS;
+        return HM_FAIL;
     }
-    return HM_FAIL;
+    return HM_SUCCESS;
 }
 
 uint8_t *hermes_key_store_iterator_get_user_id(hermes_key_store_iterator_t *iterator) {

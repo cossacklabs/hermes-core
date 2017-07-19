@@ -235,7 +235,7 @@ mid_hermes_ll_rights_list_t *mid_hermes_ll_block_access_rights(
     assert(rights);
     hermes_key_store_iterator_t *i = hermes_key_store_iterator_create(key_store, bl->id->data, bl->id->length);
     assert(i);
-    while (HM_SUCCESS == hermes_key_store_iterator_next(i)) {
+    do {
         mid_hermes_ll_user_t *user = mid_hermes_ll_user_load_c(
                 hermes_key_store_iterator_get_user_id(i), hermes_key_store_iterator_get_user_id_length(i),
                 credential_store);
@@ -259,7 +259,7 @@ mid_hermes_ll_rights_list_t *mid_hermes_ll_block_access_rights(
             hermes_key_store_iterator_destroy(&i);
             return NULL;
         }
-    }
+    } while (HM_SUCCESS == hermes_key_store_iterator_next(i));
     hermes_key_store_iterator_destroy(&i);
     return rights;
 }
@@ -435,10 +435,10 @@ mid_hermes_ll_block_t *mid_hermes_ll_block_delete(
             bl->old_mac ? bl->old_mac->data : bl->mac->data, bl->old_mac ? bl->old_mac->length : bl->mac->length)) {
         return NULL;
     }
-    if (key_store
-        && ((HM_SUCCESS != mid_hermes_ll_rtoken_delete(bl, bl->rtoken, key_store))
-            || (bl->wtoken && HM_SUCCESS != mid_hermes_ll_wtoken_delete(bl, bl->wtoken, key_store)))) {
-        return NULL;
+    if (key_store){
+        if(HM_SUCCESS != mid_hermes_ll_rtoken_delete(bl, bl->rtoken, key_store)){
+            return NULL;
+        }
     }
     if (rights && key_store) {
         mid_hermes_ll_rights_list_node_t *node;

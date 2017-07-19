@@ -25,6 +25,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h> 
+#include <stdio.h>
 
 #define HERMES_KEY_STORE_PATH "db/key_store"
 
@@ -136,10 +137,18 @@ uint32_t  db_get_indexed_rights(void* db, const uint8_t* block_id, const size_t 
   if((dir=opendir(fpath))!=NULL) {
     size_t i=index;
     while((ent=readdir(dir)) != NULL) {
-	if(!(--i)){
-             *user_id=malloc(strlen(ent->d_name)+1);
-	     *user_id_length=strlen(ent->d_name)+1;
-	     *user_id_length=base64_decode(*user_id, ent->d_name, *user_id_length);
+	if(0==strcmp(ent->d_name, ".") || 0==strcmp(ent->d_name, "..")){
+	    continue;
+        }
+	if(!(i--)){
+             *user_id=malloc(strlen(ent->d_name));
+	     *user_id_length=strlen(ent->d_name);
+	     *user_id_length=base64_decode(*user_id, ent->d_name, strlen(ent->d_name));
+	     if(!(*user_id_length)){
+		 free(*user_id);
+		 closedir(dir);
+		 return 1;
+	     }
 	     *rights_mask=HM_KEY_STORE_READ_ACCESS_MASK;
              BUILD_TYPED_PATH(fpath, C(((db_t*)db)->path), E(block_id, block_id_length), C(ent->d_name), C("w"));
 	     if(0==check_file_exist(fpath)){
@@ -150,6 +159,7 @@ uint32_t  db_get_indexed_rights(void* db, const uint8_t* block_id, const size_t 
         }
     }
     closedir (dir);
+    return 1;
   } else {
   /* could not open directory */
   perror ("");

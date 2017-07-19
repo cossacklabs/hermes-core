@@ -87,7 +87,7 @@ static PyObject *MidHermes_addBlock(pyhermes_MidHermesObject *self, PyObject *ar
     size_t block_id_length = 0, block_length = 0, meta_length = 0;
     static char *kwlist[] = {"id", "data", "meta", NULL};
     if (!PyArg_ParseTupleAndKeywords(
-            args, kwds, "s#s#s#", kwlist, &block_id, &block_id_length, &block, &block_length, &meta, &meta_length)) {
+            args, kwds, "y#y#y#", kwlist, &block_id, &block_id_length, &block, &block_length, &meta, &meta_length)) {
         PyErr_SetString(HermesError, "MidHermes.addBlock invalid parameters");
         return NULL;
     }
@@ -105,7 +105,7 @@ static PyObject *MidHermes_updBlock(pyhermes_MidHermesObject *self, PyObject *ar
     size_t block_id_length = 0, block_length = 0, meta_length = 0;
     static char *kwlist[] = {"id", "data", "meta", NULL};
     if (!PyArg_ParseTupleAndKeywords(
-            args, kwds, "s#s#s#", kwlist, &block_id, &block_id_length, &block, &block_length, &meta, &meta_length)) {
+            args, kwds, "y#y#y#", kwlist, &block_id, &block_id_length, &block, &block_length, &meta, &meta_length)) {
         PyErr_SetString(HermesError, "MidHermes.updBlock invalid parameters");
         return NULL;
     }
@@ -122,7 +122,7 @@ static PyObject *MidHermes_delBlock(pyhermes_MidHermesObject *self, PyObject *ar
     const char *block_id = NULL;
     size_t block_id_length = 0;
     static char *kwlist[] = {"id", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s#", kwlist, &block_id, &block_id_length)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "y#", kwlist, &block_id, &block_id_length)) {
         PyErr_SetString(HermesError, "MidHermes.delBlock invalid parameters");
         return NULL;
     }
@@ -137,7 +137,7 @@ static PyObject *MidHermes_getBlock(pyhermes_MidHermesObject *self, PyObject *ar
     const char *block_id = NULL, *block = NULL, *meta = NULL;
     size_t block_id_length = 0, block_length = 0, meta_length = 0;
     static char *kwlist[] = {"id", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s#", kwlist, &block_id, &block_id_length)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "y#", kwlist, &block_id, &block_id_length)) {
         PyErr_SetString(HermesError, "MidHermes.getBlock invalid parameters");
         return NULL;
     }
@@ -147,20 +147,19 @@ static PyObject *MidHermes_getBlock(pyhermes_MidHermesObject *self, PyObject *ar
         PyErr_SetString(HermesError, "MidHermes.getBlock error");
         return NULL;
     }
-    return Py_BuildValue("s#s#", block, block_length, meta, meta_length);
+    return Py_BuildValue("y#y#", block, block_length, meta, meta_length);
 }
 
 static PyObject *MidHermes_rotateBlock(pyhermes_MidHermesObject *self, PyObject *args, PyObject *kwds) {
-    const char *block_id = NULL, *block = NULL, *meta = NULL;
-    size_t block_id_length = 0, block_length = 0, meta_length = 0;
+    const char *block_id = NULL;
+    size_t block_id_length = 0;
     static char *kwlist[] = {"id", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s#", kwlist, &block_id, &block_id_length)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "y#", kwlist, &block_id, &block_id_length)) {
         PyErr_SetString(HermesError, "MidHermes.rotateBlock invalid parameters");
         return NULL;
     }
     if (0 != mid_hermes_rotate_block(
-            self->mid_hermes, (const uint8_t *) block_id, block_id_length, (uint8_t **) (&block), &block_length,
-            (uint8_t **) (&meta), &meta_length)) {
+            self->mid_hermes, (const uint8_t *) block_id, block_id_length)) {
         PyErr_SetString(HermesError, "MidHermes.rotateBlock error");
         return NULL;
     }
@@ -171,7 +170,7 @@ static PyObject *MidHermes_grantReadAccess(pyhermes_MidHermesObject *self, PyObj
     const char *block_id = NULL, *user_id = NULL;
     size_t block_id_length = 0, user_id_length = 0;
     static char *kwlist[] = {"id", "user", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s#s#", kwlist, &block_id, &block_id_length, &user_id,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "y#y#", kwlist, &block_id, &block_id_length, &user_id,
                                      &user_id_length)) {
         PyErr_SetString(HermesError, "MidHermes.grantReadAccess invalid parameters");
         return NULL;
@@ -188,7 +187,7 @@ static PyObject *MidHermes_grantUpdateAccess(pyhermes_MidHermesObject *self, PyO
     const char *block_id = NULL, *user_id = NULL;
     size_t block_id_length = 0, user_id_length = 0;
     static char *kwlist[] = {"id", "user", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s#s#", kwlist, &block_id, &block_id_length, &user_id,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "y#y#", kwlist, &block_id, &block_id_length, &user_id,
                                      &user_id_length)) {
         PyErr_SetString(HermesError, "MidHermes.grantUpdateAccess invalid parameters");
         return NULL;
@@ -205,7 +204,7 @@ static PyObject *MidHermes_denyReadAccess(pyhermes_MidHermesObject *self, PyObje
     const char *block_id = NULL, *user_id = NULL;
     size_t block_id_length = 0, user_id_length = 0;
     static char *kwlist[] = {"id", "user", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s#s#", kwlist, &block_id, &block_id_length, &user_id,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "y#y#", kwlist, &block_id, &block_id_length, &user_id,
                                      &user_id_length)) {
         PyErr_SetString(HermesError, "MidHermes.denyReadAccess invalid parameters");
         return NULL;
@@ -222,7 +221,7 @@ static PyObject *MidHermes_denyUpdateAccess(pyhermes_MidHermesObject *self, PyOb
     const char *block_id = NULL, *user_id = NULL;
     size_t block_id_length = 0, user_id_length = 0;
     static char *kwlist[] = {"id", "user", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s#s#", kwlist, &block_id, &block_id_length, &user_id,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "y#y#", kwlist, &block_id, &block_id_length, &user_id,
                                      &user_id_length)) {
         PyErr_SetString(HermesError, "MidHermes.denyUpdateAccess invalid parameters");
         return NULL;
