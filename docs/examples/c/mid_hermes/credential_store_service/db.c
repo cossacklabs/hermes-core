@@ -22,6 +22,7 @@
 #include <string.h>
 #include "../../utils/utils.h"
 #include <assert.h>
+#include <stdio.h>
 
 #define CREDENTIAL_STORE_PATH "db/credential_store"
 #define CS_SUCCESS 0
@@ -33,6 +34,7 @@ typedef struct db_type{
 
 uint32_t db_get_public_key(void* cs, const uint8_t* user_id, const size_t user_id_length, uint8_t** pub_key, size_t* pub_key_length){
   char fpath[10*1024];
+  fprintf(stderr, ".. %s %i ..", user_id, user_id_length);
   BUILD_TYPED_PATH(fpath, C(((db_t*)cs)->path), E(user_id, user_id_length));
   return read_whole_file(fpath, pub_key, pub_key_length);  
 }

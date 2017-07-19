@@ -27,9 +27,13 @@
 #include <string.h>
 #include <sys/stat.h>
 
-struct hm_ks_db_type{
-  char db_dir[256];
+typedef struct hm_test_ks_db_token_type{
+  
 };
+
+typedef struct hm_test_ks_db_type{
+  char db_dir[256];
+} hm_test_ks_db_t;
 
 hm_ks_db_t* hm_test_ks_db_create(const char* data_dir_name){
   if(!data_dir_name && strlen(data_dir_name)>=(256-1)){
@@ -78,4 +82,3 @@ uint32_t hm_ks_db_del_rtoken(hm_ks_db_t* db, const uint8_t* block_id, const size
 uint32_t hm_ks_db_del_wtoken(hm_ks_db_t* db, const uint8_t* block_id, const size_t block_id_length, const uint8_t* user_id, const size_t user_id_length, const uint8_t* owner_id, const size_t owner_id_length){
   return HM_FAIL;
 }
-

@@ -1,4 +1,4 @@
-#!usr/bin/python
+#!/usr/bin/python
 
 #
 # Copyright (c) 2017 Cossack Labs Limited
@@ -44,10 +44,16 @@ class Trasnport:
             total_sent = total_sent + sent
 
     def receive(self, needed_length):
-        data = self.socket.recv(needed_length)
-        if not data:
-            raise RuntimeError("socket connection broken")
-        return data
+        chunks = []
+        bytes_recd = 0
+        while bytes_recd < needed_length:
+            chunk = self.socket.recv(needed_length - bytes_recd)
+            if chunk == b'':
+                print(len(data))
+                raise RuntimeError("socket connection broken")
+            chunks.append(chunk)
+            bytes_recd = bytes_recd + len(chunk)
+        return b''.join(chunks)
 
 
 parser = argparse.ArgumentParser(description='Hermes client example.')
@@ -64,8 +70,8 @@ parser.add_argument('--update', '-u', action='store_true', default=False,
 parser.add_argument('--delete', '-d', action='store_true', default=False,
                     dest='delete')
 
-# parser.add_argument('--rotate', '-rt', action='store_true', default=False,
-#                     dest='rotate')
+parser.add_argument('--rotate', '-rt', action='store_true', default=False,
+                 dest='rotate')
 
 parser.add_argument('--grant_read', '-gr', action='store_true', default=False,
                     dest='grant_read')
@@ -92,10 +98,10 @@ mid_hermes = hermes.MidHermes(
     args.id, base64.b64decode(args.sk), credential_store_transport,
     data_store_transport, key_store_transport)
 
-if not (args.add or args.read or args.update or args.delete or
+if not (args.add or args.read or args.update or args.delete or args.rotate or
             args.grant_read or args.grant_update or args.revoke_update or
             args.revoke_read):# or args.rotate):
-    print("choose any command add|read|update|delete|grant_read|grant_update|"
+    print("choose any command add|read|update|delete|rotate|grant_read|grant_update|"
           "revoke_read|revoke_update")
     exit(1)
 
@@ -112,9 +118,9 @@ elif args.update:
 elif args.delete:
     mid_hermes.delBlock(args.doc_file_name.encode())
     print('deleted <{}>'.format(args.doc_file_name))
-# elif args.rotate:
-#     mid_hermes.rotateBlock(args.doc_file_name.encode())
-#     print('rotated <{}>'.format(args.doc_file_name))
+elif args.rotate:
+    mid_hermes.rotateBlock(args.doc_file_name.encode())
+    print('rotated <{}>'.format(args.doc_file_name))
 elif args.grant_read:
     mid_hermes.grantReadAccess(
         args.doc_file_name.encode(), args.for_user.encode())

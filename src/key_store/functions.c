@@ -23,6 +23,7 @@
 #include <hermes/common/errors.h>
 
 #include <string.h>
+#include <stdio.h>
 
 uint32_t hm_key_store_set_rtoken(
         hm_ks_db_t *db,
@@ -339,7 +340,7 @@ uint32_t hm_key_store_get_indexed_rights_proxy(
         const uint8_t *block_id, const size_t block_id_length,
         const size_t index, uint8_t **user_id,
         size_t *user_id_length, uint32_t *rights_mask) {
-    if (!client || block_id || !block_id_length || !user_id || !user_id_length || !rights_mask) {
+    if (!client || !block_id || !block_id_length || !user_id || !user_id_length || !rights_mask) {
         return HM_INVALID_PARAMETER;
     }
     hm_param_pack_t *in = HM_PARAM_PACK(HM_PARAM_BUFFER_C(block_id, block_id_length), HM_PARAM_INT32(index));
@@ -364,6 +365,7 @@ uint32_t hm_key_store_get_indexed_rights_proxy(
         hm_param_pack_destroy(&out);
         return res;
     }
+    hm_param_pack_destroy(&out);
     return HM_SUCCESS;
 }
 

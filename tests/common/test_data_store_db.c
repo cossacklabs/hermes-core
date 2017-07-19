@@ -28,65 +28,85 @@
 #include <sys/stat.h>
 #include <stdbool.h>
 
-struct hm_ds_db_type{
-  char db_dir[256];
-};
+#define MAX_ID_LENGTH 32
+#define MAX_BLOCK_LENGTH 256
+#define MAX_META_LENGTH 256
+#define MAX_MAC_LENGTH 64
+#define MAX_BLOCK_COUNT 256
 
-#define ID_LENGTH 32
+typedef struct hm_test_ds_db_block_type{
+  uint8_t mac[MAX_MAC_LENGTH];
+  uint8_t data[MAX_BLOCK_LENGTH];
+  uint8_t meta[MAX_META_LENGTH];
+}hm_test_ds_db_block_t;
 
-void gen_id(char **id) {
-  char charset[] = "0123456789"
-    "abcdefghijklmnopqrstuvwxyz"
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  *id=malloc(ID_LENGTH);
+typedef struct hm_test_ds_db_type{
+  hm_test_ds_db_block_t blocks[MAX_BLOCK_COUNT];
+  size_t used_blocks;
+}hm_test_ds_db_t;
+
+uint32_t hm_test_ds_db_insert_block(void* db, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length,const uint8_t* mac, const size_t mac_length, uint8_t** id, size_t* id_length){
+  if(!db || !block || !block_length || block_length>MAX_BLOCK_LENGTH || !meta || !meta_length || meta_length>MAX_META_LENGTH || !mac || !mac_length || mac_length>MAX_MAC_LENGTH || !id){
+    return HM_INVALID_PARAMETER;
+  }
+  if(((hm_test_ds_db_t*)db)->used_blocks == MAX_BLOCK_COUNT){
+    return HM_FAIL;
+  }
+  *id=malloc(sizeof(uint32_t));
   assert(*id);
-  char* iid=*id;
-  int length=ID_LENGTH;
-  while (length-- > 0) {
-    size_t index = (double) rand() / RAND_MAX * (sizeof charset - 1);
-    *(iid)++ = charset[index];
-  }
-  *iid = '\0';
-}
-
-bool is_file_exists(const char* file_name){
-  struct stat sb;
-  if(stat(file_name, &sb) == 0){
-    return true;
-  }
-  return false;
-}
-
-uint32_t write_file(const char* file_name, const uint8_t* data, const size_t data_length){
-  FILE* file=fopen(file_name, "w+b");
-  if(!file){
-    return HM_FAIL;
-  }
-  if(data_length!=fwrite(data, 1, data_length,  file)){
-    fclose(file);
-    return HM_FAIL;
-  }
-  fclose(file);
+  memcpy(*id, &(((hm_test_ds_db_t*)db)->used_blocks), sizeof(uint32_t));
+  *id_length=sizeof(uint32_t);
+  memcpy(((hm_test_ds_db_t*)db)->blocks[((hm_test_ds_db_t*)db)->used_blocks].data, block, block_length);
+  memcpy(((hm_test_ds_db_t*)db)->blocks[((hm_test_ds_db_t*)db)->used_blocks].meta, meta, meta_length);
+  memcpy(((hm_test_ds_db_t*)db)->blocks[((hm_test_ds_db_t*)db)->used_blocks].mac, mac, mac_length);
+  ++(((hm_test_ds_db_t*)db)->used_blocks);
   return HM_SUCCESS;
 }
 
-uint32_t read_file(const char* file_name, uint8_t** data, size_t* data_length){
-  FILE* file=fopen(file_name, "rb");
-  if(!file){
+uint32_t hm_test_ds_db_insert_block_with_id(void* db, const uint8_t* id, const size_t id_length, const uint8_t* block, const size_t block_length, const uint8_t* meta, const size_t meta_length, const uint8_t* mac, const size_t mac_length){
+  return HM_FAIL;
+}
+
+
+uint32_t hm_test_ds_db_read_block(void* db, const uint8_t* id, const size_t id_length, uint8_t** block, size_t*  block_length, uint8_t** meta, size_t* meta_length){
+  if(!db || !id || !id_length || id_length!=sizeof(uint32_t) || !block || !meta){
+    return HM_INVALID_PARAMETER;
+  }
+  if(*((uint32_t*)id)>=(((hm_test_ds_db_t*)db)->used_blocks)){
     return HM_FAIL;
   }
-  fseek(file, 0L, SEEK_END);
-  *data_length = ftell(file);
-  fseek(file, 0L, SEEK_SET);
-  *data=malloc(*data_length);
-  assert(*data);
-  if((*data_length)!=fread(*data, 1, *data_length, file)){
-    free(*data);
-    fclose(file);
-    return HM_FAIL;
-  }
-  fclose(file);
+  *block=malloc(MAX_BLOCK_LENGTH);
+  assert(*block);
+  *meta=malloc(MAX_META_LENGTH);
+  assert(*meta);
+  memcpy(*block, ((hm_test_ds_db_t*)db)->blocks[*((uint32_t*)id)].data, MAX_BLOCK_LENGTH);
+  *block_length=MAX_BLOCK_LENGTH;
+  memcpy(*meta, ((hm_test_ds_db_t*)db)->blocks[*((uint32_t*)id)].meta, MAX_META_LENGTH);
+  *meta_length=MAX_META_LENGTH;
   return HM_SUCCESS;
+}
+
+uint32_t hm_test_ds_db_update_block(
+   void* db, 
+   const uint8_t* id, const size_t id_length, 
+   const uint8_t* block, const size_t block_length, 
+   const uint8_t* meta, const size_t meta_length, 
+   const uint8_t* mac, const size_t mac_length, 
+   const uint8_t* old_mac, const size_t old_mac_length){
+  if(!id || !id_length || !block || !block_length || block_length>MAX_BLOCK_LENGTH || !meta || !meta_length || meta_length>MAX_META_LENGTH || !mac || !mac_length || mac_length>MAX_MAC_LENGTH || !old_mac || !old_mac_length || old_mac_length>MAX_MAC_LENGTH){
+    return HM_INVALID_PARAMETER;
+  }
+  if(*((uint32_t*)id)>=(((hm_test_ds_db_t*)db)->used_blocks) || 0!=memcmp(((hm_test_ds_db_t*)db)->blocks[*((uint32_t*)id)].mac, old_mac, old_mac_length)){
+    return HM_FAIL;
+  }
+  memcpy(((hm_test_ds_db_t*)db)->blocks[*((uint32_t*)id)].data, block, block_length);
+  memcpy(((hm_test_ds_db_t*)db)->blocks[*((uint32_t*)id)].meta, meta, meta_length);
+  memcpy(((hm_test_ds_db_t*)db)->blocks[*((uint32_t*)id)].mac, mac, mac_length);
+  return HM_SUCCESS;
+}
+
+uint32_t hm_test_ds_db_delete_block(void* db, const uint8_t* id, const size_t id_length, const uint8_t* okd_mac, const size_t old_mac_length){
+  return HM_FAIL;
 }
 
 hm_ds_db_t* hm_test_ds_db_create(const char* data_dir_name){
@@ -95,12 +115,13 @@ hm_ds_db_t* hm_test_ds_db_create(const char* data_dir_name){
   }
   hm_ds_db_t* db=calloc(sizeof(hm_ds_db_t), 1);
   assert(db);
-  struct stat sb;
-  if (stat(data_dir_name, &sb) != 0 || !(S_ISDIR(sb.st_mode))){
-    hm_test_ds_db_destroy(&db);
-    return NULL;
-  }
-  memcpy(db->db_dir, data_dir_name, strlen(data_dir_name));
+  db->user_data=calloc(sizeof(hm_test_ds_db_t), 1);
+  assert(db->user_data);
+  db->insert_block=hm_test_ds_db_insert_block;
+  db->insert_block_with_id=hm_test_ds_db_insert_block_with_id;
+  db->get_block=hm_test_ds_db_read_block;
+  db->update_block=hm_test_ds_db_update_block;
+  db->rem_block=hm_test_ds_db_delete_block;
   return db;
 }
 
@@ -108,94 +129,8 @@ uint32_t hm_test_ds_db_destroy(hm_ds_db_t** db){
   if(!db || !(*db)){
     return HM_INVALID_PARAMETER;
   }
+  free((*db)->user_data);
   free(*db);
   *db=NULL;
   return HM_SUCCESS;
 }
-
-uint32_t hm_ds_db_insert_block(hm_ds_db_t* db, const uint8_t* block, const size_t block_length, const uint8_t* mac, const size_t mac_length, uint8_t** id, size_t* id_length){
-  if(!db || !block || !block_length || !mac || !mac_length || !id){
-    return HM_INVALID_PARAMETER;
-  }
-  *id=NULL;
-  char block_file_name[256];
-  char mac_file_name[256];
-  do{
-    free(*id);
-    gen_id((char**)(id));
-    sprintf(block_file_name, "%s/%s_blk", db->db_dir, *id);
-    sprintf(mac_file_name, "%s/%s_mac", db->db_dir, *id);
-  }while(is_file_exists(block_file_name)); 
-  *id_length=ID_LENGTH;
-  if(HM_SUCCESS!=write_file(block_file_name, block, block_length)){
-    free(*id);
-    return HM_FAIL;
-  }
-  if(HM_SUCCESS!=write_file(mac_file_name, mac, mac_length)){
-    free(*id);
-    return HM_FAIL;
-  }  
-  return HM_SUCCESS;
-}
-
-uint32_t hm_ds_db_read_block(hm_ds_db_t* db, const uint8_t* id, const size_t id_length, uint8_t** block, size_t*  block_length){
-  if(!db || !id || !id_length || !block){
-    return HM_INVALID_PARAMETER;
-  }
-  char file_name[256];
-  sprintf(file_name, "%s/%s_blk", db->db_dir, id);
-  if(!is_file_exists(file_name) || HM_SUCCESS!=read_file(file_name, block, block_length)){
-    return HM_FAIL;
-  } 
-  return HM_SUCCESS;
-}
-
-uint32_t hm_ds_db_read_block_mac(hm_ds_db_t* db, const uint8_t* id, const size_t id_length, uint8_t** mac, size_t*  mac_length){
-  if(!db || !id || !id_length || !mac){
-    return HM_INVALID_PARAMETER;
-  }
-  char file_name[256];
-  sprintf(file_name, "%s/%s_mac", db->db_dir, id);
-  if(!is_file_exists(file_name) || HM_SUCCESS!=read_file(file_name, mac, mac_length)){
-    return HM_FAIL;
-  } 
-  return HM_SUCCESS;
-}
-
-uint32_t hm_ds_db_update_block(hm_ds_db_t* db, const uint8_t* id, const size_t id_length, const uint8_t* block, const size_t block_length, const uint8_t* mac, const size_t mac_length){
-  if(!id || !id_length || !block || !block_length || !mac || !mac_length){
-    return HM_INVALID_PARAMETER;
-  }
-  char block_file_name[256];
-  char mac_file_name[256];
-  sprintf(block_file_name, "%s/%s_blk", db->db_dir, id);
-  sprintf(mac_file_name, "%s/%s_mac", db->db_dir, id);
-  if(!is_file_exists(block_file_name) || !is_file_exists(mac_file_name)){
-    return HM_FAIL;
-  }
-  if(HM_SUCCESS!=write_file(block_file_name, block, block_length)){
-    return HM_FAIL;
-  }
-  if(HM_SUCCESS!=write_file(mac_file_name, mac, mac_length)){
-    return HM_FAIL;
-  }    
-  return HM_SUCCESS;
-}
-
-uint32_t hm_ds_db_delete_block(hm_ds_db_t* db, const uint8_t* id, const size_t id_length){
-  if(!db || !id || !id_length){
-    return HM_INVALID_PARAMETER;
-  }
-  char block_file_name[256];
-  char mac_file_name[256];
-  sprintf(block_file_name, "%s/%s_blk", db->db_dir, id);
-  sprintf(mac_file_name, "%s/%s_mac", db->db_dir, id);
-  if(!is_file_exists(block_file_name) || !is_file_exists(mac_file_name)){
-    return HM_FAIL;
-  }
-  if(0!=remove(block_file_name) || 0!=remove(mac_file_name)){
-    return HM_FAIL;
-  }
-  return HM_SUCCESS;
-}
-

@@ -26,11 +26,11 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef struct hm_cs_test_db_type{
+struct hm_cs_test_db_type{
   char name[10][255];
   char key[10][255];
   uint32_t count;
-}hm_cs_test_db_t;
+};
 
 uint32_t hm_cs_test_db_get_pub_by_id(void* db, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length){
   if(!db || !id || !id_length || !key){
