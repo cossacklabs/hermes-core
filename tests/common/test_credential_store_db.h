@@ -27,6 +27,7 @@
 #include <stdint.h>
 
 hm_cs_db_t* hm_test_cs_db_create(const char* filename);
+uint32_t hm_cs_test_db_get_priv_by_id(void* db, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length);
 uint32_t hm_test_cs_db_destroy(hm_cs_db_t** db);
 
 
