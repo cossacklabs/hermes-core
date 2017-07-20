@@ -26,7 +26,7 @@ import base64
 import hermes
 
 
-class Trasnport:
+class Trasnport(object):
     def __init__(self, host, port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((host, port))
@@ -37,7 +37,8 @@ class Trasnport:
 
     def send(self, msg):
         total_sent = 0
-        while total_sent < len(msg):
+        message_length = len(msg)
+        while total_sent < message_length:
             sent = self.socket.send(msg[total_sent:])
             if not sent:
                 raise RuntimeError("socket connection broken")
@@ -45,21 +46,20 @@ class Trasnport:
 
     def receive(self, needed_length):
         chunks = []
-        bytes_recd = 0
-        while bytes_recd < needed_length:
-            chunk = self.socket.recv(needed_length - bytes_recd)
-            if chunk == b'':
-                print(len(data))
+        bytes_recieved = 0
+        while bytes_recieved < needed_length:
+            chunk = self.socket.recv(needed_length - bytes_recieved)
+            if not chunk:
                 raise RuntimeError("socket connection broken")
             chunks.append(chunk)
-            bytes_recd = bytes_recd + len(chunk)
+            bytes_recieved = bytes_recieved + len(chunk)
         return b''.join(chunks)
 
 
 parser = argparse.ArgumentParser(description='Hermes client example.')
 parser.add_argument('--id', dest='id', required=True, help='user identificator')
-parser.add_argument('--sk', dest='sk', required=True,
-                    help='base64 encoded user private key)')
+parser.add_argument('--private_key', '-pk', dest='private_key', required=True,
+                    help='path to private key)')
 
 parser.add_argument('--add', '-a', action='store_true', default=False,
                     dest='add')
@@ -87,20 +87,45 @@ parser.add_argument('--doc', dest='doc_file_name', required=True,
                     help='document file name')
 parser.add_argument('--meta', dest='meta', help='document meta data')
 parser.add_argument('--for_user', dest='for_user',
-                    help='peer user identificator')
+                    help='peer user identifier')
+parser.add_argument('--credential_store_host', dest='credential_store_host',
+                    default='127.0.0.1', help='host to credential store server')
+parser.add_argument('--credential_store_port', dest='credential_store_port',
+                    type=int, default=8888,
+                    help='port of credential store server')
+
+parser.add_argument('--data_store_host', dest='data_store_host',
+                    default='127.0.0.1', help='host to data store server')
+parser.add_argument('--data_store_port', dest='data_store_port',
+                    type=int, default=8889,
+                    help='port of data store server')
+
+
+parser.add_argument('--key_store_host', dest='key_store_host',
+                    default='127.0.0.1', help='host to key store server')
+parser.add_argument('--key_store_port', dest='key_store_port',
+                    type=int, default=8890,
+                    help='port of key store server')
+
 args = parser.parse_args()
 
-credential_store_transport = Trasnport("127.0.0.1", 8888)
-data_store_transport = Trasnport("127.0.0.1", 8889)
-key_store_transport = Trasnport("127.0.0.1", 8890)
+credential_store_transport = Trasnport(
+    args.credential_store_host, args.credential_store_port)
+data_store_transport = Trasnport(
+    args.data_store_host, args.data_store_port)
+key_store_transport = Trasnport(
+    args.key_store_host, args.key_store_port)
+
+with open(args.private_key, 'rb') as f:
+    private_key = f.read()
 
 mid_hermes = hermes.MidHermes(
-    args.id, base64.b64decode(args.sk), credential_store_transport,
+    args.id, private_key, credential_store_transport,
     data_store_transport, key_store_transport)
 
 if not (args.add or args.read or args.update or args.delete or args.rotate or
             args.grant_read or args.grant_update or args.revoke_update or
-            args.revoke_read):# or args.rotate):
+            args.revoke_read):
     print("choose any command add|read|update|delete|rotate|grant_read|grant_update|"
           "revoke_read|revoke_update")
     exit(1)

@@ -308,9 +308,9 @@ PyMODINIT_FUNC PyInit_hermes(void) {
     if (m == NULL)
         return NULL;
 
-    HermesError = PyErr_NewException("hermes.error", NULL, NULL);
+    HermesError = PyErr_NewException("hermes.HermesError", NULL, NULL);
     Py_INCREF(HermesError);
-    PyModule_AddObject(m, "error", HermesError);
+    PyModule_AddObject(m, "HermesError", HermesError);
 
     Py_INCREF(&pyhermes_MidHermesType);
     PyModule_AddObject(m, "MidHermes", (PyObject *) &pyhermes_MidHermesType);
