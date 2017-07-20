@@ -21,6 +21,9 @@
 package gohermes
 
 /*
+
+#cgo CFLAGS: -I../include 
+
 #include <hermes/rpc/transport.h>
 #include <hermes/mid_hermes/mid_hermes.h>
 #include <stdint.h>
@@ -41,7 +44,7 @@ uint32_t transport_recv(void* transport, uint8_t* buf, const size_t buf_length){
    return go_transport_recv(transport, buf, buf_length);
 }
 
-hm_rpc_transport_t* create(void* transport){
+hm_rpc_transport_t* transport_create(void* transport){
   hm_rpc_transport_t* result=calloc(1, sizeof(hm_rpc_transport_t));
   if(!result){
     return NULL;
@@ -100,10 +103,10 @@ func go_transport_recv(transport unsafe.Pointer, buf unsafe.Pointer, buf_length 
 }
 
 type MidHermes struct{
-	C.hm_rpc_transport_t* credential_store_transport;
-	C.hm_rpc_transport_t* data_store_transport;
-	C.hm_rpc_transport_t* key_store_transport;
-	C.mid_hermes_t* mid_hermes;
+	credential_store_transport *C.hm_rpc_transport_t
+	data_store_transport       *C.hm_rpc_transport_t
+	key_store_transport        *C.hm_rpc_transport_t
+	mid_hermes                 *C.mid_hermes_t
 }
 
 func MidHermes_finalize(mid_hermes *MidHermes){
