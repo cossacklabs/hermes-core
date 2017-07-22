@@ -19,37 +19,35 @@
  */
 
 #include "test_credential_store_db.h"
+#include "common.h"
 
-#include <hermes/common/errors.h>
 #include <hermes/common/errors.h>
 
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#define __USE_GNU
 #include <search.h>
 
 typedef struct hm_test_db_node_type{
-  char id[256];
+  uint8_t id[USER_ID_LENGTH];
   uint8_t pk[256];
   size_t pk_length;
-  uint8_t sk[256];
-  size_t sk_length;
 }hm_test_db_node_t;
 
-struct hm_cs_test_db_type{
+typedef struct hm_cs_test_db_type{
     void* users;
-};
-
+}hm_cs_test_db_t;
 
 int hm_test_db_node_compare(const void *pa, const void *pb){
-    return strcmp(hm_test_db_node_t *)pa->id, hm_test_db_node_t *)pb->id);
+  return memcmp(((hm_test_db_node_t*)pa)->id, ((hm_test_db_node_t*)pb)->id, USER_ID_LENGTH);
 }
 
 uint32_t hm_cs_test_db_get_pub_by_id(void* db, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length){
   if(!db || !id || !id_length || !key){
     return HM_INVALID_PARAMETER;
   }
-  hm_table_db_node_t* node=NULL;
+  hm_test_db_node_t* node=NULL;
   node = tfind(id, &(((hm_cs_test_db_t*)db)->users), hm_test_db_node_compare);
   if(node){
       *key=node->pk;
@@ -59,21 +57,7 @@ uint32_t hm_cs_test_db_get_pub_by_id(void* db, const uint8_t* id, const size_t i
   return HM_FAIL;
 }
 
-uint32_t hm_cs_test_db_get_priv_by_id(void* db, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length){
-  if(!db || !id || !id_length || !key){
-    return HM_INVALID_PARAMETER;
-  }
-  hm_table_db_node_t* node=NULL;
-  node = tfind(id, &(((hm_cs_test_db_t*)db)->users), hm_test_db_node_compare);
-  if(node){
-      *key=node->sk;
-      *key_length=node->sk_length;
-      return HM_SUCCESS;
-  }
-  return HM_FAIL;
-}
-
-hm_cs_db_t* hm_test_cs_db_create(const char* filename){
+hm_cs_db_t* hm_test_cs_db_create(){
   if(!filename){
     return NULL;
   }
@@ -82,6 +66,7 @@ hm_cs_db_t* hm_test_cs_db_create(const char* filename){
   db->user_data=calloc(1, sizeof(hm_cs_test_db_t));
   assert(db->user_data);
   db->get_pub=hm_cs_test_db_get_pub_by_id;
+  
   return db;
 }
 

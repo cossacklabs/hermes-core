@@ -19,15 +19,12 @@
  */
 
 
-#ifndef HERMES_TESTS_TEST_CREDENTIAL_STORE_DB_H
-#define HERMES_TESTS_TEST_CREDENTIAL_STORE_DB_H
+#ifndef TEST_KEY_STORE_DB_H
+#define TEST_KEY_STORE_DB_H
 
-#include <hermes/credential_store/db.h>
+#include <hermes/key_store/db.h>
 
-#include <stdint.h>
+hm_ks_db_t* hm_test_ks_db_create();
+uint32_t hm_test_ks_db_destroy(hm_ks_db_t** db);
 
-hm_cs_db_t* hm_test_cs_db_create();
-uint32_t hm_test_cs_db_destroy(hm_cs_db_t** db);
-
-
-#endif //HERMES_TESTS_TEST_CREDENTIAL_STORE_DB_H
+#endif //TEST_KEY_STORE_DB_H

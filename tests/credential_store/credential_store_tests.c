@@ -95,7 +95,7 @@ void* client(void* param){
   }
   uint8_t* key=NULL;
   size_t key_length=0;
-  if(HM_SUCCESS!=hm_crerential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)CS_TEST_CORRECT_ID1, sizeof(CS_TEST_CORRECT_ID1), &key, &key_length)){
+  if(HM_SUCCESS!=hm_credential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)CS_TEST_CORRECT_ID1, sizeof(CS_TEST_CORRECT_ID1), &key, &key_length)){
     hm_credential_store_client_sync_destroy(&c);
     hm_test_transport_destroy(transport);
     testsuite_fail_if(true, "credential store client sync calling");
@@ -104,7 +104,7 @@ void* client(void* param){
   if(0!=strcmp(CS_TEST_CORRECT_ID1_KEY, (const char*)key)){
     testsuite_fail_if(true, "credential store client sync res");    
   }
-  if(HM_SUCCESS!=hm_crerential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)CS_TEST_CORRECT_ID2, sizeof(CS_TEST_CORRECT_ID2), &key, &key_length)){
+  if(HM_SUCCESS!=hm_credential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)CS_TEST_CORRECT_ID2, sizeof(CS_TEST_CORRECT_ID2), &key, &key_length)){
     hm_credential_store_client_sync_destroy(&c);
     hm_test_transport_destroy(transport);
     testsuite_fail_if(true, "credential store client sync calling");
@@ -113,13 +113,13 @@ void* client(void* param){
   if(0!=strcmp(CS_TEST_CORRECT_ID2_KEY, (const char*)key)){
     testsuite_fail_if(true, "credential store client sync res");    
   }
-  if(HM_SUCCESS==hm_crerential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)CS_TEST_INCORRECT_ID, sizeof(CS_TEST_INCORRECT_ID), &key, &key_length)){
+  if(HM_SUCCESS==hm_credential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)CS_TEST_INCORRECT_ID, sizeof(CS_TEST_INCORRECT_ID), &key, &key_length)){
     hm_credential_store_client_sync_destroy(&c);
     hm_test_transport_destroy(transport);
     testsuite_fail_if(true, "credential store client sync calling with incorrect id");
     return (void*)1;
   }
-  if(HM_SUCCESS!=hm_crerential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)CS_TEST_CORRECT_ID3, sizeof(CS_TEST_CORRECT_ID3), &key, &key_length)){
+  if(HM_SUCCESS!=hm_credential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)CS_TEST_CORRECT_ID3, sizeof(CS_TEST_CORRECT_ID3), &key, &key_length)){
     hm_credential_store_client_sync_destroy(&c);
     hm_test_transport_destroy(transport);
     testsuite_fail_if(true, "credential store client sync calling");

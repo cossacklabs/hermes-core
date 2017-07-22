@@ -19,15 +19,18 @@
  */
 
 
-#ifndef HERMES_TESTS_TEST_CREDENTIAL_STORE_DB_H
-#define HERMES_TESTS_TEST_CREDENTIAL_STORE_DB_H
+#ifndef COMMON_H
+#define COMMON_H
 
-#include <hermes/credential_store/db.h>
+#define BLOCK_ID_LENGTH 32
+#define USER_ID_LENGTH 32
+#define MAX_MAC_LENGTH 256
+#define MAX_TOKEN_LENGTH 256
+#define MAX_BLOCK_LENGTH 1024
+#define MAX_META_LENGTH 1024
 
-#include <stdint.h>
+#define MAX_BLOCKS_COUNT 1024
+#define MAX_USERS_PER_BLOCK 32
+#define MAX_USERS 32
 
-hm_cs_db_t* hm_test_cs_db_create();
-uint32_t hm_test_cs_db_destroy(hm_cs_db_t** db);
-
-
-#endif //HERMES_TESTS_TEST_CREDENTIAL_STORE_DB_H
+#endif //COMMON_H
