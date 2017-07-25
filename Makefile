@@ -226,3 +226,212 @@ uninstall: CMD = rm -rf $(PREFIX)/include/hermes && rm -f $(PREFIX)/lib/libherme
 uninstall:
 	@echo -n "hermes uninstall "
 	@$(BUILD_CMD_)
+
+GIT_VERSION := $(shell if [ -d ".git" ]; then git version; fi 2>/dev/null)
+ifdef GIT_VERSION
+	VERSION = $(shell git describe --tags HEAD | cut -b 1-)
+else
+	VERSION = $(shell date -I)
+endif
+
+
+get_version:
+	@echo $(VERSION)
+
+DIST_FILENAME = $(VERSION).tar.gz
+
+dist:
+	mkdir -p $(VERSION)
+	rsync -avz src $(VERSION)
+	rsync -avz docs $(VERSION)
+	rsync -avz tests $(VERSION)
+	rsync -avz LICENSE.md $(VERSION)
+	rsync -avz Makefile $(VERSION)
+	rsync -avz README.md $(VERSION)
+	rsync -avz include $(VERSION)
+	rsync -avz pyhermes $(VERSION)
+	tar -zcvf $(DIST_FILENAME) $(VERSION)
+	rm -rf $(VERSION)
+
+unpack_dist:
+	@tar -xf $(DIST_FILENAME)
+
+
+COSSACKLABS_URL = https://www.cossacklabs.com
+MAINTAINER = "Cossack Labs Limited <dev@cossacklabs.com>"
+LICENSE_NAME = "Apache License Version 2.0"
+LIBRARY_SO_VERSION := $(shell echo $(VERSION) | sed 's/^\([0-9.]*\)\(.*\)*$$/\1/')
+
+DEBIAN_VERSION := $(shell cat /etc/debian_version 2> /dev/null)
+DEBIAN_STRETCH_VERSION := libssl1.0.2
+DEBIAN_ARCHITECTURE = `dpkg --print-architecture 2>/dev/null`
+# 9.0 == stretch
+# if found 9. (9.1, 9.2, ...) then it's debian 9.x
+ifeq ($(findstring 9.,$(DEBIAN_VERSION)),9.)
+        DEBIAN_DEPENDENCIES := '$(DEBIAN_STRETCH_VERSION) libthemis'
+else ifeq ($(DEBIAN_VERSION),stretch/sid)
+        DEBIAN_DEPENDENCIES := '$(DEBIAN_STRETCH_VERSION) libthemis'
+else
+        DEBIAN_DEPENDENCIES := 'openssl libthemis'
+endif
+RPM_DEPENDENCIES = 'openssl libthemis'
+
+ifeq ($(shell lsb_release -is 2> /dev/null),Debian)
+	NAME_SUFFIX = $(VERSION)+$(shell lsb_release -cs)_$(DEBIAN_ARCHITECTURE).deb
+else ifeq ($(shell lsb_release -is 2> /dev/null),Ubuntu)
+	NAME_SUFFIX = $(VERSION)+$(shell lsb_release -cs)_$(DEBIAN_ARCHITECTURE).deb
+else
+	OS_NAME = $(shell cat /etc/os-release | grep -e "^ID=\".*\"" | cut -d'"' -f2)
+	OS_VERSION = $(shell cat /etc/os-release | grep -i version_id|cut -d'"' -f2)
+	ARCHITECTURE = $(shell arch)
+	NAME_SUFFIX = $(VERSION)+$(OS_NAME)$(OS_VERSION)_$(ARCHITECTURE).rpm
+endif
+
+
+SHORT_DESCRIPTION = Hermes is a cryptography-based method of providing protected data storage and sharing
+RPM_SUMMARY = "Hermes is a cryptography-based method of providing protected data \
+	storage and sharing that allows enforcing cryptographically checked CRUD \
+	permissions to data blocks and doesn't let server that's running Hermes \
+	do anything worse than DoS."
+
+
+
+HEADER_FILES_MAP = $(BIN_PATH)/include/hermes/=$(PREFIX)/include/hermes \
+	$(BIN_PATH)/include/pyhermes/=$(PREFIX)/include/pyhermes \
+	$(BIN_PATH)/include/credential_store/=$(PREFIX)/include/credential_store \
+	$(BIN_PATH)/include/key_store/=$(PREFIX)/include/key_store \
+	$(BIN_PATH)/include/data_store/=$(PREFIX)/include/data_store \
+	$(BIN_PATH)/include/mid_hermes/=$(PREFIX)/include/mid_hermes \
+	$(BIN_PATH)/include/mid_hermes_ll/=$(PREFIX)/include/mid_hermes_ll
+
+STATIC_BINARY_LIBRARY_MAP = $(BIN_PATH)/libhermes_common.a=$(PREFIX)/lib/libhermes_common.a.$(LIBRARY_SO_VERSION) \
+		 $(BIN_PATH)/libhermes_data_store.a=$(PREFIX)/lib/libhermes_data_store.a.$(LIBRARY_SO_VERSION) \
+		 $(BIN_PATH)/libhermes_mid_hermes.a=$(PREFIX)/lib/libhermes_mid_hermes.a.$(LIBRARY_SO_VERSION) \
+		 $(BIN_PATH)/libhermes_rpc.a=$(PREFIX)/lib/libhermes_rpc.a.$(LIBRARY_SO_VERSION) \
+		 $(BIN_PATH)/libhermes_credential_store.a=$(PREFIX)/lib/libhermes_credential_store.a.$(LIBRARY_SO_VERSION) \
+		 $(BIN_PATH)/libhermes_key_store.a=$(PREFIX)/lib/libhermes_key_store.a.$(LIBRARY_SO_VERSION) \
+		 $(BIN_PATH)/libhermes_mid_hermes_ll.a=$(PREFIX)/lib/libhermes_mid_hermes_ll.a.$(LIBRARY_SO_VERSION)
+
+SHARED_BINARY_LIBRARY_MAP = $(BIN_PATH)/libhermes_data_store.so=$(PREFIX)/lib/libhermes_data_store.so.$(LIBRARY_SO_VERSION) \
+		 $(BIN_PATH)/libhermes_mid_hermes.so=$(PREFIX)/lib/libhermes_mid_hermes.so.$(LIBRARY_SO_VERSION) \
+		 $(BIN_PATH)/libhermes_rpc.so=$(PREFIX)/lib/libhermes_rpc.so.$(LIBRARY_SO_VERSION) \
+		 $(BIN_PATH)/libhermes_credential_store.so=$(PREFIX)/lib/libhermes_credential_store.so.$(LIBRARY_SO_VERSION) \
+		 $(BIN_PATH)/libhermes_key_store.so=$(PREFIX)/lib/libhermes_key_store.so.$(LIBRARY_SO_VERSION) \
+		 $(BIN_PATH)/libhermes_mid_hermes_ll.so=$(PREFIX)/lib/libhermes_mid_hermes_ll.so.$(LIBRARY_SO_VERSION)
+
+
+BINARY_LIBRARY_MAP = $(STATIC_BINARY_LIBRARY_MAP) $(SHARED_BINARY_LIBRARY_MAP)
+
+POST_INSTALL_SCRIPT := $(BIN_PATH)/post_install.sh
+POST_UNINSTALL_SCRIPT := $(BIN_PATH)/post_uninstall.sh
+
+install_shell_scripts:
+	@printf "ln -s $(PREFIX)/lib/libhermes_common.so.$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_common.so \n \
+		ln -s $(PREFIX)/lib/libhermes_data_store.so.$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_data_store.so \n \
+		ln -s $(PREFIX)/lib/libhermes_mid_hermes.so.$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_mid_hermes.so \n \
+		ln -s $(PREFIX)/lib/libhermes_rpc.so.$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_rpc.so \n \
+		ln -s $(PREFIX)/lib/libhermes_credential_store.so.$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_credential_store.so \n \
+		ln -s $(PREFIX)/lib/libhermes_key_store.so.$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_key_store.so \n \
+		ln -s $(PREFIX)/lib/libhermes_mid_hermes_ll.so.$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_mid_hermes_ll.so" > $(POST_INSTALL_SCRIPT)
+
+	@printf "unlink  $(PREFIX)/lib/libhermes_common.so 2>/dev/null \n \
+		unlink  $(PREFIX)/lib/libhermes_data_store.so 2>/dev/null \n \
+		unlink  $(PREFIX)/lib/libhermes_mid_hermes.so 2>/dev/null \n \
+		unlink  $(PREFIX)/lib/libhermes_rpc.so 2>/dev/null \n \
+		unlink  $(PREFIX)/lib/libhermes_credential_store.so 2>/dev/null \n \
+		unlink  $(PREFIX)/lib/libhermes_key_store.so 2>/dev/null \n \
+		unlink  $(PREFIX)/lib/libhermes_mid_hermes_ll.so 2>/dev/null" > $(POST_UNINSTALL_SCRIPT)
+
+HEADERS_FOLDER = $(BIN_PATH)/include
+
+collect_headers:
+	@mkdir -p $(HEADERS_FOLDER) $(HEADERS_FOLDER)/pyhermes
+	@cp -r include/hermes src/credential_store src/data_store src/key_store src/mid_hermes src/mid_hermes_ll pyhermes $(HEADERS_FOLDER)/
+# delete non-header files
+	@find build/include ! -name *.h -type f -exec rm {} \;
+# delete empty folders that may copied before
+	@find build/include ! -name *.h -type d | sort -r | xargs rmdir --ignore-fail-on-non-empty
+
+
+deb: core static_core collect_headers install_shell_scripts #test
+	@find . -name \*.so -exec strip -o {} {} \;
+	@mkdir -p $(BIN_PATH)/deb
+#libhermes-dev
+	@fpm --input-type dir \
+		 --output-type deb \
+		 --name libhermes-dev \
+		 --license $(LICENSE_NAME) \
+		 --url '$(COSSACKLABS_URL)' \
+		 --description '$(SHORT_DESCRIPTION)' \
+		 --maintainer $(MAINTAINER) \
+		 --package $(BIN_PATH)/deb/libhermes-dev_$(NAME_SUFFIX) \
+		 --architecture $(DEBIAN_ARCHITECTURE) \
+		 --version $(VERSION) \
+		 --depends $(DEBIAN_DEPENDENCIES) \
+		 --deb-priority optional \
+		 --after-install $(POST_INSTALL_SCRIPT) \
+		 --after-remove $(POST_UNINSTALL_SCRIPT) \
+		 --category security \
+		 $(BINARY_LIBRARY_MAP) \
+		 $(HEADER_FILES_MAP) 1>/dev/null
+
+#libhermes
+	@fpm --input-type dir \
+		 --output-type deb \
+		 --name libhermes \
+		 --license $(LICENSE_NAME) \
+		 --url '$(COSSACKLABS_URL)' \
+		 --description '$(SHORT_DESCRIPTION)' \
+		 --maintainer $(MAINTAINER) \
+		 --package $(BIN_PATH)/deb/libhermes_$(NAME_SUFFIX) \
+		 --depends $(DEBIAN_DEPENDENCIES) \
+		 --after-install $(POST_INSTALL_SCRIPT) \
+		 --after-remove $(POST_UNINSTALL_SCRIPT) \
+		 --architecture $(DEBIAN_ARCHITECTURE) \
+		 --version $(VERSION) \
+		 --deb-priority optional \
+		 --category security \
+		 $(BINARY_LIBRARY_MAP) 1>/dev/null
+
+# it's just for printing .deb files
+	@find $(BIN_PATH) -name \*.deb
+
+
+rpm: core static_core collect_headers install_shell_scripts #test
+	@find . -name \*.so -exec strip -o {} {} \;
+	@mkdir -p $(BIN_PATH)/rpm
+#libhermes-devel
+	@fpm --input-type dir \
+         --output-type rpm \
+         --name libhermes-devel \
+         --license $(LICENSE_NAME) \
+         --url '$(COSSACKLABS_URL)' \
+         --description '$(SHORT_DESCRIPTION)' \
+         --rpm-summary $(RPM_SUMMARY) \
+         --depends $(RPM_DEPENDENCIES) \
+         --maintainer $(MAINTAINER) \
+         --after-install $(POST_INSTALL_SCRIPT) \
+         --after-remove $(POST_UNINSTALL_SCRIPT) \
+         --package $(BIN_PATH)/rpm/libhermes-devel_$(NAME_SUFFIX) \
+         --version $(VERSION) \
+         --category security \
+         $(BINARY_LIBRARY_MAP) \
+		 $(HEADER_FILES_MAP) 1>/dev/null
+#libhermes
+	@fpm --input-type dir \
+         --output-type rpm \
+         --name libhermes \
+         --license $(LICENSE_NAME) \
+         --url '$(COSSACKLABS_URL)' \
+         --description '$(SHORT_DESCRIPTION)' \
+         --rpm-summary $(RPM_SUMMARY) \
+         --maintainer $(MAINTAINER) \
+         --after-install $(POST_INSTALL_SCRIPT) \
+         --after-remove $(POST_UNINSTALL_SCRIPT) \
+         --depends $(RPM_DEPENDENCIES) \
+         --package $(BIN_PATH)/rpm/libhermes_$(NAME_SUFFIX) \
+         --version $(VERSION) \
+         --category security \
+         $(BINARY_LIBRARY_MAP) 1>/dev/null
+# it's just for printing .rpm files
+	@find $(BIN_PATH) -name \*.rpm
