@@ -227,11 +227,24 @@ uninstall:
 	@echo -n "hermes uninstall "
 	@$(BUILD_CMD_)
 
+PACKAGE_NAME = hermes
+# check that it's git repo
 GIT_VERSION := $(shell if [ -d ".git" ]; then git version; fi 2>/dev/null)
+# check that repo has any tag
+GIT_TAG_STATUS := $(shell git describe --tags HEAD 2>/dev/null)
+GIT_TAG_STATUS := $(.SHELLSTATUS)
+
 ifdef GIT_VERSION
-	VERSION = $(shell git describe --tags HEAD | cut -b 1-)
+# if has tag then use it
+        ifeq ($(GIT_TAG_STATUS),0)
+                VERSION = $(shell git describe --tags HEAD | cut -b 1-)
+        else
+# otherwise use last commit hash
+                VERSION = $(shell git describe --always HEAD)
+        endif
 else
-	VERSION = $(shell date -I)
+# if it's not git repo then use date as version
+        VERSION = $(shell date -I | sed s/-/_/g)
 endif
 
 
@@ -256,12 +269,26 @@ dist:
 unpack_dist:
 	@tar -xf $(DIST_FILENAME)
 
+collect_headers:
+	@mkdir -p $(HEADERS_FOLDER) $(HEADERS_FOLDER)/pyhermes
+	@cp -r include/hermes src/credential_store src/data_store src/key_store src/mid_hermes src/mid_hermes_ll pyhermes $(HEADERS_FOLDER)/
+# delete non-header files
+	@find build/include ! -name *.h -type f -exec rm {} \;
+# delete empty folders that may copied before
+	@find build/include ! -name *.h -type d | sort -r | xargs rmdir --ignore-fail-on-non-empty
+
 
 COSSACKLABS_URL = https://www.cossacklabs.com
 MAINTAINER = "Cossack Labs Limited <dev@cossacklabs.com>"
 LICENSE_NAME = "Apache License Version 2.0"
-LIBRARY_SO_VERSION := $(shell echo $(VERSION) | sed 's/^\([0-9.]*\)\(.*\)*$$/\1/')
+SHORT_DESCRIPTION = Hermes is a cryptography-based method of providing protected data storage and sharing
+RPM_SUMMARY = "Hermes is a cryptography-based method of providing protected data \
+	storage and sharing that allows enforcing cryptographically checked CRUD \
+	permissions to data blocks and doesn't let server that's running Hermes \
+	do anything worse than DoS."
+PACKAGE_CATEGORY = security
 
+LIBRARY_SO_VERSION := $(shell echo $(VERSION) | sed 's/^\([0-9.]*\)\(.*\)*$$/\1/')
 DEBIAN_VERSION := $(shell cat /etc/debian_version 2> /dev/null)
 DEBIAN_STRETCH_VERSION := libssl1.0.2
 DEBIAN_ARCHITECTURE = `dpkg --print-architecture 2>/dev/null`
@@ -284,16 +311,8 @@ else
 	OS_NAME = $(shell cat /etc/os-release | grep -e "^ID=\".*\"" | cut -d'"' -f2)
 	OS_VERSION = $(shell cat /etc/os-release | grep -i version_id|cut -d'"' -f2)
 	ARCHITECTURE = $(shell arch)
-	NAME_SUFFIX = $(VERSION)+$(OS_NAME)$(OS_VERSION)_$(ARCHITECTURE).rpm
+	NAME_SUFFIX = $(shell echo -n "$(VERSION)"|sed s/-/_/g).$(OS_NAME)$(OS_VERSION).$(ARCHITECTURE).rpm
 endif
-
-
-SHORT_DESCRIPTION = Hermes is a cryptography-based method of providing protected data storage and sharing
-RPM_SUMMARY = "Hermes is a cryptography-based method of providing protected data \
-	storage and sharing that allows enforcing cryptographically checked CRUD \
-	permissions to data blocks and doesn't let server that's running Hermes \
-	do anything worse than DoS."
-
 
 
 HEADER_FILES_MAP = $(BIN_PATH)/include/hermes/=$(PREFIX)/include/hermes \
@@ -344,15 +363,6 @@ install_shell_scripts:
 
 HEADERS_FOLDER = $(BIN_PATH)/include
 
-collect_headers:
-	@mkdir -p $(HEADERS_FOLDER) $(HEADERS_FOLDER)/pyhermes
-	@cp -r include/hermes src/credential_store src/data_store src/key_store src/mid_hermes src/mid_hermes_ll pyhermes $(HEADERS_FOLDER)/
-# delete non-header files
-	@find build/include ! -name *.h -type f -exec rm {} \;
-# delete empty folders that may copied before
-	@find build/include ! -name *.h -type d | sort -r | xargs rmdir --ignore-fail-on-non-empty
-
-
 deb: core static_core collect_headers install_shell_scripts #test
 	@find . -name \*.so -exec strip -o {} {} \;
 	@mkdir -p $(BIN_PATH)/deb
@@ -364,14 +374,14 @@ deb: core static_core collect_headers install_shell_scripts #test
 		 --url '$(COSSACKLABS_URL)' \
 		 --description '$(SHORT_DESCRIPTION)' \
 		 --maintainer $(MAINTAINER) \
-		 --package $(BIN_PATH)/deb/libhermes-dev_$(NAME_SUFFIX) \
+		 --package $(BIN_PATH)/deb/lib$(PACKAGE_NAME)-dev_$(NAME_SUFFIX) \
 		 --architecture $(DEBIAN_ARCHITECTURE) \
 		 --version $(VERSION) \
 		 --depends $(DEBIAN_DEPENDENCIES) \
 		 --deb-priority optional \
 		 --after-install $(POST_INSTALL_SCRIPT) \
 		 --after-remove $(POST_UNINSTALL_SCRIPT) \
-		 --category security \
+		 --category $(PACKAGE_CATEGORY) \
 		 $(BINARY_LIBRARY_MAP) \
 		 $(HEADER_FILES_MAP) 1>/dev/null
 
@@ -383,14 +393,14 @@ deb: core static_core collect_headers install_shell_scripts #test
 		 --url '$(COSSACKLABS_URL)' \
 		 --description '$(SHORT_DESCRIPTION)' \
 		 --maintainer $(MAINTAINER) \
-		 --package $(BIN_PATH)/deb/libhermes_$(NAME_SUFFIX) \
+		 --package $(BIN_PATH)/deb/lib$(PACKAGE_NAME)_$(NAME_SUFFIX) \
 		 --depends $(DEBIAN_DEPENDENCIES) \
 		 --after-install $(POST_INSTALL_SCRIPT) \
 		 --after-remove $(POST_UNINSTALL_SCRIPT) \
 		 --architecture $(DEBIAN_ARCHITECTURE) \
 		 --version $(VERSION) \
 		 --deb-priority optional \
-		 --category security \
+		 --category $(PACKAGE_CATEGORY) \
 		 $(BINARY_LIBRARY_MAP) 1>/dev/null
 
 # it's just for printing .deb files
@@ -412,9 +422,9 @@ rpm: core static_core collect_headers install_shell_scripts #test
          --maintainer $(MAINTAINER) \
          --after-install $(POST_INSTALL_SCRIPT) \
          --after-remove $(POST_UNINSTALL_SCRIPT) \
-         --package $(BIN_PATH)/rpm/libhermes-devel_$(NAME_SUFFIX) \
+         --package $(BIN_PATH)/rpm/lib$(PACKAGE_NAME)-devel-$(NAME_SUFFIX) \
          --version $(VERSION) \
-         --category security \
+         --category $(PACKAGE_CATEGORY) \
          $(BINARY_LIBRARY_MAP) \
 		 $(HEADER_FILES_MAP) 1>/dev/null
 #libhermes
@@ -429,9 +439,9 @@ rpm: core static_core collect_headers install_shell_scripts #test
          --after-install $(POST_INSTALL_SCRIPT) \
          --after-remove $(POST_UNINSTALL_SCRIPT) \
          --depends $(RPM_DEPENDENCIES) \
-         --package $(BIN_PATH)/rpm/libhermes_$(NAME_SUFFIX) \
+         --package $(BIN_PATH)/rpm/lib$(PACKAGE_NAME)-$(NAME_SUFFIX) \
          --version $(VERSION) \
-         --category security \
+         --category $(PACKAGE_CATEGORY) \
          $(BINARY_LIBRARY_MAP) 1>/dev/null
 # it's just for printing .rpm files
 	@find $(BIN_PATH) -name \*.rpm
