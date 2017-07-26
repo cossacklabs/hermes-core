@@ -104,7 +104,7 @@ uint32_t hm_rpc_server_call_func(hm_rpc_server_t* server, const uint8_t* func_si
 #define ANSI_COLOR_RED     "\033[1m\033[31m"
 #define ANSI_COLOR_GREEN   "\033[1m\033[32m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
-    fprintf(stderr, ANSI_COLOR_RED "FAIL(1)\n" ANSI_COLOR_RESET);
+    fprintf(stderr, ANSI_COLOR_RED "FAIL (calling of unregistered function)\n" ANSI_COLOR_RESET);
 #endif
     return HM_FAIL;    
   }
@@ -112,7 +112,7 @@ uint32_t hm_rpc_server_call_func(hm_rpc_server_t* server, const uint8_t* func_si
   if(!pack){
     hm_rpc_server_send_error(server, HM_FAIL);
 #ifdef DEBUG
-    fprintf(stderr, ANSI_COLOR_RED "FAIL(2)\n" ANSI_COLOR_RESET);
+    fprintf(stderr, ANSI_COLOR_RED "FAIL (parameters receiving error)\n" ANSI_COLOR_RESET);
 #endif
     return HM_FAIL;
   }
@@ -124,14 +124,18 @@ uint32_t hm_rpc_server_call_func(hm_rpc_server_t* server, const uint8_t* func_si
 #define ANSI_COLOR_RED     "\033[1m\033[31m"
 #define ANSI_COLOR_GREEN   "\033[1m\033[32m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
-    fprintf(stderr, ANSI_COLOR_RED "FAIL(3)\n" ANSI_COLOR_RESET);
+    fprintf(stderr, ANSI_COLOR_RED "FAIL (calling function error)\n" ANSI_COLOR_RESET);
 #endif
     return hm_rpc_server_send_error(server, res);
   }
   res=hm_rpc_server_send(server, out_pack);
   hm_param_pack_destroy(&out_pack);
 #ifdef DEBUG
-  fprintf(stderr, ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET);
+  if(HM_SUCCESS!=res){
+     fprintf(stderr, ANSI_COLOR_RED "FAIL (result sending error)\n" ANSI_COLOR_RESET);
+  }else{
+    fprintf(stderr, ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET);
+  }
 #endif
   return res;
 }

@@ -32,20 +32,15 @@
 #include <string.h>
 
 #include <pthread.h>
+#include <assert.h>
 
+#include <themis/themis.h>
+#include "../common/common.h"
 #include "../common/test_transport.h"
 #include "../common/test_credential_store_db.h"  
 
 #define CS_PIPE_NAME "/tmp/hermes_core_test_cs_pipe" 
 #define SC_PIPE_NAME "/tmp/hermes_core_test_sc_pipe"
-#define CS_TEST_DB_FILE_NAME "tests/cs_test_db"
-#define CS_TEST_CORRECT_ID1 "user1"
-#define CS_TEST_CORRECT_ID1_KEY "user1_public_key_data"
-#define CS_TEST_CORRECT_ID2 "user2"
-#define CS_TEST_CORRECT_ID2_KEY "user2_public_key_data"
-#define CS_TEST_CORRECT_ID3 "user3"
-#define CS_TEST_CORRECT_ID3_KEY "user3_public_key_data"
-#define CS_TEST_INCORRECT_ID "user4"
 
 void* server(void* param){
   hm_rpc_transport_t* transport = hm_test_transport_create(SC_PIPE_NAME, CS_PIPE_NAME, true);
@@ -53,7 +48,7 @@ void* server(void* param){
     testsuite_fail_if(true, "server transport initializing");
     return (void*)1;
   }
-  hm_cs_db_t* db=hm_test_cs_db_create(CS_TEST_DB_FILE_NAME);
+  hm_cs_db_t* db=hm_test_cs_db_create();
   if(!db){
     hm_test_transport_destroy(transport);
     return (void*)1;
@@ -66,13 +61,9 @@ void* server(void* param){
     return (void*)1;
   }
   int i=0;
-  for(;i<4;++i){
+  for(;i<3*MAX_USERS;++i){
     if(HM_SUCCESS!=hm_credential_store_server_call(s)){
-      hm_credential_store_server_destroy(&s);
-      hm_test_cs_db_destroy(&db);
-      hm_test_transport_destroy(transport);
       testsuite_fail_if(true, "credential store server calling");
-      return (void*)1;
     }
   }
   hm_credential_store_server_destroy(&s);
@@ -93,42 +84,53 @@ void* client(void* param){
     testsuite_fail_if(true, "credential store client sync creation");
     return (void*)1;
   }
+  sleep(1);
   uint8_t* key=NULL;
   size_t key_length=0;
-  if(HM_SUCCESS!=hm_credential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)CS_TEST_CORRECT_ID1, sizeof(CS_TEST_CORRECT_ID1), &key, &key_length)){
-    hm_credential_store_client_sync_destroy(&c);
-    hm_test_transport_destroy(transport);
-    testsuite_fail_if(true, "credential store client sync calling");
-    return (void*)1;
+  int i=1;
+  while(i<=MAX_USERS){
+    uint8_t user_id[USER_ID_LENGTH];
+    assert(SOTER_SUCCESS==soter_rand(user_id, sizeof(user_id)));
+    if(HM_SUCCESS==hm_credential_store_client_sync_call_get_pub_key_by_id(c, user_id, USER_ID_LENGTH, &key, &key_length)){ 
+      free(key);
+      testsuite_fail_if(true, "credential store client sync calling"); 
+    }
+    ++i;
   }
-  if(0!=strcmp(CS_TEST_CORRECT_ID1_KEY, (const char*)key)){
-    testsuite_fail_if(true, "credential store client sync res");    
+  i=1;
+  while(i<=MAX_USERS){
+    char user_id[USER_ID_LENGTH];
+    char command[256];
+    sprintf(command, "find . -maxdepth 1 -name \"*.priv\" | sed '%iq;d'", i);
+    FILE* f=popen(command, "r");
+    if(f){
+      if(fgets(command, sizeof(command), f)){
+        uint8_t user_id[USER_ID_LENGTH];
+        int j=0;
+        for(; j<USER_ID_LENGTH; ++j) {
+          sscanf(command+2+2*j, "%02x", (unsigned int*)(&(user_id[j])));
+        }
+        if(HM_SUCCESS!=hm_credential_store_client_sync_call_get_pub_key_by_id(c, user_id, USER_ID_LENGTH, &key, &key_length)){ 
+          testsuite_fail_if(true, "credential store client sync calling"); 
+        }
+        else{
+          free(key);
+        }
+      }
+      pclose(f);
+    }
+    ++i;
   }
-  if(HM_SUCCESS!=hm_credential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)CS_TEST_CORRECT_ID2, sizeof(CS_TEST_CORRECT_ID2), &key, &key_length)){
-    hm_credential_store_client_sync_destroy(&c);
-    hm_test_transport_destroy(transport);
-    testsuite_fail_if(true, "credential store client sync calling");
-    return (void*)1;
+  i=1;
+  while(i<=MAX_USERS){
+    uint8_t user_id[USER_ID_LENGTH];
+    assert(SOTER_SUCCESS==soter_rand(user_id, sizeof(user_id)));
+    if(HM_SUCCESS==hm_credential_store_client_sync_call_get_pub_key_by_id(c, user_id, USER_ID_LENGTH, &key, &key_length)){ 
+      free(key);
+      testsuite_fail_if(true, "credential store client sync calling"); 
+    }
+    ++i;
   }
-  if(0!=strcmp(CS_TEST_CORRECT_ID2_KEY, (const char*)key)){
-    testsuite_fail_if(true, "credential store client sync res");    
-  }
-  if(HM_SUCCESS==hm_credential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)CS_TEST_INCORRECT_ID, sizeof(CS_TEST_INCORRECT_ID), &key, &key_length)){
-    hm_credential_store_client_sync_destroy(&c);
-    hm_test_transport_destroy(transport);
-    testsuite_fail_if(true, "credential store client sync calling with incorrect id");
-    return (void*)1;
-  }
-  if(HM_SUCCESS!=hm_credential_store_client_sync_call_get_pub_key_by_id(c, (const uint8_t*)CS_TEST_CORRECT_ID3, sizeof(CS_TEST_CORRECT_ID3), &key, &key_length)){
-    hm_credential_store_client_sync_destroy(&c);
-    hm_test_transport_destroy(transport);
-    testsuite_fail_if(true, "credential store client sync calling");
-    return (void*)1;
-  }
-  if(0!=strcmp(CS_TEST_CORRECT_ID3_KEY, (const char*)key)){
-    testsuite_fail_if(true, "credential store client sync res");    
-  }
-  //  free(key);
   hm_credential_store_client_sync_destroy(&c);
   hm_test_transport_destroy(transport);
   return NULL;
@@ -163,6 +165,7 @@ void credential_store_tests(){
 }
 
 int main(int argc, char *argv[]){
+  system("rm *.priv");
   testsuite_start_testing();
   testsuite_enter_suite("credential_store test");
 

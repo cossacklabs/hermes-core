@@ -23,7 +23,7 @@ package gohermes
 /*
 
 #cgo CFLAGS: -I../../include 
-#cgo LDFLAGS: -L../../build -lhermes_mid_hermes -lhermes_mid_hermes_ll -lhermes_credential_store -lhermes_data_store -lhermes_key_store -lhermes_rpc -lcommon -lthemis -lsoter 
+#cgo LDFLAGS: -L../../build -lhermes_mid_hermes -lhermes_mid_hermes_ll -lhermes_credential_store -lhermes_data_store -lhermes_key_store -lhermes_rpc -lhermes_common -lthemis -lsoter 
 #include <hermes/mid_hermes/mid_hermes.h>
 #include "transport.h"
 #include <string.h>

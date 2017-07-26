@@ -21,19 +21,19 @@ include tests/rpc/rpc.mk
 include tests/credential_store/credential_store.mk
 include tests/key_store/key_store.mk
 
-rpc_test: CMD = $(CC) -o $(TEST_BIN_PATH)/rpc_test $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lhermes_rpc -lhermes_common -lsoter $(COVERLDFLAGS) -lpthread
+rpc_test: CMD = $(CC) -o $(TEST_BIN_PATH)/rpc_test $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
 
 rpc_test: rpc_static $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-credential_store_test: CMD = $(CC) -o $(TEST_BIN_PATH)/credential_store_test $(CREDENTIAL_STORE_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lhermes_credential_store -lhermes_rpc -lhermes_common -lsoter $(COVERLDFLAGS) -lpthread
+credential_store_test: CMD = $(CC) -o $(TEST_BIN_PATH)/credential_store_test $(CREDENTIAL_STORE_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lhermes_credential_store -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
 
 credential_store_test: credential_store_static rpc_static $(CREDENTIAL_STORE_TEST_OBJ) $(COMMON_TEST_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-key_store_test: CMD = $(CC) -o $(TEST_BIN_PATH)/key_store_test $(KEY_STORE_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lhermes_key_store -lhermes_rpc -lhermes_common -lsoter $(COVERLDFLAGS) -lpthread
+key_store_test: CMD = $(CC) -o $(TEST_BIN_PATH)/key_store_test $(KEY_STORE_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lhermes_key_store -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
 
 key_store_test: key_store_static rpc_static $(KEY_STORE_TEST_OBJ) $(COMMON_TEST_OBJ)
 	@echo -n "link "
