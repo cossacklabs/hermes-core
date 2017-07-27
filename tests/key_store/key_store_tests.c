@@ -192,6 +192,22 @@ void* client(void* param){
                                                           rtoken.user_id, sizeof(rtoken.user_id))){
     testsuite_fail_if(true, "key store client sync calling"); 
   }
+  //grant read access
+  if(HM_SUCCESS!=hm_key_store_client_sync_call_set_rtoken(c,
+                                                          rtoken.block_id, sizeof(rtoken.block_id),
+                                                          wtoken.user_id, sizeof(wtoken.user_id),
+                                                          rtoken.user_id, sizeof(rtoken.user_id),
+                                                          rtoken.token, sizeof(rtoken.token))){ 
+    testsuite_fail_if(true, "key store client sync calling"); 
+  }
+  //grant update access
+  if(HM_SUCCESS!=hm_key_store_client_sync_call_set_rtoken(c,
+                                                          rtoken.block_id, sizeof(rtoken.block_id),
+                                                          wtoken.user_id, sizeof(wtoken.user_id),
+                                                          rtoken.user_id, sizeof(rtoken.user_id),
+                                                          rtoken.token, sizeof(rtoken.token))){ 
+    testsuite_fail_if(true, "key store client sync calling"); 
+  }
 
 
   

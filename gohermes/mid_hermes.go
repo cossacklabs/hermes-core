@@ -58,7 +58,7 @@ var transport_map = make(map[uint64]HermesTransport)
 //export go_transport_send
 func go_transport_send(transport C.uint64_t, buf unsafe.Pointer, buf_length C.size_t) C.int {
 	p := transport_map[uint64(transport)]
-	b := (*[1<<30]byte)(buf)[0:buf_length]
+	b := (*[1<<30]byte)(buf)[0:buf_length] //convert {buf, buf_length} to []byte
 	err := p.Send(b)
 	if nil != err {
 		return 1;

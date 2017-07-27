@@ -82,24 +82,31 @@ uint32_t hm_mac_create(
     if (!key || !key_length || !data || !data_length || !mac || !mac_length) {
         return HM_INVALID_PARAMETER;
     }
-    uint8_t *pre_mac = NULL;
-    size_t pre_mac_len = 0;
-    if (THEMIS_BUFFER_TOO_SMALL != themis_secure_cell_encrypt_context_imprint(
-            key, key_length, data, data_length, context, context_length, NULL, &pre_mac_len)) {
-        return HM_FAIL;
+    soter_hmac_ctx_t* hmac_ctx=soter_hmac_create(SOTER_HASH_SHA512, key, key_length);
+    if(!hmac_ctx){
+      return HM_FAIL;
     }
-    pre_mac = malloc(pre_mac_len);
+    if(SOTER_SUCCESS!=soter_hmac_update(hmac_ctx, data, data_length)){
+      soter_hmac_destroy(hmac_ctx);
+      return HM_FAIL;
+    }
+    if(SOTER_SUCCESS!=soter_hmac_update(hmac_ctx, context, context_length)){
+      soter_hmac_destroy(hmac_ctx);
+      return HM_FAIL;
+    }
+    size_t mac_len = 0;
+    if (SOTER_BUFFER_TOO_SMALL != soter_hmac_final(hmac_ctx, NULL, &mac_len)){
+      soter_hmac_destroy(hmac_ctx);
+      return HM_FAIL;
+    }
+    *mac = malloc(mac_len);
     assert(pre_mac);
-    if (THEMIS_SUCCESS != themis_secure_cell_encrypt_context_imprint(
-            key, key_length, data, data_length, context, context_length, pre_mac, &pre_mac_len)) {
-        free(pre_mac);
-        return HM_FAIL;
+    if (SOTER_SUCCESS != soter_hmac_final(hmac_ctx, *mac, &mac_len)){
+      soter_hmac_destroy(hmac_ctx);
+      return HM_FAIL;
     }
-    *mac = malloc(HM_MAC_LEN);
-    assert(*mac);
-    memcpy(*mac, pre_mac + pre_mac_len - HM_MAC_LEN, HM_MAC_LEN);
-    free(pre_mac);
-    *mac_length = HM_MAC_LEN;
+    soter_hmac_destroy(hmac_ctx);
+    *mac_length = mac_len;
     return HM_SUCCESS;
 }
 
