@@ -21,20 +21,20 @@
 package main
 
 import (
-	"net"
 	"../../../gohermes"
-//	"github.com/cossacklabs/hermes-core/gohermes"
+	"net"
+	//	"github.com/cossacklabs/hermes-core/gohermes"
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"encoding/base64"
 )
 
-type Transport struct{
+type Transport struct {
 	connection net.Conn
 }
 
-func NewTransport(uri string) (Transport, error){
+func NewTransport(uri string) (Transport, error) {
 	conn, err := net.Dial("tcp", uri)
 	if err != nil {
 		return Transport{}, err
@@ -42,36 +42,36 @@ func NewTransport(uri string) (Transport, error){
 	return Transport{conn}, nil
 }
 
-func (t Transport)Send(buf []byte) error{
+func (t Transport) Send(buf []byte) error {
 	var total_send = 0
 	for total_send < len(buf) {
-		sended, err := t.connection.Write(buf[total_send:]);
+		sended, err := t.connection.Write(buf[total_send:])
 		if nil != err {
-			return err 
+			return err
 		}
 		total_send += sended
 	}
 	return nil
 }
 
-func (t Transport)Recv(buf []byte) error{
+func (t Transport) Recv(buf []byte) error {
 	var total_received = 0
-	for total_received < len(buf){
+	for total_received < len(buf) {
 		received, err := t.connection.Read(buf[total_received:])
 		if nil != err {
-			return err 
+			return err
 		}
-		total_received += received		
+		total_received += received
 	}
 	return nil
 }
 
-func (t Transport)Close(){
+func (t Transport) Close() {
 	t.connection.Close()
 }
 
-func usage() string{
-return `Usage of ./hermes_client:
+func usage() string {
+	return `Usage of ./hermes_client:
   -command string
 	command
   -credential_store_uri string
@@ -92,7 +92,7 @@ return `Usage of ./hermes_client:
 	user private key`
 }
 
-func main(){
+func main() {
 	var credential_store_uri = flag.String("credential_store_uri", "127.0.0.1:8888", "Credential Store URI")
 	var key_store_uri = flag.String("key_store_uri", "127.0.0.1:8890", "Key Store URI")
 	var data_store_uri = flag.String("data_store_uri", "127.0.0.1:8889", "Data Store URI")
@@ -112,7 +112,7 @@ func main(){
 	if nil != err {
 		panic(err)
 		return
-	}	
+	}
 	CredentialStoreTransport, err := NewTransport(*credential_store_uri)
 	if nil != err {
 		panic(err)
@@ -139,28 +139,28 @@ func main(){
 	}
 	defer mid_hermes.Close()
 
-	switch *command{
+	switch *command {
 	case "add_block":
-		if *meta == ""{
+		if *meta == "" {
 			fmt.Println(usage())
 		}
 		data, err := ioutil.ReadFile(*doc_file_name)
 		if nil != err {
 			panic(err)
 		}
-		err = mid_hermes.AddBlock([]byte(*doc_file_name), data, []byte(*meta));
+		err = mid_hermes.AddBlock([]byte(*doc_file_name), data, []byte(*meta))
 		if nil != err {
 			panic(err)
 		}
 	case "read_block":
-		data, meta, err := mid_hermes.ReadBlock([]byte(*doc_file_name));
+		data, meta, err := mid_hermes.ReadBlock([]byte(*doc_file_name))
 		if nil != err {
 			panic(err)
 		}
 		fmt.Println(string(data))
 		fmt.Println(string(meta))
 	case "update_block":
-		if *meta == ""{
+		if *meta == "" {
 			fmt.Println(usage())
 		}
 		data, err := ioutil.ReadFile(*doc_file_name)
@@ -172,12 +172,12 @@ func main(){
 			panic(err)
 		}
 	case "delete_block":
-		err := mid_hermes.DeleteBlock([]byte(*doc_file_name));
+		err := mid_hermes.DeleteBlock([]byte(*doc_file_name))
 		if nil != err {
 			panic(err)
 		}
 	case "rotate_block":
-		err := mid_hermes.RotateBlock([]byte(*doc_file_name));
+		err := mid_hermes.RotateBlock([]byte(*doc_file_name))
 		if nil != err {
 			panic(err)
 		}
@@ -186,7 +186,7 @@ func main(){
 			fmt.Println(usage())
 			return
 		}
-		err := mid_hermes.GrantReadAccess([]byte(*doc_file_name), []byte(*for_user));
+		err := mid_hermes.GrantReadAccess([]byte(*doc_file_name), []byte(*for_user))
 		if nil != err {
 			panic(err)
 		}
@@ -195,7 +195,7 @@ func main(){
 			fmt.Println(usage())
 			return
 		}
-		err := mid_hermes.GrantUpdateAccess([]byte(*doc_file_name), []byte(*for_user));
+		err := mid_hermes.GrantUpdateAccess([]byte(*doc_file_name), []byte(*for_user))
 		if nil != err {
 			panic(err)
 		}
@@ -204,7 +204,7 @@ func main(){
 			fmt.Println(usage())
 			return
 		}
-		err := mid_hermes.RevokeReadAccess([]byte(*doc_file_name), []byte(*for_user));
+		err := mid_hermes.RevokeReadAccess([]byte(*doc_file_name), []byte(*for_user))
 		if nil != err {
 			panic(err)
 		}
@@ -213,7 +213,7 @@ func main(){
 			fmt.Println(usage())
 			return
 		}
-		err := mid_hermes.RevokeUpdateAccess([]byte(*doc_file_name), []byte(*for_user));
+		err := mid_hermes.RevokeUpdateAccess([]byte(*doc_file_name), []byte(*for_user))
 		if nil != err {
 			panic(err)
 		}
@@ -222,5 +222,3 @@ func main(){
 	}
 	fmt.Println("success")
 }
-
-
