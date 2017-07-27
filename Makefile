@@ -305,8 +305,10 @@ RPM_DEPENDENCIES = 'openssl libthemis'
 
 ifeq ($(shell lsb_release -is 2> /dev/null),Debian)
 	NAME_SUFFIX = $(VERSION)+$(shell lsb_release -cs)_$(DEBIAN_ARCHITECTURE).deb
+	OS_CODENAME = $(shell lsb_release -cs)
 else ifeq ($(shell lsb_release -is 2> /dev/null),Ubuntu)
 	NAME_SUFFIX = $(VERSION)+$(shell lsb_release -cs)_$(DEBIAN_ARCHITECTURE).deb
+	OS_CODENAME = $(shell lsb_release -cs)
 else
 	OS_NAME = $(shell cat /etc/os-release | grep -e "^ID=\".*\"" | cut -d'"' -f2)
 	OS_VERSION = $(shell cat /etc/os-release | grep -i version_id|cut -d'"' -f2)
@@ -376,7 +378,7 @@ deb: core static_core collect_headers install_shell_scripts #test
 		 --maintainer $(MAINTAINER) \
 		 --package $(BIN_PATH)/deb/lib$(PACKAGE_NAME)-dev_$(NAME_SUFFIX) \
 		 --architecture $(DEBIAN_ARCHITECTURE) \
-		 --version $(VERSION) \
+		 --version $(VERSION)+$(OS_CODENAME) \
 		 --depends $(DEBIAN_DEPENDENCIES) \
 		 --deb-priority optional \
 		 --after-install $(POST_INSTALL_SCRIPT) \
@@ -398,7 +400,7 @@ deb: core static_core collect_headers install_shell_scripts #test
 		 --after-install $(POST_INSTALL_SCRIPT) \
 		 --after-remove $(POST_UNINSTALL_SCRIPT) \
 		 --architecture $(DEBIAN_ARCHITECTURE) \
-		 --version $(VERSION) \
+		 --version $(VERSION)+$(OS_CODENAME) \
 		 --deb-priority optional \
 		 --category $(PACKAGE_CATEGORY) \
 		 $(BINARY_LIBRARY_MAP) 1>/dev/null
