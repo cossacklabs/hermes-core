@@ -295,18 +295,20 @@ DEBIAN_ARCHITECTURE = `dpkg --print-architecture 2>/dev/null`
 # 9.0 == stretch
 # if found 9. (9.1, 9.2, ...) then it's debian 9.x
 ifeq ($(findstring 9.,$(DEBIAN_VERSION)),9.)
-        DEBIAN_DEPENDENCIES := '$(DEBIAN_STRETCH_VERSION) libthemis'
+        DEBIAN_DEPENDENCIES := --depends $(DEBIAN_STRETCH_VERSION) --depends libthemis
 else ifeq ($(DEBIAN_VERSION),stretch/sid)
-        DEBIAN_DEPENDENCIES := '$(DEBIAN_STRETCH_VERSION) libthemis'
+        DEBIAN_DEPENDENCIES := --depends $(DEBIAN_STRETCH_VERSION) --depends libthemis
 else
-        DEBIAN_DEPENDENCIES := 'openssl libthemis'
+        DEBIAN_DEPENDENCIES := --depends openssl --depends libthemis
 endif
-RPM_DEPENDENCIES = 'openssl libthemis'
+RPM_DEPENDENCIES = --depends openssl --depends libthemis
 
 ifeq ($(shell lsb_release -is 2> /dev/null),Debian)
 	NAME_SUFFIX = $(VERSION)+$(shell lsb_release -cs)_$(DEBIAN_ARCHITECTURE).deb
+	OS_CODENAME = $(shell lsb_release -cs)
 else ifeq ($(shell lsb_release -is 2> /dev/null),Ubuntu)
 	NAME_SUFFIX = $(VERSION)+$(shell lsb_release -cs)_$(DEBIAN_ARCHITECTURE).deb
+	OS_CODENAME = $(shell lsb_release -cs)
 else
 	OS_NAME = $(shell cat /etc/os-release | grep -e "^ID=\".*\"" | cut -d'"' -f2)
 	OS_VERSION = $(shell cat /etc/os-release | grep -i version_id|cut -d'"' -f2)
@@ -376,8 +378,8 @@ deb: core static_core collect_headers install_shell_scripts #test
 		 --maintainer $(MAINTAINER) \
 		 --package $(BIN_PATH)/deb/lib$(PACKAGE_NAME)-dev_$(NAME_SUFFIX) \
 		 --architecture $(DEBIAN_ARCHITECTURE) \
-		 --version $(VERSION) \
-		 --depends $(DEBIAN_DEPENDENCIES) \
+		 --version $(VERSION)+$(OS_CODENAME) \
+		 $(DEBIAN_DEPENDENCIES) \
 		 --deb-priority optional \
 		 --after-install $(POST_INSTALL_SCRIPT) \
 		 --after-remove $(POST_UNINSTALL_SCRIPT) \
@@ -394,11 +396,11 @@ deb: core static_core collect_headers install_shell_scripts #test
 		 --description '$(SHORT_DESCRIPTION)' \
 		 --maintainer $(MAINTAINER) \
 		 --package $(BIN_PATH)/deb/lib$(PACKAGE_NAME)_$(NAME_SUFFIX) \
-		 --depends $(DEBIAN_DEPENDENCIES) \
+		 $(DEBIAN_DEPENDENCIES) \
 		 --after-install $(POST_INSTALL_SCRIPT) \
 		 --after-remove $(POST_UNINSTALL_SCRIPT) \
 		 --architecture $(DEBIAN_ARCHITECTURE) \
-		 --version $(VERSION) \
+		 --version $(VERSION)+$(OS_CODENAME) \
 		 --deb-priority optional \
 		 --category $(PACKAGE_CATEGORY) \
 		 $(BINARY_LIBRARY_MAP) 1>/dev/null
@@ -418,7 +420,7 @@ rpm: core static_core collect_headers install_shell_scripts #test
          --url '$(COSSACKLABS_URL)' \
          --description '$(SHORT_DESCRIPTION)' \
          --rpm-summary $(RPM_SUMMARY) \
-         --depends $(RPM_DEPENDENCIES) \
+         $(RPM_DEPENDENCIES) \
          --maintainer $(MAINTAINER) \
          --after-install $(POST_INSTALL_SCRIPT) \
          --after-remove $(POST_UNINSTALL_SCRIPT) \
@@ -438,7 +440,7 @@ rpm: core static_core collect_headers install_shell_scripts #test
          --maintainer $(MAINTAINER) \
          --after-install $(POST_INSTALL_SCRIPT) \
          --after-remove $(POST_UNINSTALL_SCRIPT) \
-         --depends $(RPM_DEPENDENCIES) \
+         $(RPM_DEPENDENCIES) \
          --package $(BIN_PATH)/rpm/lib$(PACKAGE_NAME)-$(NAME_SUFFIX) \
          --version $(VERSION) \
          --category $(PACKAGE_CATEGORY) \

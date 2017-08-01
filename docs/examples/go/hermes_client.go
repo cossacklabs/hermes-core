@@ -21,9 +21,8 @@
 package main
 
 import (
-	"../../../gohermes"
 	"net"
-	//	"github.com/cossacklabs/hermes-core/gohermes"
+	"github.com/cossacklabs/hermes-core/gohermes"
 	"encoding/base64"
 	"flag"
 	"fmt"
