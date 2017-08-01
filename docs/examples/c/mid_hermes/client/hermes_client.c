@@ -46,6 +46,25 @@
 #define DATA_STORE_PORT       8889
 #define KEY_STORE_PORT        8890
 
+const char const* HELP = "usage: client <command> <user id> <base64 encoded user private key>  <name of file for proceed> <meta> <for user>.\n"
+        "           <command>                         - executes the command to be performed by the client, see below;\n"
+        "           <user id>                         - user identifier (user needs to be registered in Credential store);\n"
+        "           <base64 encoded user private key> - base64 encoded private key of the user;\n"
+        "           <name of file to be processed>    - filename of the file to be processed (file name is used as block ID in Hermes);\n"
+        "           <meta>                            - some data associated with a file that is stored in the database in plaintext;\n"
+        "           <for user>                        - identifier of the user for which permissions are provided/revoked from (this information is needed by some commands).\n"
+        "\n"
+        "commands:\n"
+        "           add_block -  add <name of file to be processed> block with <meta> to Hermes system\n"
+        "           read_block -  read <name of file to be processed> block with <meta> from Hermes system\n"
+        "           update_block -  update <name of file to be processed> block with <meta> in Hermes system\n"
+        "           delete_block -  delete <name of file to be processed> block from Hermes system\n"
+        "           rotate -   rotate <name of file to be processed> block from Hermes system\n"
+        "           grant_read - grant read access for <for user> to <name of file to be processed> block in Hermes system\n"
+        "           grant_update - grant update access for <for user> to <name of file to be processed> block in Hermes system\n"
+        "           revoke_read - deny read access for <for user> to <name of file to be processed> block in Hermes system\n"
+        "           revoke_update - deny update access for <for user> to <name of file to be processed> block in Hermes system";
+
 hm_rpc_transport_t *server_connect(const char *ip, int port) {
     int64_t sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == -1) {
@@ -71,8 +90,12 @@ hm_rpc_transport_t *server_connect(const char *ip, int port) {
 }
 
 int main(int argc, char **argv) {
+    if (argc == 2 && strcmp(argv[1], "--help") == 0){
+        fprintf(stdout, HELP);
+        return SUCCESS;
+    }
     if (argc < 5) {
-        fprintf(stderr, "error: params error\n");
+        fprintf(stderr, "error: params error\n\n%s\n", HELP);
         return 1;
     }
     hm_rpc_transport_t *cs_transport = server_connect(CREDENTIAL_STORE_IP, CREDENTIAL_STORE_PORT);
@@ -174,7 +197,7 @@ int main(int argc, char **argv) {
         }
         return SUCCESS;
     } else {
-        fprintf(stderr, "error: undefined command %s\n", argv[1]);
+        fprintf(stderr, "error: undefined command %s\n\n%s\n", argv[1], HELP);
         return FAIL;
     }
     mid_hermes_destroy(&mh);
