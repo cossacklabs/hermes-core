@@ -63,7 +63,7 @@ const char const* HELP = "usage: client <command> <user id> <base64 encoded user
         "           grant_read - grant read access for <for user> to <name of file to be processed> block in Hermes system\n"
         "           grant_update - grant update access for <for user> to <name of file to be processed> block in Hermes system\n"
         "           revoke_read - deny read access for <for user> to <name of file to be processed> block in Hermes system\n"
-        "           revoke_update - deny update access for <for user> to <name of file to be processed> block in Hermes system";
+        "           revoke_update - deny update access for <for user> to <name of file to be processed> block in Hermes system\n";
 
 hm_rpc_transport_t *server_connect(const char *ip, int port) {
     int64_t sock = socket(AF_INET, SOCK_STREAM, 0);
