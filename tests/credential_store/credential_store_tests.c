@@ -91,9 +91,10 @@ void* client(void* param){
   while(i<=MAX_USERS){
     uint8_t user_id[USER_ID_LENGTH];
     assert(SOTER_SUCCESS==soter_rand(user_id, sizeof(user_id)));
-    if(HM_SUCCESS==hm_credential_store_client_sync_call_get_pub_key_by_id(c, user_id, USER_ID_LENGTH, &key, &key_length)){ 
+    hermes_status_t res=hm_credential_store_client_sync_call_get_pub_key_by_id(c, user_id, USER_ID_LENGTH, &key, &key_length);
+    testsuite_fail_if(HM_SUCCESS==res, "credential store client sync calling"); 
+    if(HM_SUCCESS==res){
       free(key);
-      testsuite_fail_if(true, "credential store client sync calling"); 
     }
     ++i;
   }
@@ -110,10 +111,9 @@ void* client(void* param){
         for(; j<USER_ID_LENGTH; ++j) {
           sscanf(command+2+2*j, "%02x", (unsigned int*)(&(user_id[j])));
         }
-        if(HM_SUCCESS!=hm_credential_store_client_sync_call_get_pub_key_by_id(c, user_id, USER_ID_LENGTH, &key, &key_length)){ 
-          testsuite_fail_if(true, "credential store client sync calling"); 
-        }
-        else{
+        hermes_status_t res=hm_credential_store_client_sync_call_get_pub_key_by_id(c, user_id, USER_ID_LENGTH, &key, &key_length);
+        testsuite_fail_if(HM_SUCCESS!=res, "credential store client sync calling"); 
+        if(HM_SUCCESS==res){
           free(key);
         }
       }
@@ -125,9 +125,10 @@ void* client(void* param){
   while(i<=MAX_USERS){
     uint8_t user_id[USER_ID_LENGTH];
     assert(SOTER_SUCCESS==soter_rand(user_id, sizeof(user_id)));
-    if(HM_SUCCESS==hm_credential_store_client_sync_call_get_pub_key_by_id(c, user_id, USER_ID_LENGTH, &key, &key_length)){ 
+    hermes_status_t res=hm_credential_store_client_sync_call_get_pub_key_by_id(c, user_id, USER_ID_LENGTH, &key, &key_length);
+    testsuite_fail_if(HM_SUCCESS==res, "credential store client sync calling"); 
+    if(HM_SUCCESS==res){
       free(key);
-      testsuite_fail_if(true, "credential store client sync calling"); 
     }
     ++i;
   }

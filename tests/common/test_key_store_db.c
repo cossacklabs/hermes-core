@@ -176,8 +176,10 @@ uint32_t db_get_rtoken(
   *token_length=(*searched_token)->rtoken_length;
   memcpy(*token, (*searched_token)->rtoken, (*searched_token)->rtoken_length);
   *owner_id=malloc(USER_ID_LENGTH);
+  *owner_id_length=USER_ID_LENGTH;
   assert(*owner_id);
   memcpy(*owner_id, (*searched_token)->rtoken_owner, USER_ID_LENGTH);
+  //  fprintf(stderr, "%i %i\n", *token_length, );
   return HM_SUCCESS;
 }
 
@@ -217,6 +219,7 @@ uint32_t db_get_wtoken(
   memcpy(*token, (*searched_token)->wtoken, (*searched_token)->wtoken_length);
   *owner_id=malloc(USER_ID_LENGTH);
   assert(*owner_id);
+  *owner_id_length=USER_ID_LENGTH;
   memcpy(*owner_id, (*searched_token)->wtoken_owner, USER_ID_LENGTH);
   return HM_SUCCESS;
 }
@@ -253,21 +256,15 @@ uint32_t db_del_rtoken(
   free(block_node);
   hm_test_ks_db_token_t* token=calloc(1, sizeof(hm_test_ks_db_token_t));
   assert(token);
-  memcpy(token->user_id, owner_id, USER_ID_LENGTH);
-  hm_test_ks_db_token_t** searched_token= (hm_test_ks_db_token_t**)(tfind)(token, &((*serached_block_node)->users), hm_ks_test_db_token_compare);
-  if(!searched_token || !((*searched_token)->wtoken_length)){
-    free(token);
-    return HM_FAIL;
-  }  
   memcpy(token->user_id, user_id, USER_ID_LENGTH);
-  searched_token= (hm_test_ks_db_token_t**)(tfind)(token, &((*serached_block_node)->users), hm_ks_test_db_token_compare);
+  hm_test_ks_db_token_t** searched_token= (hm_test_ks_db_token_t**)(tfind)(token, &((*serached_block_node)->users), hm_ks_test_db_token_compare);
   if(!searched_token){
     free(token);
     return HM_FAIL;
   }
   free(token);
-  tdelete(searched_token, &((*serached_block_node)->users), hm_ks_test_db_token_compare);
-  free(searched_token);
+  tdelete((*searched_token), &((*serached_block_node)->users), hm_ks_test_db_token_compare);
+  free(*searched_token);
   return HM_SUCCESS;
 }
 
@@ -290,14 +287,8 @@ uint32_t db_del_wtoken(
   free(block_node);
   hm_test_ks_db_token_t* token=calloc(1, sizeof(hm_test_ks_db_token_t));
   assert(token);
-  memcpy(token->user_id, owner_id, USER_ID_LENGTH);
-  hm_test_ks_db_token_t** searched_token= (hm_test_ks_db_token_t**)(tfind)(token, &((*serached_block_node)->users), hm_ks_test_db_token_compare);
-  if(!searched_token || !((*searched_token)->wtoken_length)){
-    free(token);
-    return HM_FAIL;
-  }  
   memcpy(token->user_id, user_id, USER_ID_LENGTH);
-  searched_token= (hm_test_ks_db_token_t**)(tfind)(token, &((*serached_block_node)->users), hm_ks_test_db_token_compare);
+  hm_test_ks_db_token_t** searched_token= (hm_test_ks_db_token_t**)(tfind)(token, &((*serached_block_node)->users), hm_ks_test_db_token_compare);
   if(!searched_token){
     free(token);
     return HM_FAIL;

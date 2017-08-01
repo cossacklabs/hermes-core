@@ -33,6 +33,8 @@
 #include <assert.h>
 #include <pthread.h>
 
+#include <themis/themis.h>
+#include "../common/common.h"
 #include "../common/test_transport.h"
 #include "../common/test_data_store_db.h"  
 
@@ -59,7 +61,7 @@ void* server(void* param){
     return (void*)1;
   }
   int i=0;
-  for(;i<1;++i){
+  for(;i<6;++i){
     if(HM_SUCCESS!=hm_data_store_server_call(s)){
       hm_data_store_server_destroy(&s);
       hm_test_ds_db_destroy(&db);
@@ -74,14 +76,24 @@ void* server(void* param){
   return NULL;
 }
 
-uint32_t gen_new_block(uint8_t** block, size_t* block_length, uint8_t** mac, size_t* mac_length){
-  *block_length=2556;
-  *block=malloc(*block_length);
-  assert(*block);
-  *mac_length=32;
-  *mac=malloc(*mac_length);
-  assert(*mac);
-  return HM_SUCCESS;
+typedef struct block_type{
+  uint8_t id[BLOCK_ID_LENGTH];
+  uint8_t block[MAX_BLOCK_LENGTH];
+  size_t block_length;
+  uint8_t meta[MAX_META_LENGTH];
+  size_t meta_length;
+  uint8_t mac[MAX_MAC_LENGTH];
+  size_t mac_length;
+}block_t;
+
+void gen_new_block(block_t* block){
+  assert(SOTER_SUCCESS==soter_rand(block->id, BLOCK_ID_LENGTH));  
+  block->block_length=sizeof(block->block);
+  assert(SOTER_SUCCESS==soter_rand(block->block, block->block_length));
+  block->meta_length=sizeof(block->meta);
+  assert(SOTER_SUCCESS==soter_rand(block->meta, block->meta_length));
+  block->mac_length=sizeof(block->mac);
+  assert(SOTER_SUCCESS==soter_rand(block->mac, block->mac_length));
 }
 
 void* client(void* param){
@@ -96,29 +108,15 @@ void* client(void* param){
     testsuite_fail_if(true, "data store client sync creation");
     return (void*)1;
   }
-  uint8_t* key=NULL;
-  size_t key_length=0;
-  uint8_t* block=NULL, *mac=NULL, *id=NULL;
-  size_t block_length=0, mac_length=0, id_length=0;
-  if(HM_SUCCESS!=gen_new_block(&block, &block_length, &mac, &mac_length) || HM_SUCCESS!=hm_data_store_client_sync_call_create_block(c, block, block_length, mac, mac_length, &id, &id_length)){
-    free(block);
-    free(mac);
-    hm_data_store_client_sync_destroy(&c);
-    hm_test_transport_destroy(transport);
-    testsuite_fail_if(true, "data store client sync calling");
-    return (void*)1;
-  }
-  free(block);
-free(mac);
-if(HM_SUCCESS!=gen_new_block(&block, &block_length, &mac, &mac_length) || HM_SUCCESS!=hm_data_store_client_sync_call_create_block(c, block, block_length, mac, mac_length, &id, &id_length)){
-    free(block);
-free(mac);
-hm_data_store_client_sync_destroy(&c);
-hm_test_transport_destroy(transport);
-testsuite_fail_if(true, "data store client sync calling");
-return (void*)1;
-}
-  //  free(key);
+  block_t block1, block2;
+  gen_new_block(&block1);
+  gen_new_block(&block2);
+  testsuite_fail_if(HM_SUCCESS!=hm_data_store_client_sync_call_create_block_with_id(c, block1.id, BLOCK_ID_LENGTH, block1.block, block1.block_length, block1.meta, block1.meta_length, block1.mac, block1.mac_length), "data store client sync calling");
+  testsuite_fail_if(HM_SUCCESS!=hm_data_store_client_sync_call_create_block_with_id(c, block2.id, BLOCK_ID_LENGTH, block2.block, block2.block_length, block2.meta, block2.meta_length, block2.mac, block2.mac_length), "data store client sync calling");
+  testsuite_fail_if(HM_SUCCESS!=hm_data_store_client_sync_call_update_block(c, block1.id, BLOCK_ID_LENGTH, block1.block, block1.block_length, block1.meta, block1.meta_length, block1.mac, block1.mac_length, block1.mac, block1.mac_length), "data store client sync calling");
+  testsuite_fail_if(HM_SUCCESS==hm_data_store_client_sync_call_update_block(c, block1.id, BLOCK_ID_LENGTH, block1.block, block1.block_length, block1.meta, block1.meta_length, block1.mac, block1.mac_length, block2.mac, block2.mac_length), "data store client sync calling"); 
+  testsuite_fail_if(HM_SUCCESS==hm_data_store_client_sync_call_delete_block(c, block1.id, BLOCK_ID_LENGTH, block2.mac, block2.mac_length), "data store client sync calling"); 
+  testsuite_fail_if(HM_SUCCESS!=hm_data_store_client_sync_call_delete_block(c, block1.id, BLOCK_ID_LENGTH, block1.mac, block1.mac_length), "data store client sync calling"); 
   hm_data_store_client_sync_destroy(&c);
   hm_test_transport_destroy(transport);
   return NULL;

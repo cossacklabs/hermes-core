@@ -120,7 +120,7 @@ uint32_t hm_key_store_del_rtoken(
     }
     uint8_t *test_token = NULL, *test_id = NULL;
     size_t test_token_length = 0, test_id_length = 0;
-    if (HM_SUCCESS != db->get_rtoken(
+    if (HM_SUCCESS != db->get_wtoken(
             db->user_data, block_id, block_id_length, owner_id, owner_id_length, &test_token, &test_token_length,
             &test_id, &test_id_length)) {
         return HM_FAIL;

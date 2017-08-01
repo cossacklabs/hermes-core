@@ -62,7 +62,7 @@ void* server(void* param){
     return (void*)1;
   }
   int i=0;
-  for(;i<20;++i){
+  for(;i<25;++i){
     if(HM_SUCCESS!=hm_key_store_server_call(s)){
       testsuite_fail_if(true, "data store server calling");
     }
@@ -104,115 +104,158 @@ void* client(void* param){
   gen_new_token(&rtoken);
   gen_new_token(&wtoken);
   //try to add self owned wtoken without rtoken added
-  if(HM_SUCCESS==hm_key_store_client_sync_call_set_wtoken(c,
-                                                          rtoken.block_id, sizeof(rtoken.block_id),
-                                                          rtoken.user_id, sizeof(rtoken.user_id),
-                                                          rtoken.user_id, sizeof(rtoken.user_id),
-                                                          rtoken.token, sizeof(rtoken.token))){ 
-    testsuite_fail_if(true, "key store client sync calling"); 
-  } 
+  testsuite_fail_if(HM_SUCCESS==hm_key_store_client_sync_call_set_wtoken(
+                                                                         c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         rtoken.token, sizeof(rtoken.token)), "key store client sync calling"); 
   //try to add not owned token for new block 
-  if(HM_SUCCESS==hm_key_store_client_sync_call_set_rtoken(c,
-                                                          rtoken.block_id, sizeof(rtoken.block_id),
-                                                          rtoken.user_id, sizeof(rtoken.user_id),
-                                                          rtoken.owner_id, sizeof(rtoken.owner_id),
-                                                          rtoken.token, sizeof(rtoken.token))){ 
-     testsuite_fail_if(true, "key store client sync calling"); 
-  }
+  testsuite_fail_if(HM_SUCCESS==hm_key_store_client_sync_call_set_rtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         rtoken.owner_id, sizeof(rtoken.owner_id),
+                                                                         rtoken.token, sizeof(rtoken.token)), "key store client sync calling"); 
   //add owned new rtoken for new block
-  if(HM_SUCCESS!=hm_key_store_client_sync_call_set_rtoken(c,
-                                                          rtoken.block_id, sizeof(rtoken.block_id),
-                                                          rtoken.user_id, sizeof(rtoken.user_id),
-                                                          rtoken.user_id, sizeof(rtoken.user_id),
-                                                          rtoken.token, sizeof(rtoken.token))){ 
-    testsuite_fail_if(true, "key store client sync calling"); 
-  } 
+  testsuite_fail_if(HM_SUCCESS!=hm_key_store_client_sync_call_set_rtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         rtoken.token, sizeof(rtoken.token)), "key store client sync calling"); 
   //try to add owned wtoken for different user, owner have not update rights  
-  if(HM_SUCCESS==hm_key_store_client_sync_call_set_wtoken(c,
-                                                          rtoken.block_id, sizeof(rtoken.block_id),
-                                                          wtoken.user_id, sizeof(wtoken.user_id),
-                                                          rtoken.user_id, sizeof(rtoken.user_id),
-                                                          rtoken.token, sizeof(rtoken.token))){ 
-    testsuite_fail_if(true, "key store client sync calling"); 
-  } 
+  testsuite_fail_if(HM_SUCCESS==hm_key_store_client_sync_call_set_wtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         wtoken.user_id, sizeof(wtoken.user_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         rtoken.token, sizeof(rtoken.token)), "key store client sync calling"); 
   //add self owned wtoken
-  if(HM_SUCCESS!=hm_key_store_client_sync_call_set_wtoken(c,
-                                                          rtoken.block_id, sizeof(rtoken.block_id),
-                                                          rtoken.user_id, sizeof(rtoken.user_id),
-                                                          rtoken.user_id, sizeof(rtoken.user_id),
-                                                          rtoken.token, sizeof(rtoken.token))){ 
-    testsuite_fail_if(true, "key store client sync calling"); 
-  }
-
+  testsuite_fail_if(HM_SUCCESS!=hm_key_store_client_sync_call_set_wtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         rtoken.token, sizeof(rtoken.token)), "key store client sync calling"); 
   //try to grant access to unaccessed token
-  if(HM_SUCCESS==hm_key_store_client_sync_call_set_rtoken(c,
-                                                          wtoken.block_id, sizeof(wtoken.block_id),
-                                                          rtoken.user_id, sizeof(rtoken.user_id),
-                                                          wtoken.user_id, sizeof(wtoken.user_id),
-                                                          rtoken.token, sizeof(rtoken.token))){ 
-    testsuite_fail_if(true, "key store client sync calling"); 
-  }
-
+  testsuite_fail_if(HM_SUCCESS==hm_key_store_client_sync_call_set_rtoken(c,
+                                                                         wtoken.block_id, sizeof(wtoken.block_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         wtoken.user_id, sizeof(wtoken.user_id),
+                                                                         rtoken.token, sizeof(rtoken.token)), "key store client sync calling"); 
   //grant read access
-  if(HM_SUCCESS!=hm_key_store_client_sync_call_set_rtoken(c,
-                                                          rtoken.block_id, sizeof(rtoken.block_id),
-                                                          wtoken.user_id, sizeof(wtoken.user_id),
-                                                          rtoken.user_id, sizeof(rtoken.user_id),
-                                                          rtoken.token, sizeof(rtoken.token))){ 
-    testsuite_fail_if(true, "key store client sync calling"); 
-  }
-
+  testsuite_fail_if(HM_SUCCESS!=hm_key_store_client_sync_call_set_rtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         wtoken.user_id, sizeof(wtoken.user_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         rtoken.token, sizeof(rtoken.token)), "key store client sync calling"); 
   //grant read access only having read access
-  if(HM_SUCCESS!=hm_key_store_client_sync_call_set_rtoken(c,
-                                                          rtoken.block_id, sizeof(rtoken.block_id),
-                                                          rtoken.user_id, sizeof(rtoken.user_id),
-                                                          wtoken.user_id, sizeof(wtoken.user_id),
-                                                          rtoken.token, sizeof(rtoken.token))){ 
-    testsuite_fail_if(true, "key store client sync calling"); 
-  }
+  testsuite_fail_if(HM_SUCCESS!=hm_key_store_client_sync_call_set_rtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         wtoken.user_id, sizeof(wtoken.user_id),
+                                                                         rtoken.token, sizeof(rtoken.token)), "key store client sync calling"); 
   //try to grant update access only having read access
-  if(HM_SUCCESS==hm_key_store_client_sync_call_set_wtoken(c,
-                                                          rtoken.block_id, sizeof(rtoken.block_id),
-                                                          rtoken.user_id, sizeof(rtoken.user_id),
-                                                          wtoken.user_id, sizeof(wtoken.user_id),
-                                                          rtoken.token, sizeof(rtoken.token))){ 
-    testsuite_fail_if(true, "key store client sync calling"); 
-  }
+  testsuite_fail_if(HM_SUCCESS==hm_key_store_client_sync_call_set_wtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         wtoken.user_id, sizeof(wtoken.user_id),
+                                                                         rtoken.token, sizeof(rtoken.token)), "key store client sync calling"); 
   //try to revoke update access only having read access
-  if(HM_SUCCESS==hm_key_store_client_sync_call_del_wtoken(c,
-                                                          rtoken.block_id, sizeof(rtoken.block_id),
-                                                          rtoken.user_id, sizeof(rtoken.user_id),
-                                                          wtoken.user_id, sizeof(wtoken.user_id))){
-    testsuite_fail_if(true, "key store client sync calling"); 
-  }
+  testsuite_fail_if(HM_SUCCESS==hm_key_store_client_sync_call_del_wtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         wtoken.user_id, sizeof(wtoken.user_id)), "key store client sync calling"); 
   //revoke read access 
-  if(HM_SUCCESS!=hm_key_store_client_sync_call_del_rtoken(c,
-                                                          rtoken.block_id, sizeof(rtoken.block_id),
-                                                          wtoken.user_id, sizeof(wtoken.user_id),
-                                                          rtoken.user_id, sizeof(rtoken.user_id))){
-    testsuite_fail_if(true, "key store client sync calling"); 
-  }
+  testsuite_fail_if(HM_SUCCESS!=hm_key_store_client_sync_call_del_rtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         wtoken.user_id, sizeof(wtoken.user_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id)), "key store client sync calling"); 
   //grant read access
-  if(HM_SUCCESS!=hm_key_store_client_sync_call_set_rtoken(c,
-                                                          rtoken.block_id, sizeof(rtoken.block_id),
-                                                          wtoken.user_id, sizeof(wtoken.user_id),
-                                                          rtoken.user_id, sizeof(rtoken.user_id),
-                                                          rtoken.token, sizeof(rtoken.token))){ 
-    testsuite_fail_if(true, "key store client sync calling"); 
-  }
+  testsuite_fail_if(HM_SUCCESS!=hm_key_store_client_sync_call_set_rtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         wtoken.user_id, sizeof(wtoken.user_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         rtoken.token, sizeof(rtoken.token)), "key store client sync calling"); 
   //grant update access
-  if(HM_SUCCESS!=hm_key_store_client_sync_call_set_rtoken(c,
-                                                          rtoken.block_id, sizeof(rtoken.block_id),
-                                                          wtoken.user_id, sizeof(wtoken.user_id),
-                                                          rtoken.user_id, sizeof(rtoken.user_id),
-                                                          rtoken.token, sizeof(rtoken.token))){ 
-    testsuite_fail_if(true, "key store client sync calling"); 
-  }
-
-
+  testsuite_fail_if(HM_SUCCESS!=hm_key_store_client_sync_call_set_wtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         wtoken.user_id, sizeof(wtoken.user_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         rtoken.token, sizeof(rtoken.token)), "key store client sync calling"); 
+  //deny update access
+  testsuite_fail_if(HM_SUCCESS!=hm_key_store_client_sync_call_del_wtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         wtoken.user_id, sizeof(wtoken.user_id)), "key store client sync calling"); 
+  //grant read access
+  testsuite_fail_if(HM_SUCCESS!=hm_key_store_client_sync_call_set_rtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         wtoken.user_id, sizeof(wtoken.user_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         rtoken.token, sizeof(rtoken.token)), "key store client sync calling"); 
+  //try to grant update access
+  testsuite_fail_if(HM_SUCCESS==hm_key_store_client_sync_call_set_wtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         wtoken.user_id, sizeof(wtoken.user_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         rtoken.token, sizeof(rtoken.token)), "key store client sync calling"); 
+  //try to deny update access
+  testsuite_fail_if(HM_SUCCESS==hm_key_store_client_sync_call_del_wtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         wtoken.user_id, sizeof(wtoken.user_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id)), "key store client sync calling"); 
+  //try to deny access
+  testsuite_fail_if(HM_SUCCESS==hm_key_store_client_sync_call_del_rtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         wtoken.user_id, sizeof(wtoken.user_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id)), "key store client sync calling"); 
+  //deny read access
+  testsuite_fail_if(HM_SUCCESS!=hm_key_store_client_sync_call_del_rtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         wtoken.user_id, sizeof(wtoken.user_id)), "key store client sync calling"); 
+  //try to grant read access
+  testsuite_fail_if(HM_SUCCESS==hm_key_store_client_sync_call_set_rtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         wtoken.user_id, sizeof(wtoken.user_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         rtoken.token, sizeof(rtoken.token)), "key store client sync calling"); 
+  uint8_t *token=NULL, *owner_id=NULL;
+  size_t token_length=0, owner_id_length=0;
+  //read rtoken
+  testsuite_fail_if(HM_SUCCESS!=hm_key_store_client_sync_call_get_rtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         wtoken.user_id, sizeof(wtoken.user_id),
+                                                                         &token, &token_length,
+                                                                         &owner_id, &owner_id_length), "key store client sync calling"); 
+  free(token);
+  free(owner_id);
+  //read wtoken
+  testsuite_fail_if(HM_SUCCESS!=hm_key_store_client_sync_call_get_wtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         wtoken.user_id, sizeof(wtoken.user_id),
+                                                                         &token, &token_length,
+                                                                         &owner_id, &owner_id_length), "key store client sync calling"); 
+  free(token);
+  free(owner_id);
+  //try to read rtoken
+  testsuite_fail_if(HM_SUCCESS==hm_key_store_client_sync_call_get_rtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         &token, &token_length,
+                                                                         &owner_id, &owner_id_length), "key store client sync calling"); 
+  //try to read update token
+  testsuite_fail_if(HM_SUCCESS==hm_key_store_client_sync_call_get_wtoken(c,
+                                                                         rtoken.block_id, sizeof(rtoken.block_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         &token, &token_length,
+                                                                         &owner_id, &owner_id_length), "key store client sync calling"); 
+  //try to read rtoken from absent document
+  testsuite_fail_if(HM_SUCCESS==hm_key_store_client_sync_call_get_rtoken(c,
+                                                                         wtoken.block_id, sizeof(wtoken.block_id),
+                                                                         rtoken.user_id, sizeof(rtoken.user_id),
+                                                                         &token, &token_length,
+                                                                         &owner_id, &owner_id_length), "key store client sync calling"); 
   
   
-
   hm_key_store_client_sync_destroy(&c);
   hm_test_transport_destroy(transport);
   return NULL;
