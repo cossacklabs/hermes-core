@@ -26,7 +26,7 @@
 
 #include <stdint.h>
 
-hm_ds_db_t* hm_test_ds_db_create(const char* filename);
+hm_ds_db_t* hm_test_ds_db_create();
 uint32_t hm_test_ds_db_destroy(hm_ds_db_t** db);
 
 #endif //HERMES_TESTS_TEST_DATA_STORE_DB_H

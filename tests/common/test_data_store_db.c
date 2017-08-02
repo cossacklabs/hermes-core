@@ -190,10 +190,7 @@ uint32_t hm_test_ds_db_delete_block(void* db, const uint8_t* id, const size_t id
   return HM_SUCCESS;
 }
 
-hm_ds_db_t* hm_test_ds_db_create(const char* data_dir_name){
-  if(!data_dir_name && strlen(data_dir_name)>=(256-1)){
-    return NULL;
-  }
+hm_ds_db_t* hm_test_ds_db_create(){
   hm_ds_db_t* db=calloc(1, sizeof(hm_ds_db_t));
   assert(db);
   db->user_data=calloc(1, sizeof(hm_test_ds_db_t));
