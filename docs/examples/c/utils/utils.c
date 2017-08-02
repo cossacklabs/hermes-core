@@ -81,7 +81,6 @@ int remove_directory(const char *path)
 }
 
 int create_directory(const char *path){
-  int retval;
   char subpath[FILENAME_MAX] = "", *delim;
   if (NULL != (delim = strrchr(path, '/'))){
     strncat(subpath, path, delim - path);
