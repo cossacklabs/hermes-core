@@ -19,7 +19,7 @@
 #
 
 
-CC = clang
+#CC = clang
 INCLUDE_PATH = include
 SRC_PATH = src
 BIN_PATH = build
