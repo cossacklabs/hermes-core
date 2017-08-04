@@ -112,7 +112,7 @@ hm_cs_db_t* hm_test_cs_db_create(){
     assert(THEMIS_SUCCESS==soter_rand(node->id, USER_ID_LENGTH));
     assert(THEMIS_SUCCESS==themis_gen_ec_key_pair(sk, &sk_length, node->pk, &(node->pk_length)) || !(node->pk_length));
     int j=0;
-    sprintf(sk_filename, "");
+    sk_filename[0]=0;
     for(;j<USER_ID_LENGTH;++j){
       sprintf(sk_filename, "%s%02x", sk_filename, node->id[j]);
     }
