@@ -68,11 +68,11 @@ uint32_t hm_hash_table_entry_destroy(hm_hash_table_entry_t *entry) {
 }
 
 int hm_hash_(const uint8_t *key, const size_t key_length) {
-    // TODO comment why 5381
+    //one of simplest hash functions.
     unsigned long hash = 5381;
     int i = 0;
     for (; i < key_length; ++i) {
-        hash = ((hash << 5) + hash) + key[i]; /* hash * 33 + car */
+        hash = ((hash << 5) + hash) + key[i];
     }
     return hash % HM_HASH_TABLE_CAP;
 }
