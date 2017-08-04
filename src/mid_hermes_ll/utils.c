@@ -100,7 +100,7 @@ uint32_t hm_mac_create(
       return HM_FAIL;
     }
     *mac = malloc(mac_len);
-    assert(pre_mac);
+    assert(*mac);
     if (SOTER_SUCCESS != soter_hmac_final(hmac_ctx, *mac, &mac_len)){
       soter_hmac_destroy(hmac_ctx);
       return HM_FAIL;
