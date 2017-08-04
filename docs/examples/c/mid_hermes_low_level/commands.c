@@ -51,7 +51,7 @@ mid_hermes_ll_user_t* create_user(const char* user_id, const char* user_sk){
   }
   uint8_t ssk[2048];
 
-  size_t ssk_length=sizeof(ssk);
+  size_t ssk_length;
   if(user_sk){
     ssk_length=string_to_buf(user_sk, ssk);
     if(!ssk_length){
@@ -59,11 +59,9 @@ mid_hermes_ll_user_t* create_user(const char* user_id, const char* user_sk){
       return NULL;
     }
     return mid_hermes_ll_local_user_create(mid_hermes_ll_buffer_create((const uint8_t*)user_id, strlen(user_id)+1),
-                                           user_sk?mid_hermes_ll_buffer_create(ssk, ssk_length):NULL,
-                                           pk);
+                                           mid_hermes_ll_buffer_create(ssk, ssk_length), pk);
   }
-  return mid_hermes_ll_user_create(mid_hermes_ll_buffer_create((const uint8_t*)user_id, strlen(user_id)+1),
-                                   pk);  
+  return mid_hermes_ll_user_create(mid_hermes_ll_buffer_create((const uint8_t*)user_id, strlen(user_id)+1), pk);
 }
 
 int add_block(const char* user_id, const char* user_sk, const char* block_file_name, const char* block_meta_data){
@@ -119,8 +117,8 @@ int upd_block(const char* user_id, const char* user_sk, const char* block_file_n
     return 1;
   }
   if(!bl->save(bl, NULL, ds, ks)){
-    return 1;
     mid_hermes_ll_block_destroy(&bl);
+    return 1;
   }
   mid_hermes_ll_block_destroy(&bl);
   return 0;
@@ -139,8 +137,8 @@ int del_block(const char* user_id, const char* user_sk, const char* block_file_n
     return 1;
   }
   if(!bl->delete(bl, NULL, ds, ks)){
-    return 1;
     mid_hermes_ll_block_destroy(&bl);
+    return 1;
   }
   mid_hermes_ll_block_destroy(&bl);
   return 0;
