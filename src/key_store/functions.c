@@ -1,22 +1,24 @@
 /*
- * Copyright (c) 2017 Cossack Labs Limited
- *
- * This file is part of Hermes.
- *
- * Hermes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Hermes is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with Hermes.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+* Copyright (c) 2017 Cossack Labs Limited
+*
+* This file is a part of Hermes-core.
+*
+* Hermes-core is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Hermes-core is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Hermes-core.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
+
+
 
 #include "functions.h"
 
@@ -120,7 +122,7 @@ uint32_t hm_key_store_del_rtoken(
     }
     uint8_t *test_token = NULL, *test_id = NULL;
     size_t test_token_length = 0, test_id_length = 0;
-    if (HM_SUCCESS != db->get_rtoken(
+    if (HM_SUCCESS != db->get_wtoken(
             db->user_data, block_id, block_id_length, owner_id, owner_id_length, &test_token, &test_token_length,
             &test_id, &test_id_length)) {
         return HM_FAIL;
