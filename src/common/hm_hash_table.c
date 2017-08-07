@@ -70,7 +70,7 @@ uint32_t hm_hash_table_entry_destroy(hm_hash_table_entry_t *entry) {
 }
 
 int hm_hash_(const uint8_t *key, const size_t key_length) {
-    //one of simplest hash functions.
+    //djb2 function.
     unsigned long hash = 5381;
     int i = 0;
     for (; i < key_length; ++i) {
