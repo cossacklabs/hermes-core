@@ -109,7 +109,9 @@ void* client(void* param){
       if(fgets(command, sizeof(command), f)){
         uint8_t user_id[USER_ID_LENGTH];
         int j=0;
+	//convert hexdecimal string to binary array of USER_ID_LENGTH bytes
         for(; j<USER_ID_LENGTH; ++j) {
+	  //by default path returned by "find" begins with "./", we need to skip them.
           sscanf(command+2+2*j, "%02x", (unsigned int*)(&(user_id[j])));
         }
         hermes_status_t res=hm_credential_store_client_sync_call_get_pub_key_by_id(c, user_id, USER_ID_LENGTH, &key, &key_length);

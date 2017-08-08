@@ -86,7 +86,6 @@ uint32_t db_del_rtoken(
                        const uint8_t* user_id, const size_t user_id_length,
                        const uint8_t* owner_id, const size_t owner_id_length){
   if(!db || !block_id || BLOCK_ID_LENGTH != block_id_length || !user_id || USER_ID_LENGTH != user_id_length || !owner_id || USER_ID_LENGTH != owner_id_length){
-    fprintf(stderr, "cccc\n");
     return HM_INVALID_PARAMETER;
   }
   hm_test_ks_db_node_t* block_node=calloc(1, sizeof(hm_test_ks_db_node_t));
@@ -94,7 +93,6 @@ uint32_t db_del_rtoken(
   memcpy(block_node->block_id, block_id, block_id_length);
   hm_test_ks_db_node_t** serached_block_node = (hm_test_ks_db_node_t**)tfind(block_node, &(((hm_test_ks_db_t*)db)->blocks), hm_ks_test_db_node_compare);
   if(!serached_block_node){
-    fprintf(stderr, "bbbb\n");
     free(block_node);
     return HM_FAIL;
   }
@@ -104,14 +102,12 @@ uint32_t db_del_rtoken(
   memcpy(token->user_id, user_id, USER_ID_LENGTH);
   hm_test_ks_db_token_t** searched_token= (hm_test_ks_db_token_t**)(tfind)(token, &((*serached_block_node)->users), hm_ks_test_db_token_compare);
   if(!searched_token){
-    fprintf(stderr, "aaaa\n");
     free(token);
     return HM_FAIL;
   }
   free(token);
   tdelete((*searched_token), &((*serached_block_node)->users), hm_ks_test_db_token_compare);
   free(*searched_token);
-  fprintf(stderr, "ddddd\n");
   return HM_SUCCESS;
 }
 
@@ -269,9 +265,9 @@ uint32_t  db_get_indexed_rights(
                                 uint8_t** user_id, size_t* user_id_length,
                                 uint32_t* rights_mask){
   if(!db || !block_id || !block_id_length || !user_id || !user_id_length || !rights_mask){
-    return 1;
+    return HM_INVALID_PARAMETER;
   }
-  return 1;
+  return HM_FAIL;
 }
 
 uint32_t db_del_wtoken(
