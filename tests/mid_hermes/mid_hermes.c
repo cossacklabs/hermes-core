@@ -202,8 +202,10 @@ void gen_users(users_t* u){
     if(f){
       if(fgets(command, sizeof(command), f)){
         uint8_t user_id[USER_ID_LENGTH];
-        int j=0;
-        for(; j<USER_ID_LENGTH; ++j) {
+        int j;
+	//convert hexdecimal string to binary array of USER_ID_LENGTH bytes
+        for(j=0; j<USER_ID_LENGTH; ++j) {
+    	    //by default path returned by "find" begins with "./", we need to skip them.
           sscanf(command+2+2*j, "%02x", (unsigned int*)(&(u->users[i-1].id[j])));
         }
         command[2+USER_ID_LENGTH*2+5]=0;

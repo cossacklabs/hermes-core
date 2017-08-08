@@ -32,9 +32,11 @@
 #define __USE_GNU
 #include <search.h>
 
+#define MAX_KEY_LENGTH 256
+
 typedef struct hm_test_db_node_type{
   uint8_t id[USER_ID_LENGTH];
-  uint8_t pk[256];
+  uint8_t pk[MAX_KEY_LENGTH];
   size_t pk_length;
 }hm_test_db_node_t;
 
@@ -42,6 +44,8 @@ typedef struct hm_cs_test_db_type{
     void* users;
 }hm_cs_test_db_t;
 
+
+//comparation rouitine see: man tsearch
 int hm_test_db_node_compare(const void *pa, const void *pb){
   if(!pa){
     if(!pb){
@@ -112,9 +116,9 @@ hm_cs_db_t* hm_test_cs_db_create(){
     size_t sk_length=sizeof(sk);
     assert(THEMIS_SUCCESS==soter_rand(node->id, USER_ID_LENGTH));
     assert(THEMIS_SUCCESS==themis_gen_ec_key_pair(sk, &sk_length, node->pk, &(node->pk_length)) || !(node->pk_length));
-    int j=0;
+    int j;
     sk_filename[0]=0;
-    for(;j<USER_ID_LENGTH;++j){
+    for(j=0;j<USER_ID_LENGTH;++j){
       sprintf(sk_filename, "%s%02x", sk_filename, node->id[j]);
     }
     sprintf(sk_filename, "%s.priv", sk_filename);

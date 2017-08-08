@@ -195,7 +195,7 @@ int buffer_destroy(buffer_t **buffer) {
 }
 
 int buffer_push_status(buffer_t *buffer, const int status) {
-    if (!buffer || 0 != buffer_realloc_(buffer, buffer->length_ + sizeof(int32_t)+1)) {//int field if buffer get 1(HERMES_BUFFER_NODE_TYPE_INT)+4(value) bytes
+    if (!buffer || 0 != buffer_realloc_(buffer, buffer->length_ + sizeof(int32_t)+1)) {//int field if buffer get 1(for HERMES_BUFFER_NODE_TYPE_INT)+4(for data) bytes
         return BUFFER_BAD_ALLOC;
     }
     if (buffer->read_only_) {
@@ -208,7 +208,7 @@ int buffer_push_status(buffer_t *buffer, const int status) {
 }
 
 int buffer_push_data(buffer_t *buffer, const uint8_t *data, const size_t data_len) {
-    if (!buffer || !data || !data_len || 0 != buffer_realloc_(buffer, buffer->length_ + data_len + sizeof(uint32_t) + 1)) {//buffer field if buffer get 1(HERMES_BUFFER_NODE_TYPE_BIN + 4(size) + data_len(value) bytes
+    if (!buffer || !data || !data_len || 0 != buffer_realloc_(buffer, buffer->length_ + data_len + sizeof(uint32_t) + 1)) {//buffer field if buffer has 1(for HERMES_BUFFER_NODE_TYPE_BIN + 4(for length) + data_len(for data) bytes
         return BUFFER_BAD_ALLOC;
     }
     if (buffer->read_only_) {
@@ -223,7 +223,7 @@ int buffer_push_data(buffer_t *buffer, const uint8_t *data, const size_t data_le
 
 int buffer_push_string(buffer_t *buffer, const char *string) {
     if (!buffer || !string || strlen(string) == 0 ||
-        0 != buffer_realloc_(buffer, buffer->length_ + strlen(string) + 6)) { //buffer field if buffer get 1(HERMES_BUFFER_NODE_TYPE_STR + 4(size) + (strlen+1)(value) bytes
+        0 != buffer_realloc_(buffer, buffer->length_ + strlen(string) + 6)) { //string field in buffer has 1(for HERMES_BUFFER_NODE_TYPE_STR + 4(for length) + (strlen+1)(for data with last zero) bytes
         return BUFFER_BAD_ALLOC;
     }
     if (buffer->read_only_) {
@@ -233,7 +233,7 @@ int buffer_push_string(buffer_t *buffer, const char *string) {
     size_t str_len = strlen(string);
     memcpy((buffer->data_.data) + (buffer->length_) + 1, (uint8_t *) &str_len, sizeof(uint32_t));
     memcpy((buffer->data_.data) + (buffer->length_) + 1 + sizeof(uint32_t), string, strlen(string) + 1);
-    buffer->length_ += strlen(string) + 2 + sizeof(uint32_t);
+    buffer->length_ += strlen(string) + 2 + sizeof(uint32_t); 
     return BUFFER_SUCCESS;
 }
 

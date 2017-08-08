@@ -268,12 +268,12 @@ int key_store_general_flow(){
   pthread_t client_thread;
   if(pthread_create(&client_thread, NULL, client, NULL)){
     testsuite_fail_if(true, "creating client thread");
-    return -11;
+    return -1;
   }
   pthread_t server_thread;
   if(pthread_create(&server_thread, NULL, server, NULL)){
     testsuite_fail_if(true, "creating server thread");
-    return -11;
+    return -1;
   }
   int res1, res2;
   pthread_join(client_thread, (void**)(&res2));
