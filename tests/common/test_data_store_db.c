@@ -47,6 +47,7 @@ typedef struct hm_test_ds_db_type{
   void* blocks;
 }hm_test_ds_db_t;
 
+//comparation routine see "man tsearch"
 int hm_ds_test_db_node_compare(const void* a, const void* b){
   if(!a){
     if(!b){
