@@ -412,7 +412,7 @@ hermes_status_t mid_hermes_ll_rtoken_delete(
     }
     return hermes_key_store_set_rtoken(
             key_store, token->user->id->data, token->user->id->length, bl->id->data, bl->id->length, NULL, 0,
-            token->owner->id->data, token->owner->id->length);
+            bl->user->id->data, bl->user->id->length);
 }
 
 hermes_status_t mid_hermes_ll_wtoken_delete(
