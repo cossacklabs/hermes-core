@@ -46,34 +46,33 @@ void* server(void* param){
   hm_rpc_transport_t* transport = hm_test_transport_create(SC_PIPE_NAME, CS_PIPE_NAME, true);
   if(!transport){
     testsuite_fail_if(true, "server transport initializing");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   hm_ds_db_t* db=hm_test_ds_db_create();
   if(!db){
     hm_test_transport_destroy(transport);
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   hm_data_store_server_t* s=hm_data_store_server_create(transport, db);
   if(!s){
     hm_test_ds_db_destroy(&db);
     hm_test_transport_destroy(transport);
     testsuite_fail_if(true, "data store server creation");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
-  int i=0;
-  for(;i<6;++i){
+  for(;;){
     if(HM_SUCCESS!=hm_data_store_server_call(s)){
       hm_data_store_server_destroy(&s);
       hm_test_ds_db_destroy(&db);
       hm_test_transport_destroy(transport);
       testsuite_fail_if(true, "data store server calling");
-      return (void*)1;
+      return (void*)TEST_FAIL;
     }
   }
   hm_data_store_server_destroy(&s);
   hm_test_ds_db_destroy(&db);
   hm_test_transport_destroy(transport);
-  return NULL;
+  return (void*)TEST_SUCCESS;
 }
 
 typedef struct block_type{
@@ -100,13 +99,13 @@ void* client(void* param){
   hm_rpc_transport_t* transport = hm_test_transport_create(CS_PIPE_NAME, SC_PIPE_NAME, false);
   if(!transport){
     testsuite_fail_if(true, "client transport initializing");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   hm_data_store_client_sync_t* c=hm_data_store_client_sync_create(transport);
   if(!c){
     hm_test_transport_destroy(transport);
     testsuite_fail_if(true, "data store client sync creation");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   block_t block1, block2;
   gen_new_block(&block1);
@@ -119,7 +118,7 @@ void* client(void* param){
   testsuite_fail_if(HM_SUCCESS!=hm_data_store_client_sync_call_delete_block(c, block1.id, BLOCK_ID_LENGTH, block1.mac, block1.mac_length), "data store client sync calling"); 
   hm_data_store_client_sync_destroy(&c);
   hm_test_transport_destroy(transport);
-  return NULL;
+  return (void*)TEST_SUCCESS;
 }
 
 int data_store_general_flow(){
@@ -128,22 +127,18 @@ int data_store_general_flow(){
   pthread_t client_thread;
   if(pthread_create(&client_thread, NULL, client, NULL)){
     testsuite_fail_if(true, "creating client thread");
-    return -11;
+    return TEST_FAIL;
   }
   pthread_t server_thread;
   if(pthread_create(&server_thread, NULL, server, NULL)){
     testsuite_fail_if(true, "creating server thread");
-    return -11;
+    return TEST_FAIL;
   }
-  int res1, res2;
-  pthread_join(server_thread, (void**)(&res1));
-  pthread_join(client_thread, (void**)(&res2));
+  int res;
+  pthread_join(client_thread, (void**)(&res));
   unlink(CS_PIPE_NAME);
   unlink(SC_PIPE_NAME);
-  if(res1 || res2){
-    return -1;
-  }
-  return 0;
+  return res;
 }
 
 void data_store_tests(){

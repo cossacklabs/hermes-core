@@ -35,4 +35,13 @@
 #define MAX_USERS_PER_BLOCK 32
 #define MAX_USERS 32
 
+#define TEST_SUCCESS 0
+#define TEST_FAIL 1
+
+#include <stdint.h>
+#include <stdlib.h>
+
+void bin_array_to_hexdecimal_string(const uint8_t* in, const size_t in_length, char* out, size_t out_length);
+void hexdecimal_string_to_bin_array(const char* in, const size_t in_length, uint8_t* out, size_t out_length);
+
 #endif //COMMON_H

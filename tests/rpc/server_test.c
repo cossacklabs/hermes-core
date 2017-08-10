@@ -30,6 +30,7 @@
 
 #include <pthread.h>
 
+#include "../common/common.h"
 #include "../common/test_transport.h"
 
 
@@ -80,56 +81,56 @@ void* client(void *param){
   hm_rpc_transport_t* transport = hm_test_transport_create(CS_PIPE_NAME, SC_PIPE_NAME, false);
   if(!transport){
     testsuite_fail_if(true, "client transport initializing");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   hm_rpc_client_sync_t* c=hm_rpc_client_sync_create(transport);
   if(!c){
     testsuite_fail_if(true, "client object initializing");
     hm_test_transport_destroy(transport);
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   uint32_t res=0;
   if(HM_SUCCESS!=func1_proxy(c, 32, 56, &res)){
     testsuite_fail_if(true, "client call");
     hm_rpc_client_sync_destroy(&c);
     hm_test_transport_destroy(transport);
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   hm_rpc_client_sync_destroy(&c);
   hm_test_transport_destroy(transport);
   if(res != func1(32,56)){
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
-  return NULL;
+  return (void*)TEST_SUCCESS;
 }
 
 void* server(void *param){  
   hm_rpc_transport_t* transport = hm_test_transport_create(SC_PIPE_NAME, CS_PIPE_NAME, true);
   if(!transport){
     testsuite_fail_if(true, "server transport initializing");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   hm_rpc_server_t* s=hm_rpc_server_create(transport);
   if(!s){
     testsuite_fail_if(true, "server object initializing");
     hm_test_transport_destroy(transport);
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   if(HM_SUCCESS!=hm_rpc_server_reg_func(s, (const uint8_t*)"func1", sizeof("func1"), func1_stub)){
     testsuite_fail_if(true, "server func registration");
     hm_rpc_server_destroy(&s);
     hm_test_transport_destroy(transport);
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   if(HM_SUCCESS!=hm_rpc_server_call(s, NULL)){
     testsuite_fail_if(true, "server func calling");
     hm_rpc_server_destroy(&s);
     hm_test_transport_destroy(transport);
-    return (void*)1;    
+    return (void*)TEST_FAIL;
   }
   hm_rpc_server_destroy(&s);
   hm_test_transport_destroy(transport);
-  return NULL;
+  return (void*)TEST_SUCCESS;
 }
 
 
@@ -139,12 +140,12 @@ static int server_general_flow(){
   pthread_t client_thread;
   if(pthread_create(&client_thread, NULL, client, NULL)){
     testsuite_fail_if(true, "creating client thread");
-    return -11;
+    return TEST_FAIL;
   }
   pthread_t server_thread;
   if(pthread_create(&server_thread, NULL, server, NULL)){
     testsuite_fail_if(true, "creating server thread");
-    return -11;
+    return TEST_FAIL;
   }
   int res1, res2;
   pthread_join(server_thread, (void**)(&res1));
@@ -152,9 +153,9 @@ static int server_general_flow(){
   unlink(SC_PIPE_NAME);
   unlink(CS_PIPE_NAME);
   if(res1 || res2){
-    return -1;
+    return TEST_FAIL;
   }
-  return 0;
+  return TEST_SUCCESS;
 }
 
 void client_server_tests(){

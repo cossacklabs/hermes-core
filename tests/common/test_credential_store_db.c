@@ -33,6 +33,7 @@
 #include <search.h>
 
 #define MAX_KEY_LENGTH 256
+#define MAX_KEY_FILENAME_LENGTH 256
 
 typedef struct hm_test_db_node_type{
   uint8_t id[USER_ID_LENGTH];
@@ -59,29 +60,6 @@ int hm_test_db_node_compare(const void *pa, const void *pb){
   return memcmp(((hm_test_db_node_t*)pa)->id, ((hm_test_db_node_t*)pb)->id, USER_ID_LENGTH);
 }
 
-void
-action(const void *nodep, const VISIT which, const int depth)
-{
-  hm_test_db_node_t *datap;
-  switch (which) {
-  case preorder:
-    fprintf(stderr,"3\n");
-    break;
-  case postorder:
-    datap = *(hm_test_db_node_t **) nodep;
-    fprintf(stderr,"1\n");
-    break;
-  case endorder:
-    fprintf(stderr,"4\n");
-    break;
-  case leaf:
-    datap = *(hm_test_db_node_t **) nodep;
-    fprintf(stderr,"2\n");
-    break;
-  }
-}
-
-
 uint32_t hm_cs_test_db_get_pub_by_id(void* db, const uint8_t* id, const size_t id_length, uint8_t** key, size_t* key_length){
   if(!db || !id || id_length!=USER_ID_LENGTH || !key){
     return HM_INVALID_PARAMETER;
@@ -107,8 +85,9 @@ hm_cs_db_t* hm_test_cs_db_create(){
   db->get_pub=hm_cs_test_db_get_pub_by_id;
   //for test purpose only
   int i=0;
-  uint8_t sk[256];
-  char sk_filename[256];
+  uint8_t sk[MAX_KEY_LENGTH];
+  char sk_filename[MAX_KEY_FILENAME_LENGTH];
+  assert(MAX_KEY_FILENAME_LENGTH>(2*USER_ID_LENGTH));
   while(i<MAX_USERS){
     hm_test_db_node_t* node=malloc(sizeof(hm_test_db_node_t));
     node->pk_length=sizeof(node->pk);
@@ -116,11 +95,12 @@ hm_cs_db_t* hm_test_cs_db_create(){
     size_t sk_length=sizeof(sk);
     assert(THEMIS_SUCCESS==soter_rand(node->id, USER_ID_LENGTH));
     assert(THEMIS_SUCCESS==themis_gen_ec_key_pair(sk, &sk_length, node->pk, &(node->pk_length)) || !(node->pk_length));
-    int j;
-    sk_filename[0]=0;
-    for(j=0;j<USER_ID_LENGTH;++j){
-      sprintf(sk_filename, "%s%02x", sk_filename, node->id[j]);
-    }
+    bin_array_to_hexdecimal_string(node->id, USER_ID_LENGTH, sk_filename, 2*USER_ID_LENGTH+1);
+    //    int j;
+    //    sk_filename[0]=0;
+    //    for(j=0;j<USER_ID_LENGTH;++j){
+    //      sprintf(sk_filename, "%s%02x", sk_filename, node->id[j]);
+    //    }
     sprintf(sk_filename, "%s.priv", sk_filename);
     FILE* sk_file=fopen(sk_filename, "wb");
     assert(sk_file);
@@ -134,10 +114,8 @@ hm_cs_db_t* hm_test_cs_db_create(){
     }
     ++i;
   }
-  //
   return db;
 }
-
 
 uint32_t hm_test_cs_db_destroy(hm_cs_db_t** db){
   if(!db || !(*db) || !((hm_cs_test_db_t*)((*db)->user_data))){
