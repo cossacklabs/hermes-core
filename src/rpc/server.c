@@ -1,22 +1,24 @@
 /*
- * Copyright (c) 2017 Cossack Labs Limited
- *
- * This file is part of Hermes.
- *
- * Hermes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Hermes is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with Hermes.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+* Copyright (c) 2017 Cossack Labs Limited
+*
+* This file is a part of Hermes-core.
+*
+* Hermes-core is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Hermes-core is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Hermes-core.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
+
+
 
 
 #include <hermes/rpc/server.h>
@@ -104,7 +106,7 @@ uint32_t hm_rpc_server_call_func(hm_rpc_server_t* server, const uint8_t* func_si
 #define ANSI_COLOR_RED     "\033[1m\033[31m"
 #define ANSI_COLOR_GREEN   "\033[1m\033[32m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
-    fprintf(stderr, ANSI_COLOR_RED "FAIL(1)\n" ANSI_COLOR_RESET);
+    fprintf(stderr, ANSI_COLOR_RED "FAIL (calling of unregistered function)\n" ANSI_COLOR_RESET);
 #endif
     return HM_FAIL;    
   }
@@ -112,7 +114,7 @@ uint32_t hm_rpc_server_call_func(hm_rpc_server_t* server, const uint8_t* func_si
   if(!pack){
     hm_rpc_server_send_error(server, HM_FAIL);
 #ifdef DEBUG
-    fprintf(stderr, ANSI_COLOR_RED "FAIL(2)\n" ANSI_COLOR_RESET);
+    fprintf(stderr, ANSI_COLOR_RED "FAIL (parameters receiving error)\n" ANSI_COLOR_RESET);
 #endif
     return HM_FAIL;
   }
@@ -124,14 +126,18 @@ uint32_t hm_rpc_server_call_func(hm_rpc_server_t* server, const uint8_t* func_si
 #define ANSI_COLOR_RED     "\033[1m\033[31m"
 #define ANSI_COLOR_GREEN   "\033[1m\033[32m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
-    fprintf(stderr, ANSI_COLOR_RED "FAIL(3)\n" ANSI_COLOR_RESET);
+    fprintf(stderr, ANSI_COLOR_RED "FAIL (calling function error)\n" ANSI_COLOR_RESET);
 #endif
     return hm_rpc_server_send_error(server, res);
   }
   res=hm_rpc_server_send(server, out_pack);
   hm_param_pack_destroy(&out_pack);
 #ifdef DEBUG
-  fprintf(stderr, ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET);
+  if(HM_SUCCESS!=res){
+     fprintf(stderr, ANSI_COLOR_RED "FAIL (result sending error)\n" ANSI_COLOR_RESET);
+  }else{
+    fprintf(stderr, ANSI_COLOR_GREEN "SUCCESS\n" ANSI_COLOR_RESET);
+  }
 #endif
   return res;
 }

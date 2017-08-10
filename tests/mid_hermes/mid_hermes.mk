@@ -18,8 +18,6 @@
 #
 #
 
-MID_HERMES_SRC = $(wildcard $(SRC_PATH)/mid_hermes/*.c)
+MID_HERMES_TEST_SRC = $(wildcard tests/mid_hermes/*.c)
+MID_HERMES_TEST_OBJ = $(patsubst $(TEST_SRC_PATH)/%.c,$(TEST_OBJ_PATH)/%.o, $(MID_HERMES_TEST_SRC))
 
-MID_HERMES_OBJ = $(patsubst $(SRC_PATH)/%.c,$(OBJ_PATH)/%.o, $(MID_HERMES_SRC))
-
-MID_HERMES_BIN = hermes_mid_hermes

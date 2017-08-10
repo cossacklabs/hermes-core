@@ -20,9 +20,12 @@
 
 
 
-#ifndef MID_HERMES_MID_HERMES_LL_H
-#define MID_HERMES_MID_HERMES_LL_H
+#ifndef TEST_KEY_STORE_DB_H
+#define TEST_KEY_STORE_DB_H
 
-#include <hermes/mid_hermes_ll/mid_hermes_ll_block.h>
+#include <hermes/key_store/db.h>
 
-#endif //MID_HERMES_MID_HERMES_LL_H
+hm_ks_db_t* hm_test_ks_db_create();
+uint32_t hm_test_ks_db_destroy(hm_ks_db_t** db);
+
+#endif //TEST_KEY_STORE_DB_H

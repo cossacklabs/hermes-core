@@ -20,34 +20,28 @@
 
 
 
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef COMMON_H
+#define COMMON_H
+
+#define BLOCK_ID_LENGTH 32
+#define USER_ID_LENGTH 32
+#define MAX_MAC_LENGTH 256
+#define MAX_TOKEN_LENGTH 256
+#define MAX_DATA_LENGTH 1024
+#define MAX_BLOCK_LENGTH 2048
+#define MAX_META_LENGTH 1024
+
+#define MAX_BLOCKS_COUNT 1024
+#define MAX_USERS_PER_BLOCK 32
+#define MAX_USERS 32
+
+#define TEST_SUCCESS 0
+#define TEST_FAIL 1
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
-char* buf_to_string(const uint8_t* buf, const size_t buf_length, char* string);
-size_t string_to_buf(const char* string, uint8_t* buf);
+void bin_array_to_hexdecimal_string(const uint8_t* in, const size_t in_length, char* out, size_t out_length);
+void hexdecimal_string_to_bin_array(const char* in, const size_t in_length, uint8_t* out, size_t out_length);
 
-char* build_path(char* to, ...);
-
-#define BUILD_PATH(to, ...) build_path(to, __VA_ARGS__, NULL)
-
-char* build_typed_path(char* to, ...);
-
-#define C(a) 'c', a
-#define E(b, bl) 'e', b, bl
-
-#define BUILD_TYPED_PATH(to, ...) build_typed_path(to, __VA_ARGS__, 'f', NULL)
-
-int remove_directory(const char *path);
-int create_directory(const char *path);
-bool check_file_exist(const char* file_name);
-
-
-uint32_t read_whole_file(const char* filename, uint8_t** buf, size_t* buf_length);
-uint32_t write_whole_file(const char* filename, const uint8_t* buf, const size_t buf_length);
-
-
-#endif //UTILS_H
+#endif //COMMON_H

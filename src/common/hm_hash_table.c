@@ -1,22 +1,24 @@
 /*
- * Copyright (c) 2017 Cossack Labs Limited
- *
- * This file is part of Hermes.
- *
- * Hermes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Hermes is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with Hermes.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+* Copyright (c) 2017 Cossack Labs Limited
+*
+* This file is a part of Hermes-core.
+*
+* Hermes-core is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Hermes-core is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Hermes-core.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
+
+
 
 #include <hermes/common/hash_table.h>
 #include <hermes/common/errors.h>
@@ -68,11 +70,11 @@ uint32_t hm_hash_table_entry_destroy(hm_hash_table_entry_t *entry) {
 }
 
 int hm_hash_(const uint8_t *key, const size_t key_length) {
-    // TODO comment why 5381
+    //djb2 function.
     unsigned long hash = 5381;
     int i = 0;
     for (; i < key_length; ++i) {
-        hash = ((hash << 5) + hash) + key[i]; /* hash * 33 + car */
+        hash = ((hash << 5) + hash) + key[i];
     }
     return hash % HM_HASH_TABLE_CAP;
 }

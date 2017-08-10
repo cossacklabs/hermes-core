@@ -18,8 +18,16 @@
 #
 #
 
-MID_HERMES_SRC = $(wildcard $(SRC_PATH)/mid_hermes/*.c)
+dependencies:
+  pre:
+    - sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libssl-dev build-essential
+    - git clone https://github.com/cossacklabs/themis && cd themis && sudo make install
 
-MID_HERMES_OBJ = $(patsubst $(SRC_PATH)/%.c,$(OBJ_PATH)/%.o, $(MID_HERMES_SRC))
+  override:
+    - make
+    - sudo make install
+    - make test
 
-MID_HERMES_BIN = hermes_mid_hermes
+test:
+  override:
+    - make check 

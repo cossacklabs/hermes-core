@@ -1,17 +1,21 @@
 #
-# Copyright (c) 2015 Cossack Labs Limited
+# Copyright (c) 2017 Cossack Labs Limited
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# This file is a part of Hermes-core.
 #
-# http://www.apache.org/licenses/LICENSE-2.0
+# Hermes-core is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Hermes-core is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Hermes-core.  If not, see <http://www.gnu.org/licenses/>.
+#
 #
 
 COMMON_TEST_SRC = $(wildcard tests/common/*.c)
@@ -20,26 +24,44 @@ COMMON_TEST_OBJ = $(patsubst $(TEST_SRC_PATH)/%.c,$(TEST_OBJ_PATH)/%.o, $(COMMON
 include tests/rpc/rpc.mk
 include tests/credential_store/credential_store.mk
 include tests/key_store/key_store.mk
+include tests/data_store/data_store.mk
+include tests/mid_hermes/mid_hermes.mk
 
-rpc_test: CMD = $(CC) -o $(TEST_BIN_PATH)/rpc_test $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lrpc -lcommon -lsoter $(COVERLDFLAGS) -lpthread
+rpc_test: CMD = $(CC) -o $(TEST_BIN_PATH)/rpc_test $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
 
 rpc_test: rpc_static $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-credential_store_test: CMD = $(CC) -o $(TEST_BIN_PATH)/credential_store_test $(CREDENTIAL_STORE_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lcredential_store -lrpc -lcommon -lsoter $(COVERLDFLAGS) -lpthread
+credential_store_test: CMD = $(CC) -o $(TEST_BIN_PATH)/credential_store_test $(CREDENTIAL_STORE_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lhermes_credential_store -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
 
 credential_store_test: credential_store_static rpc_static $(CREDENTIAL_STORE_TEST_OBJ) $(COMMON_TEST_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-key_store_test: CMD = $(CC) -o $(TEST_BIN_PATH)/key_store_test $(KEY_STORE_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lkey_store -lrpc -lcommon -lsoter $(COVERLDFLAGS) -lpthread
+key_store_test: CMD = $(CC) -o $(TEST_BIN_PATH)/key_store_test $(KEY_STORE_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lhermes_key_store -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
 
 key_store_test: key_store_static rpc_static $(KEY_STORE_TEST_OBJ) $(COMMON_TEST_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-test: rpc_test credential_store_test key_store_test
+data_store_test: CMD = $(CC) -o $(TEST_BIN_PATH)/data_store_test $(DATA_STORE_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lhermes_data_store -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
+
+data_store_test: data_store_static rpc_static $(DATA_STORE_TEST_OBJ) $(COMMON_TEST_OBJ)
+	@echo -n "link "
+	@$(BUILD_CMD)
+
+mid_hermes_test: CMD = $(CC) -o $(TEST_BIN_PATH)/mid_hermes_test $(MID_HERMES_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS)  -lhermes_mid_hermes -lhermes_credential_store -lhermes_key_store -lhermes_data_store -lhermes_mid_hermes_ll -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
+
+mid_hermes_test: data_store_static key_store_static credential_store_static mid_hermes_static rpc_static $(MID_HERMES_TEST_OBJ) $(COMMON_TEST_OBJ)
+	@echo -n "link "
+	@$(BUILD_CMD)
+
+test: rpc_test credential_store_test key_store_test data_store_test mid_hermes_test
 
 check: 
 	$(TEST_BIN_PATH)/rpc_test
+	$(TEST_BIN_PATH)/credential_store_test
+	$(TEST_BIN_PATH)/key_store_test
+	$(TEST_BIN_PATH)/data_store_test
+	$(TEST_BIN_PATH)/mid_hermes_test

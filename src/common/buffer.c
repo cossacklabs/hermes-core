@@ -1,22 +1,24 @@
 /*
- * Copyright (c) 2016 Cossack Labs Limited
- *
- * This file is part of Hermes.
- *
- * Hermes is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Hermes is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with Hermes.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+* Copyright (c) 2017 Cossack Labs Limited
+*
+* This file is a part of Hermes-core.
+*
+* Hermes-core is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Hermes-core is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Hermes-core.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
+
+
 
 #include <stdlib.h>
 #include <string.h>
@@ -193,45 +195,29 @@ int buffer_destroy(buffer_t **buffer) {
 }
 
 int buffer_push_status(buffer_t *buffer, const int status) {
-    if (!buffer || 0 != buffer_realloc_(buffer, buffer->length_ + 5)) {
+    if (!buffer || 0 != buffer_realloc_(buffer, buffer->length_ + sizeof(int32_t) + sizeof(uint8_t))) {//int field if buffer get 1(for HERMES_BUFFER_NODE_TYPE_INT)+4(for data) bytes
         return BUFFER_BAD_ALLOC;
     }
     if (buffer->read_only_) {
         return BUFFER_WRITE_READ_ONLY;
     }
     buffer->data_.data[buffer->length_] = HERMES_BUFFER_NODE_TYPE_INT;
-    memcpy((buffer->data_.data) + (buffer->length_) + 1, (uint8_t *) &status, 4);
+    memcpy((buffer->data_.data) + (buffer->length_) + sizeof(uint8_t), (uint8_t *) &status, sizeof(int32_t));
     buffer->length_ += 5;
     return BUFFER_SUCCESS;
 }
 
 int buffer_push_data(buffer_t *buffer, const uint8_t *data, const size_t data_len) {
-    if (!buffer || !data || !data_len || 0 != buffer_realloc_(buffer, buffer->length_ + data_len + 5)) {
+    if (!buffer || !data || !data_len || 0 != buffer_realloc_(buffer, buffer->length_ + data_len + sizeof(uint32_t) + sizeof(uint8_t))) {//buffer field if buffer has 1(for HERMES_BUFFER_NODE_TYPE_BIN + 4(for length) + data_len(for data) bytes
         return BUFFER_BAD_ALLOC;
     }
     if (buffer->read_only_) {
         return BUFFER_WRITE_READ_ONLY;
     }
     buffer->data_.data[buffer->length_] = HERMES_BUFFER_NODE_TYPE_BIN;
-    memcpy((buffer->data_.data) + (buffer->length_) + 1, (uint8_t *) &data_len, 4);
-    memcpy((buffer->data_.data) + (buffer->length_) + 5, data, data_len);
-    buffer->length_ += data_len + 5;
-    return BUFFER_SUCCESS;
-}
-
-int buffer_push_string(buffer_t *buffer, const char *string) {
-    if (!buffer || !string || strlen(string) == 0 ||
-        0 != buffer_realloc_(buffer, buffer->length_ + strlen(string) + 6)) {
-        return BUFFER_BAD_ALLOC;
-    }
-    if (buffer->read_only_) {
-        return BUFFER_WRITE_READ_ONLY;
-    }
-    buffer->data_.data[buffer->length_] = HERMES_BUFFER_NODE_TYPE_STR;
-    size_t str_len = strlen(string);
-    memcpy((buffer->data_.data) + (buffer->length_) + 1, (uint8_t *) &str_len, 4);
-    memcpy((buffer->data_.data) + (buffer->length_) + 5, string, strlen(string) + 1);
-    buffer->length_ += strlen(string) + 6;
+    memcpy((buffer->data_.data) + (buffer->length_) + sizeof(uint8_t), (uint8_t *) &data_len, sizeof(uint32_t));
+    memcpy((buffer->data_.data) + (buffer->length_) + sizeof(uint8_t) + sizeof(uint32_t), data, data_len);
+    buffer->length_ += data_len + sizeof(uint8_t) + sizeof(uint32_t);
     return BUFFER_SUCCESS;
 }
 
@@ -245,11 +231,11 @@ int buffer_pop_status(buffer_t *buffer, int *status) {
     if (buffer->currpos_[0] != HERMES_BUFFER_NODE_TYPE_INT) {
         return BUFFER_INCORRECT_BLOCK_TYPE;
     }
-    if ((buffer->currpos_ + 5) > (buffer->data_.cdata + buffer->length_)) {
+    if ((buffer->currpos_ + sizeof(uint8_t) + sizeof(uint32_t)) > (buffer->data_.cdata + buffer->length_)) {
         return BUFFER_CORRUPTED;
     }
-    memcpy(status, buffer->currpos_ + 1, 4);
-    buffer->currpos_ += 5;
+    memcpy(status, buffer->currpos_ + sizeof(uint8_t), sizeof(int32_t));
+    buffer->currpos_ += (sizeof(uint8_t) + sizeof(uint32_t));
     return BUFFER_SUCCESS;
 }
 
@@ -264,33 +250,12 @@ int buffer_pop_data(buffer_t *buffer, const uint8_t **data, size_t *data_length)
         return BUFFER_INCORRECT_BLOCK_TYPE;
     }
     *data_length = 0;
-    memcpy(data_length, buffer->currpos_ + 1, 4);
-    if ((buffer->currpos_ + 5 + *(data_length)) > (buffer->data_.cdata + buffer->length_)) {
+    memcpy(data_length, buffer->currpos_ + sizeof(uint8_t), sizeof(uint32_t));
+    if ((buffer->currpos_ + sizeof(uint8_t) + sizeof(uint32_t) + *(data_length)) > (buffer->data_.cdata + buffer->length_)) {
         return BUFFER_CORRUPTED;
     }
-    *data = buffer->currpos_ + 5;
-    buffer->currpos_ += *data_length + 5;
-    return BUFFER_SUCCESS;
-}
-
-int buffer_pop_string(buffer_t *buffer, const char **str) {
-    if (!buffer || !str) {
-        return BUFFER_INVALID_PARAM;
-    }
-    if (buffer->currpos_ >= (buffer->data_.cdata + buffer->length_)) {
-        return BUFFER_AT_END;
-    }
-    if (buffer->currpos_[0] == HERMES_BUFFER_NODE_TYPE_STR) {
-        return BUFFER_INCORRECT_BLOCK_TYPE;
-    }
-    size_t str_len = 0;
-    memcpy(&str_len, buffer->currpos_ + 1, 4);
-    if (strlen((const char *) (buffer->currpos_) + 5) != str_len &&
-        (buffer->currpos_ + 6 + str_len) <= (buffer->data_.cdata + buffer->length_)) {
-        return BUFFER_CORRUPTED;
-    }
-    *str = (char *) (buffer->currpos_) + 5;
-    buffer->currpos_ += str_len + 6;
+    *data = buffer->currpos_ + sizeof(uint8_t) + sizeof(uint32_t);
+    buffer->currpos_ += *data_length + sizeof(uint8_t) + sizeof(uint32_t);
     return BUFFER_SUCCESS;
 }
 
