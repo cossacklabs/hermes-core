@@ -43,26 +43,27 @@
 #define CS_PIPE_NAME "/tmp/hermes_core_test_cs_pipe" 
 #define SC_PIPE_NAME "/tmp/hermes_core_test_sc_pipe"
 
+#define MAX_COMMAND_LENGTH 256
+
 void* server(void* param){
   hm_rpc_transport_t* transport = hm_test_transport_create(SC_PIPE_NAME, CS_PIPE_NAME, true);
   if(!transport){
     testsuite_fail_if(true, "server transport initializing");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   hm_cs_db_t* db=hm_test_cs_db_create();
   if(!db){
     hm_test_transport_destroy(transport);
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   hm_credential_store_server_t* s=hm_credential_store_server_create(transport, db);
   if(!s){
     hm_test_cs_db_destroy(&db);
     hm_test_transport_destroy(transport);
     testsuite_fail_if(true, "credential store server creation");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
-  int i=0;
-  for(;i<3*MAX_USERS;++i){
+  for(;;){
     if(HM_SUCCESS!=hm_credential_store_server_call(s)){
       testsuite_fail_if(true, "credential store server calling");
     }
@@ -70,20 +71,20 @@ void* server(void* param){
   hm_credential_store_server_destroy(&s);
   hm_test_cs_db_destroy(&db);
   hm_test_transport_destroy(transport);
-  return NULL;
+  return (void*)TEST_SUCCESS;
 }
 
 void* client(void* param){
   hm_rpc_transport_t* transport = hm_test_transport_create(CS_PIPE_NAME, SC_PIPE_NAME, false);
   if(!transport){
     testsuite_fail_if(true, "client transport initializing");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   hm_credential_store_client_sync_t* c=hm_credential_store_client_sync_create(transport);
   if(!c){
     hm_test_transport_destroy(transport);
     testsuite_fail_if(true, "credential store client sync creation");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   sleep(1);
   uint8_t* key=NULL;
@@ -102,18 +103,13 @@ void* client(void* param){
   i=1;
   while(i<=MAX_USERS){
     char user_id[USER_ID_LENGTH];
-    char command[256];
-    sprintf(command, "find . -maxdepth 1 -name \"*.priv\" | sed '%iq;d'", i);
+    char command[MAX_COMMAND_LENGTH];
+    sprintf(command, "find . -maxdepth 1 -name \"*.priv\" | sed '%iq;d' | awk '{print substr($0, 3, 2*%i)}'", i, USER_ID_LENGTH);
     FILE* f=popen(command, "r");
     if(f){
       if(fgets(command, sizeof(command), f)){
         uint8_t user_id[USER_ID_LENGTH];
-        int j=0;
-	//convert hexdecimal string to binary array of USER_ID_LENGTH bytes
-        for(; j<USER_ID_LENGTH; ++j) {
-	  //by default path returned by "find" begins with "./", we need to skip them.
-          sscanf(command+2+2*j, "%02x", (unsigned int*)(&(user_id[j])));
-        }
+        hexdecimal_string_to_bin_array(command, 2*USER_ID_LENGTH, user_id, USER_ID_LENGTH);
         hermes_status_t res=hm_credential_store_client_sync_call_get_pub_key_by_id(c, user_id, USER_ID_LENGTH, &key, &key_length);
         testsuite_fail_if(HM_SUCCESS!=res, "credential store client sync calling"); 
         if(HM_SUCCESS==res){
@@ -137,7 +133,7 @@ void* client(void* param){
   }
   hm_credential_store_client_sync_destroy(&c);
   hm_test_transport_destroy(transport);
-  return NULL;
+  return (void*)TEST_SUCCESS;
 }
 
 int credential_store_general_flow(){
@@ -146,22 +142,18 @@ int credential_store_general_flow(){
   pthread_t client_thread;
   if(pthread_create(&client_thread, NULL, client, NULL)){
     testsuite_fail_if(true, "creating client thread");
-    return -11;
+    return TEST_FAIL;
   }
   pthread_t server_thread;
   if(pthread_create(&server_thread, NULL, server, NULL)){
     testsuite_fail_if(true, "creating server thread");
-    return -11;
+    return TEST_FAIL;
   }
-  int res1, res2;
-  pthread_join(server_thread, (void**)(&res1));
-  pthread_join(client_thread, (void**)(&res2));
+  int res;
+  pthread_join(client_thread, (void**)(&res));
   unlink(SC_PIPE_NAME);
   unlink(CS_PIPE_NAME);
-  if(res1 || res2){
-    return -1;
-  }
-  return 0;
+  return res;
 }
 
 void credential_store_tests(){

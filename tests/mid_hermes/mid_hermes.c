@@ -55,28 +55,28 @@
 
 #define MAX_USERS_IN_TESTS 16
 #define MAX_BLOCKS_IN_TESTS 1024
-
+#define MAX_COMMAND_LENGTH 256
+#define MAX_KEY_LENGTH 256
 
 void* data_store_server(void* param){
   hm_rpc_transport_t* transport = hm_test_transport_create(DC_PIPE_NAME, CD_PIPE_NAME, true);
   if(!transport){
     testsuite_fail_if(true, "server transport initializing");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   hm_ds_db_t* db=hm_test_ds_db_create();
   if(!db){
     testsuite_fail_if(true, "data db initializing");
     hm_test_transport_destroy(transport);
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   hm_data_store_server_t* s=hm_data_store_server_create(transport, db);
   if(!s){
     hm_test_ds_db_destroy(&db);
     hm_test_transport_destroy(transport);
     testsuite_fail_if(true, "data store server creation");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
-  int i=0;
   testsuite_fail_if(false, "data store server");
   while(true){
     if(HM_SUCCESS!=hm_data_store_server_call(s)){
@@ -84,71 +84,69 @@ void* data_store_server(void* param){
       hm_test_ds_db_destroy(&db);
       hm_test_transport_destroy(transport);
       testsuite_fail_if(true, "data store server calling");
-      return (void*)1;
+      return (void*)TEST_FAIL;
     }
   }
   hm_data_store_server_destroy(&s);
   hm_test_ds_db_destroy(&db);
   hm_test_transport_destroy(transport);
-  return NULL;
+  return (void*)TEST_SUCCESS;
 }
 
 void* credential_store_server(void* param){
   hm_rpc_transport_t* transport = hm_test_transport_create(SC_PIPE_NAME, CS_PIPE_NAME, true);
   if(!transport){
     testsuite_fail_if(true, "server transport initializing");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   hm_cs_db_t* db=hm_test_cs_db_create();
   if(!db){
     testsuite_fail_if(true, "credential db initializing");
     hm_test_transport_destroy(transport);
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   hm_credential_store_server_t* s=hm_credential_store_server_create(transport, db);
   if(!s){
     hm_test_cs_db_destroy(&db);
     hm_test_transport_destroy(transport);
     testsuite_fail_if(true, "credential store server creation");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   testsuite_fail_if(false, "credential store server");
-  int i=0;
   while(true){
     if(HM_SUCCESS!=hm_credential_store_server_call(s)){
       hm_credential_store_server_destroy(&s);
       hm_test_cs_db_destroy(&db);
       hm_test_transport_destroy(transport);
       testsuite_fail_if(true, "credential store server calling");
-      return (void*)1;
+      return (void*)TEST_FAIL;
     }
   }
   hm_credential_store_server_destroy(&s);
   hm_test_cs_db_destroy(&db);
   hm_test_transport_destroy(transport);
-  return NULL;
+  return (void*)TEST_SUCCESS;
 }
 
 void* key_store_server(void* param){
   hm_rpc_transport_t* transport = hm_test_transport_create(KC_PIPE_NAME, CK_PIPE_NAME, true);
   if(!transport){
     testsuite_fail_if(true, "server transport initializing");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   hm_ks_db_t* db=hm_test_ks_db_create();
   if(!db){
     testsuite_fail_if(true, "key db initializing");
     hm_test_transport_destroy(transport);
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   hm_key_store_server_t* s=hm_key_store_server_create(transport, db);
   if(!s){
     hm_test_ks_db_destroy(&db);
     hm_test_transport_destroy(transport);
     testsuite_fail_if(true, "key store server creation");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
-  int i=0;
   testsuite_fail_if(false, "key store server");
   while(1){
     if(HM_SUCCESS!=hm_key_store_server_call(s)){
@@ -156,18 +154,18 @@ void* key_store_server(void* param){
       hm_test_ks_db_destroy(&db);
       hm_test_transport_destroy(transport);
       testsuite_fail_if(true, "key store server calling");
-      return (void*)1;
+      return (void*)TEST_FAIL;
     }
   }
   hm_key_store_server_destroy(&s);
   hm_test_ks_db_destroy(&db);
   hm_test_transport_destroy(transport);
-  return NULL;
+  return (void*)TEST_SUCCESS;
 }
 
 typedef struct user_type{
   uint8_t id[USER_ID_LENGTH];
-  uint8_t private_key[1024];
+  uint8_t private_key[MAX_KEY_LENGTH];
   size_t private_key_length;  
 }user_t;
 
@@ -196,22 +194,17 @@ void gen_users(users_t* u){
   int i=1;
   while(i<=MAX_USERS && i<=MAX_USERS_IN_TESTS){
     char user_id[USER_ID_LENGTH];
-    char command[256];
-    sprintf(command, "find . -maxdepth 1 -name \"*.priv\" | sed '%iq;d'", i);
+    char command[MAX_COMMAND_LENGTH];
+    sprintf(command, "find . -maxdepth 1 -name \"*.priv\" | sed '%iq;d' | awk '{printf substr($0, 3, 2*%i)}'", i, USER_ID_LENGTH);
     FILE* f=popen(command, "r");
     if(f){
       if(fgets(command, sizeof(command), f)){
-        uint8_t user_id[USER_ID_LENGTH];
-        int j;
-	//convert hexdecimal string to binary array of USER_ID_LENGTH bytes
-        for(j=0; j<USER_ID_LENGTH; ++j) {
-    	    //by default path returned by "find" begins with "./", we need to skip them.
-          sscanf(command+2+2*j, "%02x", (unsigned int*)(&(u->users[i-1].id[j])));
-        }
-        command[2+USER_ID_LENGTH*2+5]=0;
+        assert(strlen(command)==2*USER_ID_LENGTH);
+        hexdecimal_string_to_bin_array(command, 2*USER_ID_LENGTH, u->users[i-1].id, USER_ID_LENGTH);
+        sprintf(command, "%s.priv", command);
         FILE* kf=fopen(command, "rb");
         assert(kf);
-        u->users[i-1].private_key_length=fread(u->users[i-1].private_key, 1, 1024, kf);
+        u->users[i-1].private_key_length=fread(u->users[i-1].private_key, 1, MAX_KEY_LENGTH, kf);
         fclose(kf);
       }
       pclose(f);
@@ -256,7 +249,7 @@ void* client(void* param){
     hm_test_transport_destroy(credential_store_transport);
     hm_test_transport_destroy(data_store_transport);
     hm_test_transport_destroy(key_store_transport);
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   int j=0, i=0;
   for(;i<MAX_BLOCKS_IN_TESTS;++i){
@@ -279,7 +272,7 @@ void* client(void* param){
       testsuite_fail_if(HM_SUCCESS!=mid_hermes_deny_update_access(mh, blocks.blocks[i*j].id, BLOCK_ID_LENGTH, users.users[i].id, USER_ID_LENGTH), "data store client sync calling");
     }
   }
-  return NULL;
+  return (void*)TEST_SUCCESS;
 }
 
 int mid_hermes_general_flow(){
@@ -292,38 +285,32 @@ int mid_hermes_general_flow(){
   pthread_t credential_server_thread;
   if(pthread_create(&credential_server_thread, NULL, credential_store_server, NULL)){
     testsuite_fail_if(true, "creating credential server thread");
-    return -11;
+    return TEST_FAIL;
   }
   pthread_t data_server_thread;
   if(pthread_create(&data_server_thread, NULL, data_store_server, NULL)){
     testsuite_fail_if(true, "creating data server thread");
-    return -11;
+    return TEST_FAIL;
   }
   pthread_t key_server_thread;
   if(pthread_create(&key_server_thread, NULL, key_store_server, NULL)){
     testsuite_fail_if(true, "creating key server thread");
-    return -11;
+    return TEST_FAIL;
   }
   pthread_t client_thread;
   if(pthread_create(&client_thread, NULL, client, NULL)){
     testsuite_fail_if(true, "creating client thread");
-    return -11;
+    return TEST_FAIL;
   }
-  int res1, res2, res3, res4;
-  //  pthread_join(credential_server_thread, (void**)(&res1));
-  //pthread_join(data_server_thread, (void**)(&res3));
-  //pthread_join(key_server_thread, (void**)(&res4));
-  pthread_join(client_thread, (void**)(&res2));
+  int res;
+  pthread_join(client_thread, (void**)(&res));
   unlink(CS_PIPE_NAME);
   unlink(SC_PIPE_NAME);
   unlink(CD_PIPE_NAME);
   unlink(DC_PIPE_NAME);
   unlink(CK_PIPE_NAME);
   unlink(KC_PIPE_NAME);
-  //  if(res1 || res2 || res3 || res4){
-  //    return -1;
-  //  }
-  return 0;
+  return res;
 }
 
 void mid_hermes_tests(){

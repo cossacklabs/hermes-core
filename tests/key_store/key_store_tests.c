@@ -48,22 +48,21 @@ void* server(void* param){
   hm_rpc_transport_t* transport = hm_test_transport_create(SC_PIPE_NAME, CS_PIPE_NAME, true);
   if(!transport){
     testsuite_fail_if(true, "server transport initializing");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   hm_ks_db_t* db=hm_test_ks_db_create();
   if(!db){
     hm_test_transport_destroy(transport);
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   hm_key_store_server_t* s=hm_key_store_server_create(transport, db);
   if(!s){
     hm_test_ks_db_destroy(&db);
     hm_test_transport_destroy(transport);
     testsuite_fail_if(true, "data store server creation");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
-  int i=0;
-  for(;i<25;++i){
+  for(;;){
     if(HM_SUCCESS!=hm_key_store_server_call(s)){
       testsuite_fail_if(true, "data store server calling");
     }
@@ -71,7 +70,7 @@ void* server(void* param){
   hm_key_store_server_destroy(&s);
   hm_test_ks_db_destroy(&db);
   hm_test_transport_destroy(transport);
-  return NULL;
+  return (void*)TEST_SUCCESS;
 }
 
 typedef struct token_type{
@@ -93,13 +92,13 @@ void* client(void* param){
   hm_rpc_transport_t* transport = hm_test_transport_create(CS_PIPE_NAME, SC_PIPE_NAME, false);
   if(!transport){
     testsuite_fail_if(true, "client transport initializing");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   hm_key_store_client_sync_t* c=hm_key_store_client_sync_create(transport);
   if(!c){
     hm_test_transport_destroy(transport);
     testsuite_fail_if(true, "key store client sync creation");
-    return (void*)1;
+    return (void*)TEST_FAIL;
   }
   token_t rtoken, wtoken;
   gen_new_token(&rtoken);
@@ -259,7 +258,7 @@ void* client(void* param){
   
   hm_key_store_client_sync_destroy(&c);
   hm_test_transport_destroy(transport);
-  return NULL;
+  return TEST_SUCCESS;
 }
 
 int key_store_general_flow(){
@@ -268,22 +267,18 @@ int key_store_general_flow(){
   pthread_t client_thread;
   if(pthread_create(&client_thread, NULL, client, NULL)){
     testsuite_fail_if(true, "creating client thread");
-    return -1;
+    return TEST_FAIL;
   }
   pthread_t server_thread;
   if(pthread_create(&server_thread, NULL, server, NULL)){
     testsuite_fail_if(true, "creating server thread");
-    return -1;
+    return TEST_FAIL;
   }
-  int res1, res2;
-  pthread_join(client_thread, (void**)(&res2));
-  pthread_join(server_thread, (void**)(&res1));
+  int res;
+  pthread_join(client_thread, (void**)(&res));
   unlink(CS_PIPE_NAME);
   unlink(SC_PIPE_NAME);
-  if(res1 || res2){
-    return -1;
-  }
-  return 0;
+  return res;
 }
 
 void key_store_tests(){
@@ -299,4 +294,3 @@ int main(int argc, char *argv[]){
   testsuite_finish_testing();
   return testsuite_get_return_value();
 }
-
