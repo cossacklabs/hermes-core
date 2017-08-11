@@ -54,7 +54,7 @@
 #define CK_PIPE_NAME "/tmp/hermes_core_test_sk_pipe"
 
 #define MAX_USERS_IN_TESTS 16
-#define MAX_BLOCKS_IN_TESTS 1024
+#define MAX_BLOCKS_IN_TESTS 256
 #define MAX_COMMAND_LENGTH 256
 #define MAX_KEY_LENGTH 256
 
@@ -179,7 +179,7 @@ typedef struct block_type{
 
 void gen_block(block_t* b){
   assert(b);
-  assert(SOTER_SUCCESS==soter_rand(b->id, BLOCK_ID_LENGTH));\
+  assert(SOTER_SUCCESS==soter_rand(b->id, BLOCK_ID_LENGTH));
   b->data_length=MAX_DATA_LENGTH;
   assert(SOTER_SUCCESS==soter_rand(b->data, b->data_length));
   b->meta_length=MAX_META_LENGTH;
