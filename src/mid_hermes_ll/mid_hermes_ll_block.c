@@ -37,6 +37,45 @@ mid_hermes_ll_block_t *mid_hermes_ll_block_init_empty(mid_hermes_ll_block_t *blo
     return block;
 }
 
+// mid_hermes_ll_block_create_new encrypt block_data using meta, read_token, write_token and return initialized block
+mid_hermes_ll_block_t *mid_hermes_ll_block_create_new(
+        mid_hermes_ll_user_t *user, mid_hermes_ll_buffer_t *id,
+        mid_hermes_ll_buffer_t *block_data, mid_hermes_ll_buffer_t *meta,
+        mid_hermes_ll_token_t *read_token, mid_hermes_ll_token_t *write_token){
+
+    mid_hermes_ll_block_t *block = mid_hermes_ll_block_create_empty(user);
+    mid_hermes_ll_buffer_t *rt = mid_hermes_ll_token_get_data(read_token);
+    if (!rt) {
+        return NULL;
+    }
+    block->block = mid_hermes_ll_buffer_create(NULL, 0);
+    if (!(block->block) || HM_SUCCESS != hm_encrypt(
+            rt->data, rt->length, block_data->data, block_data->length, meta->data, meta->length,
+            &(block->block->data), &(block->block->length))) {
+        mid_hermes_ll_buffer_destroy(&rt);
+        return NULL;
+    }
+    mid_hermes_ll_buffer_destroy(&rt);
+    mid_hermes_ll_buffer_t *wt = mid_hermes_ll_token_get_data(write_token);
+    if (!wt) {
+        return NULL;
+    }
+    block->mac = mid_hermes_ll_buffer_create(NULL, 0);
+    if (!(block->mac) || HM_SUCCESS != hm_mac_create(
+            wt->data, wt->length, block_data->data, block_data->length, meta->data, meta->length,
+            &(block->mac->data), &(block->mac->length))) {
+        mid_hermes_ll_buffer_destroy(&wt);
+        return NULL;
+    }
+    mid_hermes_ll_buffer_destroy(&wt);
+    block->id = id;
+    block->meta = meta;
+    block->data = block_data;
+    return block;
+}
+
+//mid_hermes_ll_block_init encrypt data in block_data if read_token is null and save encrypted data to block->data
+// otherwise decrypt using read_token and save to block->data decrypted data
 mid_hermes_ll_block_t *mid_hermes_ll_block_init(
         mid_hermes_ll_block_t *block, mid_hermes_ll_user_t *user, mid_hermes_ll_buffer_t *id,
         mid_hermes_ll_buffer_t *block_data, mid_hermes_ll_buffer_t *meta,
