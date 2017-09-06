@@ -37,8 +37,8 @@ typedef struct mid_hermes_ll_block_type mid_hermes_ll_block_t;
 struct mid_hermes_ll_block_type {
     mid_hermes_ll_user_t *user;
     mid_hermes_ll_buffer_t *id;
-    mid_hermes_ll_buffer_t *block;
-    mid_hermes_ll_buffer_t *data;
+    mid_hermes_ll_buffer_t *block; // store encrypted data
+    mid_hermes_ll_buffer_t *data; // store raw data
     mid_hermes_ll_buffer_t *meta;
     mid_hermes_ll_buffer_t *old_mac;
     mid_hermes_ll_buffer_t *mac;
@@ -85,6 +85,19 @@ mid_hermes_ll_block_t *mid_hermes_ll_block_create_empty(mid_hermes_ll_user_t *us
 mid_hermes_ll_block_t *mid_hermes_ll_block_create(
         mid_hermes_ll_user_t *user, mid_hermes_ll_buffer_t *id, mid_hermes_ll_buffer_t *block,
         mid_hermes_ll_buffer_t *meta, mid_hermes_ll_token_t *read_token, mid_hermes_ll_token_t *write_token);
+
+mid_hermes_ll_block_t *mid_hermes_ll_block_create_new(
+        mid_hermes_ll_user_t *user, mid_hermes_ll_buffer_t *id,
+        mid_hermes_ll_buffer_t *block_data, mid_hermes_ll_buffer_t *meta,
+        mid_hermes_ll_token_t *read_token, mid_hermes_ll_token_t *write_token);
+
+mid_hermes_ll_block_t *mid_hermes_ll_block_init(
+        mid_hermes_ll_block_t *block, mid_hermes_ll_user_t *user, mid_hermes_ll_buffer_t *id,
+        mid_hermes_ll_buffer_t *block_data, mid_hermes_ll_buffer_t *meta,
+        mid_hermes_ll_token_t *read_token, mid_hermes_ll_token_t *write_token);
+
+mid_hermes_ll_block_t *mid_hermes_ll_block_update(
+        mid_hermes_ll_block_t *bl, mid_hermes_ll_buffer_t *data, mid_hermes_ll_buffer_t *meta);
 
 hermes_status_t mid_hermes_ll_block_destroy(mid_hermes_ll_block_t **block);
 
