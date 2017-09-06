@@ -31,55 +31,68 @@ There is a separate, commercial licensed Hermes version for industrial use (its 
 
 # Installing
 
-Hermes-core is available for Debian Wheezy, Jessie, and Stretch. It is also available for CentOS 7 (please see [Quickstart](https://github.com/cossacklabs/hermes-core/wiki/Quickstart) for more details and installation instructions for [CentOS](https://github.com/cossacklabs/hermes-core/wiki/Quickstart#installing-for-centos)).  .
+## Debian / Ubuntu
 
-## Installing for Debian
+> Note: Depending on your permissions, adding `sudo` might be necessary!
 
-> Note: Depending on your permissions, adding `sudo` might be necessary!    
-
-**1. Add CossackLabs’ official GPG key:**
-```console     
-curl -fsSL https://pkgs.cossacklabs.com/gpg | sudo apt-key add -
-```
-**2. Verify fingerprint:**    
-                   
-Make sure that the key ID is `29CF C579 AD90 8838 3E37  A8FA CE53 BCCA C8FF FACB`
+**1. Import the public key used by Cossack Labs to sign packages:**
 ```console
-$ sudo apt-key fingerprint | grep -A3 C8FFFACB`
-
-pub   4096R/C8FFFACB 2017-07-14`
-      Key fingerprint = 29CF C579 AD90 8838 3E37  A8FA CE53 BCCA C8FF FACB`
-uid                  Cossack Labs Limited <dev@cossacklabs.com>`
+wget -qO - https://pkgs.cossacklabs.com/gpg | sudo apt-key add -
 ```
+> Note: If you wish to validate key fingerprint, it is: `29CF C579 AD90 8838 3E37 A8FA CE53 BCCA C8FF FACB`.
 
-**3. Add repository**     
-
-_Variant 1_    
+**2. You may need to install the apt-transport-https package before proceeding:**
 ```console
-sudo add-apt-repository \
-  "deb https://pkgs.cossacklabs.com/stable/debian \
-  $(lsb_release -cs) \
-  main"
+sudo apt-get install apt-transport-https
 ```
-
-_Variant 2_    
+**3. Add Cossack Labs repository to your `sources.list`.**
+You should add a line that specifies your OS name and the release name:
 ```console
-echo "deb https://pkgs.cossacklabs.com/stable/debian \
-  $(lsb_release -cs) \
-  main" | \
+deb https://pkgs.cossacklabs.com/stable/$OS $RELEASE main
+```
+* `$OS` should be `debian` or `ubuntu`.
+* `$RELEASE` should be one of Debian or Ubuntu release names. You can determine this by running `lsb_release -cs`, if you have `lsb_release` installed.
+* We currently build packages for the following OS and RELEASE combinations:
+*Debian "Wheezy" (Debian 7)*
+*Debian "Jessie" (Debian 8)*
+*Debian "Stretch" (Debian 9)*
+*Ubuntu Precise Pangolin (Ubuntu 12.04)*
+*Ubuntu Trusty Tahr (Ubuntu 14.04)*
+*Ubuntu Xenial Xerus (Ubuntu 16.04)*
+*Ubuntu Yakkety Yak (Ubuntu 16.10)*
+*Ubuntu Zesty Zapus (Ubuntu 17.04)*
+
+* For example, if you are running *Debian 9 "Stretch"*, run:
+```console
+echo "deb https://pkgs.cossacklabs.com/stable/debian stretch main" | \
   sudo tee /etc/apt/sources.list.d/cossacklabs.list
 ```
-
-**4. Update the apt package index:**     
+**4. Reload local package database:**
 ```console
-$ sudo apt-get update
+sudo apt-get update
+```
+**5. Install the package**
+```console
+sudo apt-get install libhermes-core
 ```
 
-**5. Install Hermes-core**
-```console
-$ sudo apt-get install libhermes-core
+## CentOS / RHEL / OEL
+> Note, we only build RPM packages for x86_64.
+
+**1. Import the public key used by Cossack Labs to sign packages:**
 ```
-***
+rpm --import https://pkgs.cossacklabs.com/gpg
+```
+>Note: If you wish to validate key fingerprint, it is: `29CF C579 AD90 8838 3E37 A8FA CE53 BCCA C8FF FACB`.
+
+**2. Create a Yum repository file for Cossack Labs package repository:**
+```console
+wget -qO - https://pkgs.cossacklabs.com/stable/centos/cossacklabs.repo | \
+  sudo tee /etc/yum.repos.d/cossacklabs.repo
+```
+**3. Install the package:**
+sudo yum install libhermes-core
+
 ## Running a local example
 
 You can try Hermes-core using a local example that contains all the storage entities Hermes-core needs for correct work.
@@ -135,7 +148,6 @@ commands:
 # Building from source
 
 > Note: This open-source version of Hermes-core is only checked to work on Linux.     
-> Note: Depending on your permissions, adding `sudo` might be necessary!
 
 To build Hermes-core, some dependencies need to be satisfied. You need to install:
 * The standard build environment (Debian-like systems you need to install ‘build-essential’ package through `$ apt-get install build-essentials openssl-dev`),
