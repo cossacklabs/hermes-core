@@ -95,7 +95,7 @@ buffer_t *buffer_create_with_(void *unused, ...) {
     va_start(va, unused);
     char *mark = va_arg(va, char*);
     while (mark != NULL) {
-        if (HERMES_BUFFER_MAGIC != (int64_t) mark) {
+        if (HERMES_BUFFER_MAGIC != (int64_t) (int) mark) {
             buffer_destroy(&res);
             va_end(va);
             return NULL;
@@ -138,7 +138,7 @@ int buffer_extract(buffer_t *buffer, ...) {
     va_start(va, buffer);
     char *mark = va_arg(va, char*);
     for (; mark != NULL; mark = va_arg(va, char*)) {
-        if ((int64_t) mark != HERMES_BUFFER_MAGIC) {
+        if ((int64_t) (int) mark != HERMES_BUFFER_MAGIC) {
             va_end(va);
             return BUFFER_INVALID_PARAM;
         }
