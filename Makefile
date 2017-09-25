@@ -27,14 +27,29 @@ TEST_SRC_PATH = tests
 TEST_OBJ_PATH = build/tests/obj
 TEST_BIN_PATH = build/tests
 
-CFLAGS += -I$(INCLUDE_PATH) -fPIC
 LDFLAGS += -Lbuild -Llibs/themis/build
+CFLAGS += -I$(INCLUDE_PATH) -I/usr/local/include -fPIC
+
+UNAME=$(shell uname)
+
+ifeq ($(UNAME),Darwin)
+	IS_MACOS := true
+endif
 
 ifeq ($(PREFIX),)
 PREFIX = /usr
+
+	# MacOS
+	ifdef IS_MACOS
+		PREFIX = /usr/local
+	endif
+
 endif
 
 SHARED_EXT = so
+ifdef IS_MACOS
+	SHARED_EXT = dylib
+endif
 
 ifdef DEBUG
 # Making debug build for now
@@ -154,7 +169,7 @@ mid_hermes_ll_static: common_static $(MID_HERMES_LL_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-mid_hermes_ll_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(MID_HERMES_LL_BIN).$(SHARED_EXT) $(MID_HERMES_LL_OBJ) $(LDFLAGS) -l$(COMMON_BIN)
+mid_hermes_ll_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(MID_HERMES_LL_BIN).$(SHARED_EXT) $(MID_HERMES_LL_OBJ) $(LDFLAGS) -l$(COMMON_BIN) -lthemis -lsoter
 
 mid_hermes_ll_shared: common_static $(MID_HERMES_LL_OBJ)
 	@echo -n "link "
@@ -220,7 +235,7 @@ ll_example: static_core
 examples: static_core ll_example hermes_example
 	
 
-uninstall: CMD = rm -rf $(PREFIX)/include/hermes && rm -f $(PREFIX)/lib/libhermes*.a && rm -f $(PREFIX)/lib/libhermes*.so
+uninstall: CMD = rm -rf $(PREFIX)/include/hermes && rm -f $(PREFIX)/lib/libhermes*.a && rm -f $(PREFIX)/lib/libhermes*.$(SHARED_EXT)
 
 uninstall:
 	@echo -n "hermes uninstall "
@@ -328,12 +343,12 @@ STATIC_BINARY_LIBRARY_MAP = $(BIN_PATH)/libhermes_common.a=$(PREFIX)/lib/libherm
 		 $(BIN_PATH)/libhermes_key_store.a=$(PREFIX)/lib/libhermes_key_store.a.$(LIBRARY_SO_VERSION) \
 		 $(BIN_PATH)/libhermes_mid_hermes_ll.a=$(PREFIX)/lib/libhermes_mid_hermes_ll.a.$(LIBRARY_SO_VERSION)
 
-SHARED_BINARY_LIBRARY_MAP = $(BIN_PATH)/libhermes_data_store.so=$(PREFIX)/lib/libhermes_data_store.so.$(LIBRARY_SO_VERSION) \
-		 $(BIN_PATH)/libhermes_mid_hermes.so=$(PREFIX)/lib/libhermes_mid_hermes.so.$(LIBRARY_SO_VERSION) \
-		 $(BIN_PATH)/libhermes_rpc.so=$(PREFIX)/lib/libhermes_rpc.so.$(LIBRARY_SO_VERSION) \
-		 $(BIN_PATH)/libhermes_credential_store.so=$(PREFIX)/lib/libhermes_credential_store.so.$(LIBRARY_SO_VERSION) \
-		 $(BIN_PATH)/libhermes_key_store.so=$(PREFIX)/lib/libhermes_key_store.so.$(LIBRARY_SO_VERSION) \
-		 $(BIN_PATH)/libhermes_mid_hermes_ll.so=$(PREFIX)/lib/libhermes_mid_hermes_ll.so.$(LIBRARY_SO_VERSION)
+SHARED_BINARY_LIBRARY_MAP = $(BIN_PATH)/libhermes_data_store.$(SHARED_EXT)=$(PREFIX)/lib/libhermes_data_store.$(SHARED_EXT).$(LIBRARY_SO_VERSION) \
+		 $(BIN_PATH)/libhermes_mid_hermes.$(SHARED_EXT)=$(PREFIX)/lib/libhermes_mid_hermes.$(SHARED_EXT).$(LIBRARY_SO_VERSION) \
+		 $(BIN_PATH)/libhermes_rpc.$(SHARED_EXT)=$(PREFIX)/lib/libhermes_rpc.$(SHARED_EXT).$(LIBRARY_SO_VERSION) \
+		 $(BIN_PATH)/libhermes_credential_store.$(SHARED_EXT)=$(PREFIX)/lib/libhermes_credential_store.$(SHARED_EXT).$(LIBRARY_SO_VERSION) \
+		 $(BIN_PATH)/libhermes_key_store.$(SHARED_EXT)=$(PREFIX)/lib/libhermes_key_store.$(SHARED_EXT).$(LIBRARY_SO_VERSION) \
+		 $(BIN_PATH)/libhermes_mid_hermes_ll.$(SHARED_EXT)=$(PREFIX)/lib/libhermes_mid_hermes_ll.$(SHARED_EXT).$(LIBRARY_SO_VERSION)
 
 
 BINARY_LIBRARY_MAP = $(STATIC_BINARY_LIBRARY_MAP) $(SHARED_BINARY_LIBRARY_MAP)
@@ -342,26 +357,26 @@ POST_INSTALL_SCRIPT := $(BIN_PATH)/post_install.sh
 POST_UNINSTALL_SCRIPT := $(BIN_PATH)/post_uninstall.sh
 
 install_shell_scripts:
-	@printf "ln -s $(PREFIX)/lib/libhermes_common.so.$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_common.so \n \
-		ln -s $(PREFIX)/lib/libhermes_data_store.so.$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_data_store.so \n \
-		ln -s $(PREFIX)/lib/libhermes_mid_hermes.so.$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_mid_hermes.so \n \
-		ln -s $(PREFIX)/lib/libhermes_rpc.so.$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_rpc.so \n \
-		ln -s $(PREFIX)/lib/libhermes_credential_store.so.$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_credential_store.so \n \
-		ln -s $(PREFIX)/lib/libhermes_key_store.so.$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_key_store.so \n \
-		ln -s $(PREFIX)/lib/libhermes_mid_hermes_ll.so.$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_mid_hermes_ll.so" > $(POST_INSTALL_SCRIPT)
+	@printf "ln -s $(PREFIX)/lib/libhermes_common.$(SHARED_EXT).$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_common.$(SHARED_EXT) \n \
+		ln -s $(PREFIX)/lib/libhermes_data_store.$(SHARED_EXT).$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_data_store.$(SHARED_EXT) \n \
+		ln -s $(PREFIX)/lib/libhermes_mid_hermes.$(SHARED_EXT).$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_mid_hermes.$(SHARED_EXT) \n \
+		ln -s $(PREFIX)/lib/libhermes_rpc.$(SHARED_EXT).$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_rpc.$(SHARED_EXT) \n \
+		ln -s $(PREFIX)/lib/libhermes_credential_store.$(SHARED_EXT).$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_credential_store.$(SHARED_EXT) \n \
+		ln -s $(PREFIX)/lib/libhermes_key_store.$(SHARED_EXT).$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_key_store.$(SHARED_EXT) \n \
+		ln -s $(PREFIX)/lib/libhermes_mid_hermes_ll.$(SHARED_EXT).$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_mid_hermes_ll.$(SHARED_EXT)" > $(POST_INSTALL_SCRIPT)
 
-	@printf "unlink  $(PREFIX)/lib/libhermes_common.so 2>/dev/null \n \
-		unlink  $(PREFIX)/lib/libhermes_data_store.so 2>/dev/null \n \
-		unlink  $(PREFIX)/lib/libhermes_mid_hermes.so 2>/dev/null \n \
-		unlink  $(PREFIX)/lib/libhermes_rpc.so 2>/dev/null \n \
-		unlink  $(PREFIX)/lib/libhermes_credential_store.so 2>/dev/null \n \
-		unlink  $(PREFIX)/lib/libhermes_key_store.so 2>/dev/null \n \
-		unlink  $(PREFIX)/lib/libhermes_mid_hermes_ll.so 2>/dev/null" > $(POST_UNINSTALL_SCRIPT)
+	@printf "unlink  $(PREFIX)/lib/libhermes_common.$(SHARED_EXT) 2>/dev/null \n \
+		unlink  $(PREFIX)/lib/libhermes_data_store.$(SHARED_EXT) 2>/dev/null \n \
+		unlink  $(PREFIX)/lib/libhermes_mid_hermes.$(SHARED_EXT) 2>/dev/null \n \
+		unlink  $(PREFIX)/lib/libhermes_rpc.$(SHARED_EXT) 2>/dev/null \n \
+		unlink  $(PREFIX)/lib/libhermes_credential_store.$(SHARED_EXT) 2>/dev/null \n \
+		unlink  $(PREFIX)/lib/libhermes_key_store.$(SHARED_EXT) 2>/dev/null \n \
+		unlink  $(PREFIX)/lib/libhermes_mid_hermes_ll.$(SHARED_EXT) 2>/dev/null" > $(POST_UNINSTALL_SCRIPT)
 
 HEADERS_FOLDER = $(BIN_PATH)/include
 
 deb: core static_core collect_headers install_shell_scripts #test
-	@find . -name \*.so -exec strip -o {} {} \;
+	@find . -name \*.$(SHARED_EXT) -exec strip -o {} {} \;
 	@mkdir -p $(BIN_PATH)/deb
 #libhermes-dev
 	@fpm --input-type dir \
@@ -405,7 +420,7 @@ deb: core static_core collect_headers install_shell_scripts #test
 
 
 rpm: core static_core collect_headers install_shell_scripts #test
-	@find . -name \*.so -exec strip -o {} {} \;
+	@find . -name \*.$(SHARED_EXT) -exec strip -o {} {} \;
 	@mkdir -p $(BIN_PATH)/rpm
 #libhermes-devel
 	@fpm --input-type dir \
