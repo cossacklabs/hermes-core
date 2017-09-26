@@ -2,3 +2,6 @@ build/**
 **~
 **.o
 tests/db/**
+
+.idea
+cmake-build-debug/**
