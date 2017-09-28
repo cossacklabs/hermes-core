@@ -27,8 +27,9 @@ TEST_SRC_PATH = tests
 TEST_OBJ_PATH = build/tests/obj
 TEST_BIN_PATH = build/tests
 
-LDFLAGS += -Lbuild -Llibs/themis/build
-CFLAGS += -I$(INCLUDE_PATH) -I/usr/local/include -fPIC
+LDFLAGS += -Lbuild
+CFLAGS += -I$(INCLUDE_PATH) -fPIC
+
 
 UNAME=$(shell uname)
 
@@ -45,6 +46,13 @@ PREFIX = /usr
 	endif
 
 endif
+
+ifdef IS_MACOS
+	CFLAGS += -I/$(PREFIX)/include
+else
+	LDFLAGS += -Llibs/themis/build
+endif
+
 
 SHARED_EXT = so
 ifdef IS_MACOS
@@ -169,9 +177,9 @@ mid_hermes_ll_static: common_static $(MID_HERMES_LL_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-mid_hermes_ll_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(MID_HERMES_LL_BIN).$(SHARED_EXT) $(MID_HERMES_LL_OBJ) $(LDFLAGS) -l$(COMMON_BIN) -lthemis -lsoter
+mid_hermes_ll_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(MID_HERMES_LL_BIN).$(SHARED_EXT) $(MID_HERMES_LL_OBJ) $(MID_HERMES_OBJ) $(KEY_STORE_OBJ) $(DATA_STORE_OBJ) $(CREDENTIAL_STORE_OBJ) $(RPC_OBJ) $(LDFLAGS) -l$(COMMON_BIN) -lthemis -lsoter
 
-mid_hermes_ll_shared: common_static $(MID_HERMES_LL_OBJ)
+mid_hermes_ll_shared: common_static $(MID_HERMES_OBJ) $(MID_HERMES_LL_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
