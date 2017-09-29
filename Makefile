@@ -363,7 +363,7 @@ install_shell_scripts:
 
 symlink_realname_to_soname:
 	# add version to filename and create symlink with realname to full name of library
-	for f in `ls $(BIN_PATH) | egrep ".*\.(so|a)(\..*)?$$" | tr '\n' ' '`; do \
+	@for f in `ls $(BIN_PATH) | egrep ".*\.(so|a)(\..*)?$$" | tr '\n' ' '`; do \
 		mv $(BIN_PATH)/$$f $(BIN_PATH)/$$f.$(LIBRARY_SO_VERSION); \
 		ln -s $(PREFIX)/lib/$$f.$(LIBRARY_SO_VERSION) $(BIN_PATH)/$$f; \
 	done
