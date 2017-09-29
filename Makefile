@@ -27,14 +27,37 @@ TEST_SRC_PATH = tests
 TEST_OBJ_PATH = build/tests/obj
 TEST_BIN_PATH = build/tests
 
+LDFLAGS += -Lbuild
 CFLAGS += -I$(INCLUDE_PATH) -fPIC
-LDFLAGS += -Lbuild -Llibs/themis/build
+
+
+UNAME=$(shell uname)
+
+ifeq ($(UNAME),Darwin)
+	IS_MACOS := true
+endif
 
 ifeq ($(PREFIX),)
 PREFIX = /usr
+
+	# MacOS
+	ifdef IS_MACOS
+		PREFIX = /usr/local
+	endif
+
 endif
 
+ifdef IS_MACOS
+	CFLAGS += -I/$(PREFIX)/include
+else
+	LDFLAGS += -Llibs/themis/build
+endif
+
+
 SHARED_EXT = so
+ifdef IS_MACOS
+	SHARED_EXT = dylib
+endif
 
 ifdef DEBUG
 # Making debug build for now
@@ -154,9 +177,9 @@ mid_hermes_ll_static: common_static $(MID_HERMES_LL_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-mid_hermes_ll_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(MID_HERMES_LL_BIN).$(SHARED_EXT) $(MID_HERMES_LL_OBJ) $(LDFLAGS) -l$(COMMON_BIN) -lthemis -lsoter
+mid_hermes_ll_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(MID_HERMES_LL_BIN).$(SHARED_EXT) $(MID_HERMES_LL_OBJ) $(MID_HERMES_OBJ) $(KEY_STORE_OBJ) $(DATA_STORE_OBJ) $(CREDENTIAL_STORE_OBJ) $(RPC_OBJ) $(LDFLAGS) -l$(COMMON_BIN) -lthemis -lsoter
 
-mid_hermes_ll_shared: common_static $(MID_HERMES_LL_OBJ)
+mid_hermes_ll_shared: common_static $(MID_HERMES_OBJ) $(MID_HERMES_LL_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
@@ -220,7 +243,7 @@ ll_example: static_core
 examples: static_core ll_example hermes_example
 	
 
-uninstall: CMD = rm -rf $(PREFIX)/include/hermes && rm -f $(PREFIX)/lib/libhermes*.a && rm -f $(PREFIX)/lib/libhermes*.so
+uninstall: CMD = rm -rf $(PREFIX)/include/hermes && rm -f $(PREFIX)/lib/libhermes*.a && rm -f $(PREFIX)/lib/libhermes*.$(SHARED_EXT)
 
 uninstall:
 	@echo -n "hermes uninstall "
