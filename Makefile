@@ -262,7 +262,7 @@ ifdef GIT_VERSION
                 VERSION = $(shell git describe --tags HEAD | cut -b 1-)
         else
 # otherwise use last commit hash
-                VERSION = $(shell git describe --always HEAD)
+                VERSION = 0.5.0-$(shell git describe --always HEAD)
         endif
 else
 # if it's not git repo then use date as version
@@ -299,7 +299,6 @@ collect_headers:
 # delete empty folders that may copied before
 	@find build/include ! -name *.h -type d | sort -r | xargs rmdir --ignore-fail-on-non-empty
 
-
 COSSACKLABS_URL = https://www.cossacklabs.com
 MAINTAINER = "Cossack Labs Limited <dev@cossacklabs.com>"
 LICENSE_NAME = "Apache License Version 2.0"
@@ -311,13 +310,16 @@ RPM_SUMMARY = "Hermes is a cryptography-based method of providing protected data
 PACKAGE_CATEGORY = security
 
 LIBRARY_SO_VERSION := $(shell echo $(VERSION) | sed 's/^\([0-9.]*\)\(.*\)*$$/\1/')
+ifeq ($(LIBRARY_SO_VERSION),)
+	LIBRARY_SO_VERSION := 0.5.0
+endif
 DEBIAN_CODENAME := $(shell lsb_release -cs 2> /dev/null)
 DEBIAN_STRETCH_VERSION := libssl1.0.2
 DEBIAN_ARCHITECTURE = `dpkg --print-architecture 2>/dev/null`
 ifeq ($(DEBIAN_CODENAME),stretch)
-        DEBIAN_DEPENDENCIES := $(DEBIAN_STRETCH_VERSION)
+        DEBIAN_DEPENDENCIES := --depends $(DEBIAN_STRETCH_VERSION) --depends libthemis
 else
-        DEBIAN_DEPENDENCIES := openssl
+        DEBIAN_DEPENDENCIES := --depends openssl --depends libthemis
 endif
 RPM_DEPENDENCIES = --depends openssl --depends libthemis
 
@@ -334,29 +336,18 @@ else
 	NAME_SUFFIX = $(shell echo -n "$(VERSION)"|sed s/-/_/g).$(OS_NAME)$(OS_VERSION).$(ARCHITECTURE).rpm
 endif
 
+HEADERS_FOLDER = $(BIN_PATH)/include
+HEADER_DIRS = $(shell ls $(HEADERS_FOLDER))
+# HEADER_FILES_MAP is path pairs of header files for fpm
+HEADER_FILES_MAP = $(foreach dir,$(HEADER_DIRS), $(BIN_PATH)/include/$(dir)/=$(PREFIX)/include/$(dir))
 
-HEADER_FILES_MAP = $(BIN_PATH)/include/hermes/=$(PREFIX)/include/hermes \
-	$(BIN_PATH)/include/pyhermes/=$(PREFIX)/include/pyhermes \
-	$(BIN_PATH)/include/credential_store/=$(PREFIX)/include/credential_store \
-	$(BIN_PATH)/include/key_store/=$(PREFIX)/include/key_store \
-	$(BIN_PATH)/include/data_store/=$(PREFIX)/include/data_store \
-	$(BIN_PATH)/include/mid_hermes/=$(PREFIX)/include/mid_hermes \
-	$(BIN_PATH)/include/mid_hermes_ll/=$(PREFIX)/include/mid_hermes_ll
+STATIC_LIBRARY_FILES = $(shell ls $(BIN_PATH)/ | egrep *\.a$$)
+# STATIC_BINARY_LIBRARY_MAP is path pairs of *.a files for fpm
+STATIC_BINARY_LIBRARY_MAP = $(foreach file,$(STATIC_LIBRARY_FILES),$(strip $(BIN_PATH)/$(file)=$(PREFIX)/lib/$(file) $(BIN_PATH)/$(file).$(LIBRARY_SO_VERSION)=$(PREFIX)/lib/$(file).$(LIBRARY_SO_VERSION)))
 
-STATIC_BINARY_LIBRARY_MAP = $(BIN_PATH)/libhermes_common.a=$(PREFIX)/lib/libhermes_common.a.$(LIBRARY_SO_VERSION) \
-		 $(BIN_PATH)/libhermes_data_store.a=$(PREFIX)/lib/libhermes_data_store.a.$(LIBRARY_SO_VERSION) \
-		 $(BIN_PATH)/libhermes_mid_hermes.a=$(PREFIX)/lib/libhermes_mid_hermes.a.$(LIBRARY_SO_VERSION) \
-		 $(BIN_PATH)/libhermes_rpc.a=$(PREFIX)/lib/libhermes_rpc.a.$(LIBRARY_SO_VERSION) \
-		 $(BIN_PATH)/libhermes_credential_store.a=$(PREFIX)/lib/libhermes_credential_store.a.$(LIBRARY_SO_VERSION) \
-		 $(BIN_PATH)/libhermes_key_store.a=$(PREFIX)/lib/libhermes_key_store.a.$(LIBRARY_SO_VERSION) \
-		 $(BIN_PATH)/libhermes_mid_hermes_ll.a=$(PREFIX)/lib/libhermes_mid_hermes_ll.a.$(LIBRARY_SO_VERSION)
-
-SHARED_BINARY_LIBRARY_MAP = $(BIN_PATH)/libhermes_data_store.$(SHARED_EXT)=$(PREFIX)/lib/libhermes_data_store.$(SHARED_EXT).$(LIBRARY_SO_VERSION) \
-		 $(BIN_PATH)/libhermes_mid_hermes.$(SHARED_EXT)=$(PREFIX)/lib/libhermes_mid_hermes.$(SHARED_EXT).$(LIBRARY_SO_VERSION) \
-		 $(BIN_PATH)/libhermes_rpc.$(SHARED_EXT)=$(PREFIX)/lib/libhermes_rpc.$(SHARED_EXT).$(LIBRARY_SO_VERSION) \
-		 $(BIN_PATH)/libhermes_credential_store.$(SHARED_EXT)=$(PREFIX)/lib/libhermes_credential_store.$(SHARED_EXT).$(LIBRARY_SO_VERSION) \
-		 $(BIN_PATH)/libhermes_key_store.$(SHARED_EXT)=$(PREFIX)/lib/libhermes_key_store.$(SHARED_EXT).$(LIBRARY_SO_VERSION) \
-		 $(BIN_PATH)/libhermes_mid_hermes_ll.$(SHARED_EXT)=$(PREFIX)/lib/libhermes_mid_hermes_ll.$(SHARED_EXT).$(LIBRARY_SO_VERSION)
+SHARED_LIBRARY_FILES = $(shell ls $(BIN_PATH)/ | egrep *\.$(SHARED_EXT)$$)
+# SHARED_BINARY_LIBRARY_MAP is path pairs of *.so files for fpm
+SHARED_BINARY_LIBRARY_MAP = $(foreach file,$(SHARED_LIBRARY_FILES),$(strip $(BIN_PATH)/$(file).$(LIBRARY_SO_VERSION)=$(PREFIX)/lib/$(file).$(LIBRARY_SO_VERSION) $(BIN_PATH)/$(file)=$(PREFIX)/lib/$(file)))
 
 
 BINARY_LIBRARY_MAP = $(STATIC_BINARY_LIBRARY_MAP) $(SHARED_BINARY_LIBRARY_MAP)
@@ -365,31 +356,26 @@ POST_INSTALL_SCRIPT := $(BIN_PATH)/post_install.sh
 POST_UNINSTALL_SCRIPT := $(BIN_PATH)/post_uninstall.sh
 
 install_shell_scripts:
-	@printf "ln -s $(PREFIX)/lib/libhermes_common.$(SHARED_EXT).$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_common.$(SHARED_EXT) \n \
-		ln -s $(PREFIX)/lib/libhermes_data_store.$(SHARED_EXT).$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_data_store.$(SHARED_EXT) \n \
-		ln -s $(PREFIX)/lib/libhermes_mid_hermes.$(SHARED_EXT).$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_mid_hermes.$(SHARED_EXT) \n \
-		ln -s $(PREFIX)/lib/libhermes_rpc.$(SHARED_EXT).$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_rpc.$(SHARED_EXT) \n \
-		ln -s $(PREFIX)/lib/libhermes_credential_store.$(SHARED_EXT).$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_credential_store.$(SHARED_EXT) \n \
-		ln -s $(PREFIX)/lib/libhermes_key_store.$(SHARED_EXT).$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_key_store.$(SHARED_EXT) \n \
-		ln -s $(PREFIX)/lib/libhermes_mid_hermes_ll.$(SHARED_EXT).$(LIBRARY_SO_VERSION) $(PREFIX)/lib/libhermes_mid_hermes_ll.$(SHARED_EXT)" > $(POST_INSTALL_SCRIPT)
+# run ldconfig to update ld.so cache
+	@printf "ldconfig" > $(POST_INSTALL_SCRIPT)
+	@cp $(POST_INSTALL_SCRIPT) $(POST_UNINSTALL_SCRIPT)
 
-	@printf "unlink  $(PREFIX)/lib/libhermes_common.$(SHARED_EXT) 2>/dev/null \n \
-		unlink  $(PREFIX)/lib/libhermes_data_store.$(SHARED_EXT) 2>/dev/null \n \
-		unlink  $(PREFIX)/lib/libhermes_mid_hermes.$(SHARED_EXT) 2>/dev/null \n \
-		unlink  $(PREFIX)/lib/libhermes_rpc.$(SHARED_EXT) 2>/dev/null \n \
-		unlink  $(PREFIX)/lib/libhermes_credential_store.$(SHARED_EXT) 2>/dev/null \n \
-		unlink  $(PREFIX)/lib/libhermes_key_store.$(SHARED_EXT) 2>/dev/null \n \
-		unlink  $(PREFIX)/lib/libhermes_mid_hermes_ll.$(SHARED_EXT) 2>/dev/null" > $(POST_UNINSTALL_SCRIPT)
+symlink_realname_to_soname:
+	# add version to filename and create symlink with realname to full name of library
+	for f in `ls $(BIN_PATH) | egrep ".*\.(so|a)(\..*)?$$" | tr '\n' ' '`; do \
+		mv $(BIN_PATH)/$$f $(BIN_PATH)/$$f.$(LIBRARY_SO_VERSION); \
+		ln -s $(PREFIX)/lib/$$f.$(LIBRARY_SO_VERSION) $(BIN_PATH)/$$f; \
+	done
 
-HEADERS_FOLDER = $(BIN_PATH)/include
+strip: 
+	@find . -name \*.so\.* -exec strip -o {} {} \;
 
-deb: core static_core collect_headers install_shell_scripts #test
-	@find . -name \*.$(SHARED_EXT) -exec strip -o {} {} \;
+deb: test core static_core collect_headers install_shell_scripts strip symlink_realname_to_soname
 	@mkdir -p $(BIN_PATH)/deb
 #libhermes-dev
 	@fpm --input-type dir \
 		 --output-type deb \
-		 --name libhermes-dev \
+		 --name lib$(PACKAGE_NAME)-dev \
 		 --license $(LICENSE_NAME) \
 		 --url '$(COSSACKLABS_URL)' \
 		 --description '$(SHORT_DESCRIPTION)' \
@@ -397,13 +383,12 @@ deb: core static_core collect_headers install_shell_scripts #test
 		 --package $(BIN_PATH)/deb/lib$(PACKAGE_NAME)-dev_$(NAME_SUFFIX) \
 		 --architecture $(DEBIAN_ARCHITECTURE) \
 		 --version $(VERSION)+$(OS_CODENAME) \
-		 $(DEBIAN_DEPENDENCIES) \
+		 $(DEBIAN_DEPENDENCIES) --depends "lib$(PACKAGE_NAME) = $(VERSION)+$(OS_CODENAME)" \
 		 --deb-priority optional \
 		 --after-install $(POST_INSTALL_SCRIPT) \
 		 --after-remove $(POST_UNINSTALL_SCRIPT) \
 		 --category $(PACKAGE_CATEGORY) \
-		 $(BINARY_LIBRARY_MAP) \
-		 $(HEADER_FILES_MAP) 1>/dev/null
+		 $(HEADER_FILES_MAP)
 
 #libhermes
 	@fpm --input-type dir \
@@ -421,36 +406,34 @@ deb: core static_core collect_headers install_shell_scripts #test
 		 --version $(VERSION)+$(OS_CODENAME) \
 		 --deb-priority optional \
 		 --category $(PACKAGE_CATEGORY) \
-		 $(BINARY_LIBRARY_MAP) 1>/dev/null
+		 $(BINARY_LIBRARY_MAP)
 
 # it's just for printing .deb files
 	@find $(BIN_PATH) -name \*.deb
 
 
-rpm: core static_core collect_headers install_shell_scripts #test
-	@find . -name \*.$(SHARED_EXT) -exec strip -o {} {} \;
+rpm: test core static_core collect_headers install_shell_scripts strip symlink_realname_to_soname
 	@mkdir -p $(BIN_PATH)/rpm
 #libhermes-devel
 	@fpm --input-type dir \
          --output-type rpm \
-         --name libhermes-devel \
+         --name lib$(PACKAGE_NAME)-devel \
          --license $(LICENSE_NAME) \
          --url '$(COSSACKLABS_URL)' \
          --description '$(SHORT_DESCRIPTION)' \
          --rpm-summary $(RPM_SUMMARY) \
-         $(RPM_DEPENDENCIES) \
+         $(RPM_DEPENDENCIES) --depends "lib$(PACKAGE_NAME) = $(VERSION)+$(OS_CODENAME)"\
          --maintainer $(MAINTAINER) \
          --after-install $(POST_INSTALL_SCRIPT) \
          --after-remove $(POST_UNINSTALL_SCRIPT) \
          --package $(BIN_PATH)/rpm/lib$(PACKAGE_NAME)-devel-$(NAME_SUFFIX) \
          --version $(VERSION) \
          --category $(PACKAGE_CATEGORY) \
-         $(BINARY_LIBRARY_MAP) \
-		 $(HEADER_FILES_MAP) 1>/dev/null
+		 $(HEADER_FILES_MAP)
 #libhermes
 	@fpm --input-type dir \
          --output-type rpm \
-         --name libhermes \
+         --name lib$(PACKAGE_NAME) \
          --license $(LICENSE_NAME) \
          --url '$(COSSACKLABS_URL)' \
          --description '$(SHORT_DESCRIPTION)' \
@@ -462,6 +445,6 @@ rpm: core static_core collect_headers install_shell_scripts #test
          --package $(BIN_PATH)/rpm/lib$(PACKAGE_NAME)-$(NAME_SUFFIX) \
          --version $(VERSION) \
          --category $(PACKAGE_CATEGORY) \
-         $(BINARY_LIBRARY_MAP) 1>/dev/null
+         $(BINARY_LIBRARY_MAP)
 # it's just for printing .rpm files
 	@find $(BIN_PATH) -name \*.rpm
