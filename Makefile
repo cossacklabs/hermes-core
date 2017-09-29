@@ -322,18 +322,19 @@ else
         DEBIAN_DEPENDENCIES := --depends openssl --depends libthemis
 endif
 RPM_DEPENDENCIES = --depends openssl --depends libthemis
+RPM_RELEASE_NUM = 1
 
 ifeq ($(shell lsb_release -is 2> /dev/null),Debian)
-	NAME_SUFFIX = $(VERSION)+$(DEBIAN_CODENAME)_$(DEBIAN_ARCHITECTURE).deb
+	NAME_SUFFIX = $(VERSION)+$(DEBIAN_CODENAME)_$(DEBIAN_ARCHITECTURE)
 	OS_CODENAME = $(shell lsb_release -cs)
 else ifeq ($(shell lsb_release -is 2> /dev/null),Ubuntu)
-	NAME_SUFFIX = $(VERSION)+$(DEBIAN_CODENAME)_$(DEBIAN_ARCHITECTURE).deb
+	NAME_SUFFIX = $(VERSION)+$(DEBIAN_CODENAME)_$(DEBIAN_ARCHITECTURE)
 	OS_CODENAME = $(shell lsb_release -cs)
 else
 	OS_NAME = $(shell cat /etc/os-release | grep -e "^ID=\".*\"" | cut -d'"' -f2)
 	OS_VERSION = $(shell cat /etc/os-release | grep -i version_id|cut -d'"' -f2)
 	ARCHITECTURE = $(shell arch)
-	NAME_SUFFIX = $(shell echo -n "$(VERSION)"|sed s/-/_/g).$(OS_NAME)$(OS_VERSION).$(ARCHITECTURE).rpm
+	NAME_SUFFIX = $(shell echo -n "$(VERSION)"|sed s/-/_/g).$(OS_NAME)$(OS_VERSION).$(ARCHITECTURE)
 endif
 
 HEADERS_FOLDER = $(BIN_PATH)/include
@@ -362,7 +363,7 @@ install_shell_scripts:
 
 symlink_realname_to_soname:
 	# add version to filename and create symlink with realname to full name of library
-	for f in `ls $(BIN_PATH) | egrep ".*\.(so|a)(\..*)?$$" | tr '\n' ' '`; do \
+	@for f in `ls $(BIN_PATH) | egrep ".*\.(so|a)(\..*)?$$" | tr '\n' ' '`; do \
 		mv $(BIN_PATH)/$$f $(BIN_PATH)/$$f.$(LIBRARY_SO_VERSION); \
 		ln -s $(PREFIX)/lib/$$f.$(LIBRARY_SO_VERSION) $(BIN_PATH)/$$f; \
 	done
@@ -422,12 +423,13 @@ rpm: test core static_core collect_headers install_shell_scripts strip symlink_r
          --url '$(COSSACKLABS_URL)' \
          --description '$(SHORT_DESCRIPTION)' \
          --rpm-summary $(RPM_SUMMARY) \
-         $(RPM_DEPENDENCIES) --depends "lib$(PACKAGE_NAME) = $(VERSION)+$(OS_CODENAME)"\
+         $(RPM_DEPENDENCIES) --depends "lib$(PACKAGE_NAME) = $(VERSION)-$(RPM_RELEASE_NUM)"\
          --maintainer $(MAINTAINER) \
          --after-install $(POST_INSTALL_SCRIPT) \
          --after-remove $(POST_UNINSTALL_SCRIPT) \
          --package $(BIN_PATH)/rpm/lib$(PACKAGE_NAME)-devel-$(NAME_SUFFIX) \
          --version $(VERSION) \
+         --rpm-auto-add-directories \
          --category $(PACKAGE_CATEGORY) \
 		 $(HEADER_FILES_MAP)
 #libhermes
@@ -444,6 +446,7 @@ rpm: test core static_core collect_headers install_shell_scripts strip symlink_r
          $(RPM_DEPENDENCIES) \
          --package $(BIN_PATH)/rpm/lib$(PACKAGE_NAME)-$(NAME_SUFFIX) \
          --version $(VERSION) \
+         --rpm-auto-add-directories \
          --category $(PACKAGE_CATEGORY) \
          $(BINARY_LIBRARY_MAP)
 # it's just for printing .rpm files
