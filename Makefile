@@ -154,7 +154,7 @@ mid_hermes_ll_static: common_static $(MID_HERMES_LL_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-mid_hermes_ll_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(MID_HERMES_LL_BIN).$(SHARED_EXT) $(MID_HERMES_LL_OBJ) $(LDFLAGS) -l$(COMMON_BIN)
+mid_hermes_ll_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(MID_HERMES_LL_BIN).$(SHARED_EXT) $(MID_HERMES_LL_OBJ) $(LDFLAGS) -l$(COMMON_BIN) -lthemis -lsoter
 
 mid_hermes_ll_shared: common_static $(MID_HERMES_LL_OBJ)
 	@echo -n "link "
