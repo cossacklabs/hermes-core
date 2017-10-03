@@ -44,6 +44,7 @@ uint32_t hm_encrypt(
     if (THEMIS_SUCCESS != themis_secure_cell_encrypt_seal(
             key, key_length, context, context_length, data, data_length, *encrypted_data, &result_buffer_length)) {
         free(*encrypted_data);
+        *encrypted_data = NULL;
         return HM_FAIL;
     }
     *encrypted_data_length = result_buffer_length;
@@ -70,6 +71,7 @@ uint32_t hm_decrypt(
             key, key_length, context, context_length, encrypted_data, encrypted_data_length,
             *data, &result_buffer_length)) {
         free(*data);
+        *data = NULL;
         return HM_FAIL;
     }
     *data_length = result_buffer_length;
@@ -133,6 +135,7 @@ uint32_t hm_asym_encrypt(
             private_key, private_key_length, public_key, public_key_len, data, data_length,
             *encrypted_data, &result_buffer_length)) {
         free(*encrypted_data);
+        *encrypted_data = NULL;
         return HM_FAIL;
     }
     *encrypted_data_length = result_buffer_length;
@@ -160,6 +163,7 @@ uint32_t hm_asym_decrypt(
             private_key, private_key_len, public_key, public_key_len, encrypted_data, encrypted_data_length,
             *data, &result_buffer_length)) {
         free(*data);
+        *data = NULL;
         return HM_FAIL;
     }
     *data_length = result_buffer_length;
