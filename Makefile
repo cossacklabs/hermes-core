@@ -334,7 +334,8 @@ else
 	OS_NAME = $(shell cat /etc/os-release | grep -e "^ID=\".*\"" | cut -d'"' -f2)
 	OS_VERSION = $(shell cat /etc/os-release | grep -i version_id|cut -d'"' -f2)
 	ARCHITECTURE = $(shell arch)
-	NAME_SUFFIX = $(shell echo -n "$(VERSION)"|sed s/-/_/g).$(OS_NAME)$(OS_VERSION).$(ARCHITECTURE).rpm
+	RPM_VERSION = $(shell echo -n "$(VERSION)"|sed s/-/_/g)
+	NAME_SUFFIX = $(RPM_VERSION).$(OS_NAME)$(OS_VERSION).$(ARCHITECTURE).rpm
 endif
 
 HEADERS_FOLDER = $(BIN_PATH)/include
@@ -423,12 +424,12 @@ rpm: test core static_core collect_headers install_shell_scripts strip symlink_r
          --url '$(COSSACKLABS_URL)' \
          --description '$(SHORT_DESCRIPTION)' \
          --rpm-summary $(RPM_SUMMARY) \
-         $(RPM_DEPENDENCIES) --depends "lib$(PACKAGE_NAME) = $(VERSION)-$(RPM_RELEASE_NUM)"\
+         $(RPM_DEPENDENCIES) --depends "lib$(PACKAGE_NAME) = $(RPM_VERSION)-$(RPM_RELEASE_NUM)"\
          --maintainer $(MAINTAINER) \
          --after-install $(POST_INSTALL_SCRIPT) \
          --after-remove $(POST_UNINSTALL_SCRIPT) \
          --package $(BIN_PATH)/rpm/lib$(PACKAGE_NAME)-devel-$(NAME_SUFFIX) \
-         --version $(VERSION) \
+         --version $(RPM_VERSION) \
          --rpm-auto-add-directories \
          --category $(PACKAGE_CATEGORY) \
 		 $(HEADER_FILES_MAP)
@@ -445,7 +446,7 @@ rpm: test core static_core collect_headers install_shell_scripts strip symlink_r
          --after-remove $(POST_UNINSTALL_SCRIPT) \
          $(RPM_DEPENDENCIES) \
          --package $(BIN_PATH)/rpm/lib$(PACKAGE_NAME)-$(NAME_SUFFIX) \
-         --version $(VERSION) \
+         --version $(RPM_VERSION) \
          --rpm-auto-add-directories \
          --category $(PACKAGE_CATEGORY) \
          $(BINARY_LIBRARY_MAP)
