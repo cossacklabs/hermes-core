@@ -42,7 +42,12 @@ mid_hermes_ll_block_t *mid_hermes_ll_block_create_new(
         mid_hermes_ll_user_t *user, mid_hermes_ll_buffer_t *id,
         mid_hermes_ll_buffer_t *block_data, mid_hermes_ll_buffer_t *meta,
         mid_hermes_ll_token_t *read_token, mid_hermes_ll_token_t *write_token){
-
+    HERMES_CHECK_IN_PARAM_RET_NULL(user);
+    HERMES_CHECK_IN_PARAM_RET_NULL(id);
+    HERMES_CHECK_IN_PARAM_RET_NULL(block_data);
+    HERMES_CHECK_IN_PARAM_RET_NULL(meta);
+    HERMES_CHECK_IN_PARAM_RET_NULL(read_token);
+    HERMES_CHECK_IN_PARAM_RET_NULL(write_token);
     mid_hermes_ll_block_t *block = mid_hermes_ll_block_create_empty(user);
     mid_hermes_ll_buffer_t *rt = mid_hermes_ll_token_get_data(read_token);
     if (!rt) {
@@ -71,6 +76,8 @@ mid_hermes_ll_block_t *mid_hermes_ll_block_create_new(
     block->id = id;
     block->meta = meta;
     block->data = block_data;
+    block->rtoken = read_token;
+    block->wtoken = write_token;
     return block;
 }
 
