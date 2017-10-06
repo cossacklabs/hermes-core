@@ -62,8 +62,6 @@ mid_hermes_ll_test: CMD = $(CC) -o $(TEST_BIN_PATH)/mid_hermes_ll_test $(MID_HER
 
 mid_hermes_ll_test: data_store_static key_store_static credential_store_static mid_hermes_static mid_hermes_ll_static rpc_static $(MID_HERMES_TEST_OBJ) $(MID_HERMES_LL_TEST_OBJ) $(COMMON_TEST_OBJ)
 	@echo -n "link "
-	@echo $(CFLAGS)
-	@echo $(LDFLAGS)
 	@$(BUILD_CMD)
 
 
