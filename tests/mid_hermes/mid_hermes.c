@@ -21,7 +21,6 @@
 
 #include <common/test_utils.h>
 
-#include <common/test_utils.h>
 #include <hermes/common/errors.h>
 #include <themis/themis.h> 
 
