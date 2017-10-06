@@ -30,6 +30,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+uint32_t hm_credential_store_check_backend(hm_cs_db_t *db);
+
 #define hm_credential_store_get_pub_key_by_id_NAME "hm_credential_store_get_pub_key_by_id"
 
 uint32_t hm_credential_store_get_pub_key_by_id(

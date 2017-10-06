@@ -27,6 +27,15 @@
 #include <string.h>
 #include <stdio.h>
 
+// hm_key_store_check_backend return HM_SUCCESS if backend hasn't NULL on all functions that expected by interface
+// otherwise HM_FAIL
+uint32_t hm_key_store_check_backend(hm_ks_db_t *db){
+    if(!(db && db->set_rtoken && db->set_wtoken && db->get_rtoken && db->get_wtoken && db->del_rtoken && db->del_wtoken && db->get_indexed_rights)){
+        return false;
+    }
+    return true;
+}
+
 uint32_t hm_key_store_set_rtoken(
         hm_ks_db_t *db,
         const uint8_t *block_id, const size_t block_id_length,

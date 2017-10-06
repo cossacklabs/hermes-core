@@ -24,6 +24,15 @@
 
 #include <hermes/common/errors.h>
 
+// hm_credential_store_check_backend return HM_SUCCESS if backend hasn't NULL on all functions that expected by interface
+// otherwise HM_FAIL
+uint32_t hm_credential_store_check_backend(hm_cs_db_t *db){
+    if(!(db && db->get_pub)){
+        return false;
+    }
+    return true;
+}
+
 uint32_t hm_credential_store_get_pub_key_by_id(
         hm_cs_db_t *db, const uint8_t *id, const size_t id_length, uint8_t **key, size_t *key_length) {
     if (!db || !(db->get_pub) || !id || !id_length || !key) {

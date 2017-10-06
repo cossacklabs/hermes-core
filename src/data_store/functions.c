@@ -26,6 +26,15 @@
 
 #include <string.h>
 
+// hm_data_store_check_backend return HM_SUCCESS if backend hasn't NULL on all functions that expected by interface
+// otherwise HM_FAIL
+uint32_t hm_data_store_check_backend(hm_ds_db_t *db){
+    if(!(db && db->insert_block && db->insert_block_with_id && db->get_block && db->update_block && db->rem_block)){
+        return false;
+    }
+    return true;
+}
+
 uint32_t hm_data_store_create_block(
         hm_ds_db_t *db,
         const uint8_t *block, const size_t block_length,
