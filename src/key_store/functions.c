@@ -259,6 +259,7 @@ uint32_t hm_key_store_get_rtoken_sync_proxy(
         hm_param_pack_destroy(&out);
         return res;
     }
+    hm_param_pack_destroy(&out);
     return HM_SUCCESS;
 }
 
@@ -293,6 +294,7 @@ uint32_t hm_key_store_get_wtoken_sync_proxy(
         hm_param_pack_destroy(&out);
         return res;
     }
+    hm_param_pack_destroy(&out);
     return HM_SUCCESS;
 }
 
