@@ -69,6 +69,7 @@ uint32_t hm_credential_store_get_pub_key_by_id_sync_proxy(
         hm_param_pack_destroy(&out);
         return res;
     }
+    hm_param_pack_destroy(&out);
     return HM_SUCCESS;
 }
 
