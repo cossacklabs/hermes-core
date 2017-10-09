@@ -35,7 +35,7 @@ struct hm_credential_store_server_type {
 };
 
 hm_credential_store_server_t *hm_credential_store_server_create(hm_rpc_transport_t *transport, hm_cs_db_t *db) {
-    if (!transport || !db) {
+    if (!transport || !db || !hm_credential_store_check_backend(db)) {
         return NULL;
     }
     hm_credential_store_server_t *server = calloc(sizeof(hm_credential_store_server_t), 1);

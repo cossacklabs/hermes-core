@@ -30,6 +30,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+uint32_t hm_data_store_check_backend(hm_ds_db_t *db);
+
 #define hm_data_store_create_block_NAME "hm_data_store_create_block"
 
 uint32_t hm_data_store_create_block(

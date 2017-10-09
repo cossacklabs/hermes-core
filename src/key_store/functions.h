@@ -30,6 +30,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+// hm_key_store_check_backend return HM_SUCCESS if backend hasn't NULL on all functions that expected by interface
+// otherwise HM_FAIL
+// should be used on server creation
+uint32_t hm_key_store_check_backend(hm_ks_db_t *db);
+
 #define hm_key_store_set_rtoken_NAME "hm_key_store_set_rtoken"
 
 uint32_t hm_key_store_set_rtoken(

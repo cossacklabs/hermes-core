@@ -35,7 +35,7 @@ struct hm_key_store_server_type {
 };
 
 hm_key_store_server_t *hm_key_store_server_create(hm_rpc_transport_t *transport, hm_ks_db_t *db) {
-    if (!transport || !db) {
+    if (!transport || !db || !hm_key_store_check_backend(db)) {
         return NULL;
     }
     hm_key_store_server_t *server = calloc(sizeof(hm_key_store_server_t), 1);
