@@ -25,7 +25,8 @@
 #include "../common/transport.h"
 #include "../../utils/base64.h"
 #include "../../utils/utils.h"
-
+#include "hermes/secure_transport/transport.h"
+#include "config.h"
 
 #include <argp.h>
 #include<sys/socket.h>
@@ -45,8 +46,8 @@
 #define KEY_STORE_IP          "127.0.0.1"
 
 #define CREDENTIAL_STORE_PORT 8888
-#define DATA_STORE_PORT       8889
-#define KEY_STORE_PORT        8890
+#define DATA_STORE_PORT       8890
+#define KEY_STORE_PORT        8889
 
 const char const* HELP = "usage: client <command> <user id> <base64 encoded user private key>  <name of file for proceed> <meta> <for user>.\n"
         "           <command>                         - executes the command to be performed by the client, see below;\n"
@@ -100,16 +101,30 @@ int main(int argc, char **argv) {
         fprintf(stderr, "error: params error\n\n%s\n", HELP);
         return 1;
     }
-    hm_rpc_transport_t *cs_transport = server_connect(CREDENTIAL_STORE_IP, CREDENTIAL_STORE_PORT);
-    hm_rpc_transport_t *ks_transport = server_connect(KEY_STORE_IP, KEY_STORE_PORT);
-    hm_rpc_transport_t *ds_transport = server_connect(DATA_STORE_IP, DATA_STORE_PORT);
+    hm_rpc_transport_t *tcp_cs_transport = server_connect(CREDENTIAL_STORE_IP, CREDENTIAL_STORE_PORT);
+    hm_rpc_transport_t *tcp_ks_transport = server_connect(KEY_STORE_IP, KEY_STORE_PORT);
+    hm_rpc_transport_t *tcp_ds_transport = server_connect(DATA_STORE_IP, DATA_STORE_PORT);
+    if (!(tcp_cs_transport && tcp_ks_transport && tcp_ds_transport)){
+        return 1;
+    }
     mid_hermes_t *mh = NULL;
     uint8_t sk[1024];
     size_t sk_length = sizeof(sk);
+    if (!(sk_length = base64_decode(sk, argv[3], sk_length))){
+        return FAIL;
+    }
+    fprintf(stderr, "cs transport\n");
+    hm_rpc_transport_t *cs_transport = create_secure_transport(argv[2], strlen(argv[2]), sk, sk_length, credential_store_pk, sizeof(credential_store_pk), credential_store_id, strlen(credential_store_id), tcp_cs_transport);
+    if(!cs_transport){return 1;}
+    fprintf(stderr, "ks transport\n");
+    hm_rpc_transport_t *ks_transport = create_secure_transport(argv[2], strlen(argv[2]), sk, sk_length, key_store_pk, sizeof(key_store_pk), key_store_id, strlen(key_store_id), tcp_ks_transport);
+    if(!ks_transport){return 1;}
+    fprintf(stderr, "ds transport\n");
+    hm_rpc_transport_t *ds_transport = create_secure_transport(argv[2], strlen(argv[2]), sk, sk_length, data_store_pk, sizeof(data_store_pk), data_store_id, strlen(data_store_id), tcp_ds_transport);
+    if(!ds_transport){return 1;}
     if (!cs_transport
         || !ds_transport
         || !ks_transport
-        || !(sk_length = base64_decode(sk, argv[3], sk_length))
         || !(mh = mid_hermes_create(argv[2], strlen(argv[2]), sk, sk_length, ks_transport, ds_transport, cs_transport))) {
         transport_destroy(&cs_transport);
         transport_destroy(&ds_transport);
@@ -121,14 +136,21 @@ int main(int argc, char **argv) {
     if (strcmp(argv[1], "add_block") == 0) {
         size_t id_length = strlen(argv[4]);
         uint8_t *block = NULL;
+        uint8_t* idBuffer = NULL;
+        size_t idBufferLength;
         size_t block_length = 0;
         if (argc != 6
             || (SUCCESS != read_whole_file(argv[4], &block, &block_length))
-            || (0 != mid_hermes_create_block(mh, (uint8_t **) &(argv[4]), &id_length, block, block_length, argv[5], strlen(argv[5])))) {
+            || (0 != mid_hermes_create_block(mh, &idBuffer, &idBufferLength, block, block_length, argv[5], strlen(argv[5])))) {
             free(block);
             fprintf(stderr, "error: block adding error\n");
             return FAIL;
         }
+        fprintf(stdout, "block created with id: ");
+        for(int i=0; i<idBufferLength; i++){
+            fprintf(stdout, "%c", idBuffer[i]);
+        }
+        fprintf(stdout, "\n");
         free(block);
         return SUCCESS;
     } else if (strcmp(argv[1], "read_block") == 0) {
