@@ -256,7 +256,7 @@ int deny_read(const char* user_id, const char* user_sk, const char* block_file_n
     mid_hermes_ll_user_destroy(&for_u);
     return 1;
   }
-  if(HM_SUCCESS!=mid_hermes_ll_token_del(for_u, bl->id, ks, false)){
+  if(HM_SUCCESS!=mid_hermes_ll_token_del(for_u, u, bl->id, ks, false)){
     mid_hermes_ll_block_destroy(&bl);
     mid_hermes_ll_token_destroy(&wtoken);
     return 1;
@@ -289,7 +289,7 @@ int deny_update(const char* user_id, const char* user_sk, const char* block_file
     mid_hermes_ll_user_destroy(&for_u);
     return 1;
   }
-  if(HM_SUCCESS!=mid_hermes_ll_token_del(for_u, bl->id, ks, true)){
+  if(HM_SUCCESS!=mid_hermes_ll_token_del(for_u, u, bl->id, ks, true)){
     mid_hermes_ll_block_destroy(&bl);
     mid_hermes_ll_token_destroy(&wtoken);
     return 1;

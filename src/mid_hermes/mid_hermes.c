@@ -107,6 +107,8 @@ hermes_status_t mid_hermes_create_block(
         return HM_FAIL;
 
     }
+    *id = bl->id->data;
+    *id_length = bl->id->length;
     mid_hermes_ll_block_destroy(&bl);
     return HM_SUCCESS;
 }
@@ -341,21 +343,24 @@ hermes_status_t mid_hermes_deny_read_access(
         return HM_FAIL;
     }
     mid_hermes_ll_buffer_t *bl_id = mid_hermes_ll_buffer_create(block_id, block_id_length);
+    // load block with user's keys that has access
     if (!bl_id
         || !(bl->load(bl, bl_id, mid_hermes->ds, mid_hermes->ks, mid_hermes->cs))) {
         mid_hermes_ll_block_destroy(&bl);
         mid_hermes_ll_buffer_destroy(&bl_id);
         return HM_FAIL;
     }
+    // load user which access will be revoked
     mid_hermes_ll_user_t *for_user = mid_hermes_ll_user_load_c(for_user_id, for_user_id_length, mid_hermes->cs);
     mid_hermes_ll_token_t *wtoken = NULL;
+
     if (!for_user
         || !(wtoken = bl->wtoken_for(bl, for_user))) {
         mid_hermes_ll_user_destroy(&for_user);
         mid_hermes_ll_block_destroy(&bl);
         return HM_FAIL;
     }
-    if (HM_SUCCESS != mid_hermes_ll_token_del(for_user, bl->id, mid_hermes->ks, false)) {
+    if (HM_SUCCESS != mid_hermes_ll_token_del(for_user, bl->user, bl->id, mid_hermes->ks, false)) {
         mid_hermes_ll_block_destroy(&bl);
         mid_hermes_ll_token_destroy(&wtoken);
         return HM_FAIL;
@@ -397,7 +402,7 @@ hermes_status_t mid_hermes_deny_update_access(
         mid_hermes_ll_block_destroy(&bl);
         return HM_FAIL;
     }
-    if (HM_SUCCESS != mid_hermes_ll_token_del(for_user, bl->id, mid_hermes->ks, true)) {
+    if (HM_SUCCESS != mid_hermes_ll_token_del(for_user, bl->user, bl->id, mid_hermes->ks, true)) {
         mid_hermes_ll_block_destroy(&bl);
         mid_hermes_ll_token_destroy(&write_token);
         return HM_FAIL;

@@ -171,18 +171,19 @@ hermes_status_t mid_hermes_ll_token_save(
 }
 
 hermes_status_t mid_hermes_ll_token_del(
-        const mid_hermes_ll_user_t *user, const mid_hermes_ll_buffer_t *bl_id,
+        const mid_hermes_ll_user_t *user, const mid_hermes_ll_user_t *owner,
+        const mid_hermes_ll_buffer_t *bl_id,
         hermes_key_store_t *key_store, bool is_update) {
     if (!user || !bl_id || !key_store) {
         return HM_FAIL;
     }
     hermes_status_t res = hermes_key_store_set_wtoken(
             key_store, user->id->data, user->id->length, bl_id->data, bl_id->length, NULL, 0,
-            user->id->data, user->id->length);
+            owner->id->data, owner->id->length);
     if (!is_update) {
         return hermes_key_store_set_rtoken(
                 key_store, user->id->data, user->id->length, bl_id->data, bl_id->length, NULL, 0,
-                user->id->data, user->id->length);
+                owner->id->data, owner->id->length);
     }
     return res;
 }
