@@ -23,9 +23,5 @@ uint32_t read_data_size(hm_rpc_transport_t* transport){
 // read_data read data_length from transport and return HM_FAIL on transport HM_FAIL response or if read count
 // of bytes not equal to data_length
 uint32_t read_data(uint8_t* data, size_t data_length, hm_rpc_transport_t* transport){
-    uint32_t read_count = transport->recv(transport->user_data, data, data_length);
-    if (read_count == HM_FAIL || read_count != data_length){
-        return HM_FAIL;
-    }
-    return read_count;
+    return transport->recv(transport->user_data, data, data_length);
 }

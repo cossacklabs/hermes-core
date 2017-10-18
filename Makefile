@@ -454,3 +454,17 @@ rpm: test core static_core collect_headers install_shell_scripts strip symlink_r
          $(BINARY_LIBRARY_MAP)
 # it's just for printing .rpm files
 	@find $(BIN_PATH) -name \*.rpm
+
+
+include src/secure_transport/secure_transport.mk
+secure_transport_static: CMD = $(AR) rcs $(BIN_PATH)/lib$(SECURE_TRANSPORT_BIN).a $(SECURE_TRANSPORT_OBJ)
+
+secure_transport_static: common_static $(SECURE_TRANSPORT_OBJ)
+	@echo -n "link "
+	@$(BUILD_CMD)
+
+secure_transport_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(SECURE_TRANSPORT_BIN).$(SHARED_EXT) $(SECURE_TRANSPORT_OBJ) $(LDFLAGS) -lthemis -lsoter
+
+secure_transport_shared: common_static $(SECURE_TRANSPORT_OBJ)
+	@echo -n "link "
+	@$(BUILD_CMD)
