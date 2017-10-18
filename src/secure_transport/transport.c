@@ -1,3 +1,22 @@
+/*
+* Copyright (c) 2017 Cossack Labs Limited
+*
+* This file is a part of Hermes-core.
+*
+* Hermes-core is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Hermes-core is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Hermes-core.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
 #include "themis/secure_session.h"
 #include "themis/secure_session_utils.h"
 #include <string.h>
@@ -8,21 +27,48 @@
 typedef struct secure_transport_type {
     // transport that will be wrapped
     hm_rpc_transport_t* user_transport;
-    // id of host to which is connected
-    uint8_t* public_key_id;
-    size_t public_key_id_length;
-    // public key of host to which is connected
-    uint8_t* public_key;
-    size_t public_key_length;
     // secure session for this connection
     secure_session_t* session;
-    secure_session_user_callbacks_t* session_callbacks;
+    secure_session_user_callbacks_t* session_callback;
+
 } secure_transport_t;
 
+/* \brief used as user_data in secure_session_user_callbacks_t implementation
+ *
+ */
+typedef struct secure_session_callback_data_type {
+    uint8_t* public_key_id;
+    size_t public_key_id_length;
+    uint8_t* public_key;
+    size_t public_key_length;
+} secure_session_callback_data_t;
+
+void destroy_callback_data(secure_session_callback_data_t** callback_) {
+    if(!*callback_) {
+        return;
+    }
+    if((*callback_)->public_key) {
+        free((*callback_)->public_key);
+        (*callback_)->public_key = NULL;
+    }
+    if((*callback_)->public_key_id) {
+        free((*callback_)->public_key_id);
+        (*callback_)->public_key_id = NULL;
+    }
+    free(*callback_);
+    *callback_ = NULL;
+}
+
+void destroy_secure_session_callback(secure_session_user_callbacks_t** callback) {
+    secure_session_callback_data_t* callback_data = (secure_session_callback_data_t*) (*callback)->user_data;
+    destroy_callback_data(&callback_data);
+    free(*callback);
+    *callback = NULL;
+}
 
 // get_public_key_for_id_wrapper return public key linked with this connection if id is equals to id of public key
 int get_public_key_for_id_wrapper(const void *id, size_t id_length, void *key_buffer, size_t key_buffer_length, void *user_data){
-    secure_transport_t* transport = (secure_transport_t*)(user_data);
+    secure_session_callback_data_t* transport = (secure_session_callback_data_t*)(user_data);
     if(transport->public_key_id_length == id_length && memcmp(id, transport->public_key_id, id_length) == 0){
         if (key_buffer_length < transport->public_key_length){
             return THEMIS_FAIL;
@@ -32,7 +78,6 @@ int get_public_key_for_id_wrapper(const void *id, size_t id_length, void *key_bu
     }
     return THEMIS_FAIL;
 };
-
 
 // hermes_transport_send encrypt buffer with secure session and send data with <send_data> function
 // implement hermes transport interface
@@ -149,34 +194,16 @@ hermes_status_t init_secure_session(hm_rpc_transport_t* transport, secure_sessio
     return HM_SUCCESS;
 }
 
-// create_secure_transport establish secure session as user with <user_id> using <private_key> with host with id
-// <public_key_id> that will be authenticated via <public_key> and return wrapepd <user_transport> with established
-// secure session
-hm_rpc_transport_t* create_secure_transport(
-        const uint8_t *user_id, const size_t user_id_length,
-        const uint8_t *private_key, const size_t private_key_length,
-        const uint8_t *public_key, const size_t public_key_length,
-        const uint8_t *public_key_id, const size_t public_key_id_length,
+hm_rpc_transport_t* create_secure_transport_with_callback(
+        const uint8_t *user_id, size_t user_id_length,
+        const uint8_t *private_key, size_t private_key_length,
+        secure_session_user_callbacks_t* callback,
         hm_rpc_transport_t* user_transport){
+
     secure_transport_t* transport = calloc(1, sizeof(secure_transport_t));
     transport->user_transport = user_transport;
-    transport->public_key = malloc(public_key_length);
-    memcpy(transport->public_key, public_key, public_key_length);
-    transport->public_key_length = public_key_length;
-
-    transport->public_key_id = malloc(public_key_id_length);
-    memcpy(transport->public_key_id, public_key_id, public_key_id_length);
-    transport->public_key_id_length = public_key_id_length;
-
-    transport->session_callbacks = malloc(sizeof(secure_session_user_callbacks_t));
-    transport->session_callbacks->user_data = transport;
-    transport->session_callbacks->get_public_key_for_id = get_public_key_for_id_wrapper;
-    transport->session_callbacks->send_data = NULL;
-    transport->session_callbacks->receive_data = NULL;
-    transport->session_callbacks->state_changed = NULL;
-
-
-    transport->session = secure_session_create(user_id, user_id_length, private_key, private_key_length, transport->session_callbacks);
+    transport->session_callback = callback;
+    transport->session = secure_session_create(user_id, user_id_length, private_key, private_key_length, callback);
     if (!transport->session)
     {
         destroy_secure_transport(&transport);
@@ -194,6 +221,46 @@ hm_rpc_transport_t* create_secure_transport(
     return rpc_transport;
 }
 
+// create_secure_transport establish secure session as user with <user_id> using <private_key> with host with id
+// <public_key_id> that will be authenticated via <public_key> and return wrapepd <user_transport> with established
+// secure session
+hm_rpc_transport_t* create_secure_transport(
+        const uint8_t *user_id, const size_t user_id_length,
+        const uint8_t *private_key, const size_t private_key_length,
+        const uint8_t *public_key, const size_t public_key_length,
+        const uint8_t *public_key_id, const size_t public_key_id_length,
+        hm_rpc_transport_t* user_transport){
+    secure_session_callback_data_t* callback_data = malloc(sizeof(secure_session_callback_data_t));
+    if(!callback_data){
+        return NULL;
+    }
+    callback_data->public_key = malloc(public_key_length);
+    if(!callback_data->public_key){
+        free(callback_data);
+        return NULL;
+    }
+    callback_data->public_key_id = malloc(public_key_id_length);
+    if(!callback_data->public_key_id){
+        free(callback_data);
+        return NULL;
+    }
+
+    memcpy(callback_data->public_key, public_key, public_key_length);
+    callback_data->public_key_length = public_key_length;
+    memcpy(callback_data->public_key_id, public_key_id, public_key_id_length);
+    callback_data->public_key_id_length = public_key_id_length;
+
+    secure_session_user_callbacks_t* secure_session_callback = calloc(1, sizeof(secure_session_user_callbacks_t));
+    if(!secure_session_callback){
+        destroy_callback_data(&callback_data);
+        return NULL;
+    }
+    secure_session_callback->user_data = callback_data;
+    secure_session_callback->get_public_key_for_id = get_public_key_for_id_wrapper;
+    return create_secure_transport_with_callback(
+            user_id, user_id_length, private_key, private_key_length, secure_session_callback, user_transport);
+}
+
 uint32_t destroy_rpc_secure_transport(hm_rpc_transport_t** transport_){
     if(!transport_ || !(*transport_) || !((*transport_))){
         return HM_FAIL;
@@ -208,21 +275,12 @@ uint32_t destroy_secure_transport(secure_transport_t** transport_){
         return HM_FAIL;
     }
     secure_transport_t* transport = *transport_;
-
-    free(transport->session_callbacks);
-    transport->session_callbacks = NULL;
+    destroy_secure_session_callback(&(transport->session_callback));
 
     secure_session_destroy(transport->session);
     transport->session = NULL;
 
-    free(transport->public_key);
-    transport->public_key = NULL;
-
-    free(transport->public_key_id);
-    transport->public_key_id = NULL;
-
     free(transport);
     *transport_ = NULL;
-
     return HM_SUCCESS;
 }

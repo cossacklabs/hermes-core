@@ -100,9 +100,9 @@ all: err core
 
 test_all: err test
 
-core: rpc_shared credential_store_shared data_store_shared key_store_shared mid_hermes_shared
+core: rpc_shared credential_store_shared data_store_shared key_store_shared mid_hermes_shared secure_transport_shared
 
-static_core: rpc_static credential_store_static data_store_static key_store_static mid_hermes_static
+static_core: rpc_static credential_store_static data_store_static key_store_static mid_hermes_static secure_transport_static
 
 common_static: CMD = $(AR) rcs $(BIN_PATH)/lib$(COMMON_BIN).a $(COMMON_OBJ)
 
@@ -294,7 +294,7 @@ unpack_dist:
 
 collect_headers:
 	@mkdir -p $(HEADERS_FOLDER) $(HEADERS_FOLDER)/pyhermes
-	@cp -r include/hermes src/credential_store src/data_store src/key_store src/mid_hermes src/mid_hermes_ll pyhermes $(HEADERS_FOLDER)/
+	@cp -r include/hermes src/credential_store src/data_store src/key_store src/mid_hermes src/mid_hermes_ll src/secure_transport  pyhermes $(HEADERS_FOLDER)/
 # delete non-header files
 	@find build/include ! -name *.h -type f -exec rm {} \;
 # delete empty folders that may copied before
