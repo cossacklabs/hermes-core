@@ -92,6 +92,39 @@ hm_rpc_transport_t *server_connect(const char *ip, int port) {
     return transport;
 }
 
+typedef struct transports_container_type{
+    hm_rpc_transport_t* credential_store_transport;
+    hm_rpc_transport_t* key_store_transport;
+    hm_rpc_transport_t* data_store_transport;
+    hm_rpc_transport_t* raw_credential_store_transport;
+    hm_rpc_transport_t* raw_key_store_transport;
+    hm_rpc_transport_t* raw_data_store_transport;
+} transports_container_t;
+
+void destroy_transports_container(transports_container_t* container){
+    if(!container){
+        return;
+    }
+    if(container->credential_store_transport){
+        destroy_rpc_secure_transport(&(container->credential_store_transport));
+    }
+    if(container->key_store_transport){
+        destroy_rpc_secure_transport(&(container->key_store_transport));
+    }
+    if(container->data_store_transport){
+        destroy_rpc_secure_transport(&(container->data_store_transport));
+    }
+    if (container->raw_credential_store_transport){
+        transport_destroy(&(container->raw_credential_store_transport));
+    }
+    if (container->raw_key_store_transport){
+        transport_destroy(&(container->raw_key_store_transport));
+    }
+    if (container->raw_data_store_transport){
+        transport_destroy(&(container->raw_data_store_transport));
+    }
+}
+
 int main(int argc, char **argv) {
     if (argc == 2 && strcmp(argv[1], "--help") == 0){
         fprintf(stdout, HELP);
@@ -99,80 +132,108 @@ int main(int argc, char **argv) {
     }
     if (argc < 5) {
         fprintf(stderr, "error: params error\n\n%s\n", HELP);
-        return 1;
+        return FAIL;
     }
-    hm_rpc_transport_t *tcp_cs_transport = server_connect(CREDENTIAL_STORE_IP, CREDENTIAL_STORE_PORT);
-    hm_rpc_transport_t *tcp_ks_transport = server_connect(KEY_STORE_IP, KEY_STORE_PORT);
-    hm_rpc_transport_t *tcp_ds_transport = server_connect(DATA_STORE_IP, DATA_STORE_PORT);
-    if (!(tcp_cs_transport && tcp_ks_transport && tcp_ds_transport)){
-        return 1;
+    transports_container_t container = {0};
+    container.raw_credential_store_transport = server_connect(CREDENTIAL_STORE_IP, CREDENTIAL_STORE_PORT);
+    if (!container.raw_credential_store_transport){
+        fprintf(stderr, "can't connect to credential store\n");
+        return FAIL;
     }
+    container.raw_key_store_transport = server_connect(KEY_STORE_IP, KEY_STORE_PORT);
+    if (!container.raw_key_store_transport){
+        fprintf(stderr, "can't connect to key store\n");
+        destroy_transports_container(&container);
+        return FAIL;
+    }
+    container.raw_data_store_transport = server_connect(DATA_STORE_IP, DATA_STORE_PORT);
+    if (!container.raw_data_store_transport){
+        fprintf(stderr, "can't connect to data store\n");
+        destroy_transports_container(&container);
+        return FAIL;
+    }
+
     mid_hermes_t *mh = NULL;
     uint8_t sk[1024];
     size_t sk_length = sizeof(sk);
     if (!(sk_length = base64_decode(sk, argv[3], sk_length))){
+        destroy_transports_container(&container);
         return FAIL;
     }
-    fprintf(stderr, "cs transport\n");
-    hm_rpc_transport_t *cs_transport = create_secure_transport(argv[2], strlen(argv[2]), sk, sk_length, credential_store_pk, sizeof(credential_store_pk), credential_store_id, strlen(credential_store_id), tcp_cs_transport);
-    if(!cs_transport){return 1;}
-    fprintf(stderr, "ks transport\n");
-    hm_rpc_transport_t *ks_transport = create_secure_transport(argv[2], strlen(argv[2]), sk, sk_length, key_store_pk, sizeof(key_store_pk), key_store_id, strlen(key_store_id), tcp_ks_transport);
-    if(!ks_transport){return 1;}
-    fprintf(stderr, "ds transport\n");
-    hm_rpc_transport_t *ds_transport = create_secure_transport(argv[2], strlen(argv[2]), sk, sk_length, data_store_pk, sizeof(data_store_pk), data_store_id, strlen(data_store_id), tcp_ds_transport);
-    if(!ds_transport){return 1;}
-    if (!cs_transport
-        || !ds_transport
-        || !ks_transport
-        || !(mh = mid_hermes_create(argv[2], strlen(argv[2]), sk, sk_length, ks_transport, ds_transport, cs_transport))) {
-        transport_destroy(&cs_transport);
-        transport_destroy(&ds_transport);
-        transport_destroy(&ks_transport);
+    container.credential_store_transport = create_secure_transport(
+            argv[2], strlen(argv[2]), sk, sk_length, credential_store_pk, sizeof(credential_store_pk),
+            credential_store_id, strlen(credential_store_id), container.raw_credential_store_transport);
+    if(!container.credential_store_transport){
+        fprintf(stderr, "can't initialize secure transport to credential store\n");
+        destroy_transports_container(&container);
+        return FAIL;
+    }
+    container.key_store_transport = create_secure_transport(
+            argv[2], strlen(argv[2]), sk, sk_length, key_store_pk, sizeof(key_store_pk),
+            key_store_id, strlen(key_store_id), container.raw_key_store_transport);
+    if(!container.key_store_transport){
+        fprintf(stderr, "can't initialize secure transport to key store\n");
+        destroy_transports_container(&container);
+        return FAIL;
+    }
+    container.data_store_transport = create_secure_transport(
+            argv[2], strlen(argv[2]), sk, sk_length, data_store_pk, sizeof(data_store_pk),
+            data_store_id, strlen(data_store_id), container.raw_data_store_transport);
+    if(!container.data_store_transport){
+        fprintf(stderr, "can't initialize secure transport to data store\n");
+        destroy_transports_container(&container);
+        return FAIL;
+    }
+    if (!(mh = mid_hermes_create(
+            argv[2], strlen(argv[2]), sk, sk_length, container.key_store_transport, container.data_store_transport,
+            container.credential_store_transport))) {
         fprintf(stderr, "mid_hermes creation error ...\n");
+        destroy_transports_container(&container);
         return FAIL;
     }
 
     if (strcmp(argv[1], "add_block") == 0) {
-        size_t id_length = strlen(argv[4]);
+        size_t idLength = strlen(argv[4]);
+        uint8_t* idBuffer = (uint8_t*)argv[4];
         uint8_t *block = NULL;
-        uint8_t* idBuffer = NULL;
-        size_t idBufferLength;
         size_t block_length = 0;
         if (argc != 6
             || (SUCCESS != read_whole_file(argv[4], &block, &block_length))
-            || (0 != mid_hermes_create_block(mh, &idBuffer, &idBufferLength, block, block_length, argv[5], strlen(argv[5])))) {
+            || (0 != mid_hermes_create_block(mh, &idBuffer, &idLength, block, block_length, argv[5], strlen(argv[5])))) {
             free(block);
             fprintf(stderr, "error: block adding error\n");
+            destroy_transports_container(&container);
             return FAIL;
         }
         fprintf(stdout, "block created with id: ");
-        for(int i=0; i<idBufferLength; i++){
+        for(int i=0; i<idLength; i++){
             fprintf(stdout, "%c", idBuffer[i]);
         }
         fprintf(stdout, "\n");
         free(block);
-        return SUCCESS;
     } else if (strcmp(argv[1], "read_block") == 0) {
         uint8_t *data = NULL, *meta = NULL;
         size_t data_length = 0, meta_length = 0;
         if (argc != 5 ||
             0 != mid_hermes_read_block(mh, argv[4], strlen(argv[4]), &data, &data_length, &meta, &meta_length)) {
             fprintf(stderr, "error: block getting error\n");
+            destroy_transports_container(&container);
             return FAIL;
         }
+        fprintf(stdout, "file data: ");
         fwrite(data, 1, data_length, stdout);
-        fwrite(meta, 1, meta_length, stderr);
+        fprintf(stdout, "\nmetadata: ");
+        fwrite(meta, 1, meta_length, stdout);
+        fprintf(stdout, "\n");
         free(data);
         free(meta);
-        return SUCCESS;
     } else if (strcmp(argv[1], "delete_block") == 0) {
         if (argc != 5
             || 0 != mid_hermes_delete_block(mh, argv[4], strlen(argv[4]))) {
             fprintf(stderr, "error: block deleting error\n");
+            destroy_transports_container(&container);
             return FAIL;
         }
-        return SUCCESS;
     } else if (strcmp(argv[1], "update_block") == 0) {
         uint8_t *block = NULL;
         size_t block_length = 0;
@@ -181,52 +242,54 @@ int main(int argc, char **argv) {
             || (0 != mid_hermes_update_block(mh, argv[4], strlen(argv[4]), block, block_length, argv[5], strlen(argv[5])))) {
             free(block);
             fprintf(stderr, "error: block adding error\n");
+            destroy_transports_container(&container);
             return FAIL;
         }
         free(block);
-        return SUCCESS;
     } else if (strcmp(argv[1], "grant_read") == 0) {
         if (argc != 6
             || 0 != mid_hermes_grant_read_access(mh, argv[4], strlen(argv[4]), argv[5], strlen(argv[5]))) {
             fprintf(stderr, "error: block read access granting error\n");
+            destroy_transports_container(&container);
             return FAIL;
         }
-        return SUCCESS;
     } else if (strcmp(argv[1], "grant_update") == 0) {
         if (argc != 6
             || 0 != mid_hermes_grant_update_access(mh, argv[4], strlen(argv[4]), argv[5], strlen(argv[5]))) {
             fprintf(stderr, "error: block update access granting error\n");
+            destroy_transports_container(&container);
             return FAIL;
         }
-        return SUCCESS;
     } else if (strcmp(argv[1], "revoke_read") == 0) {
         if (argc != 6
             || 0 != mid_hermes_deny_read_access(mh, argv[4], strlen(argv[4]), argv[5], strlen(argv[5]))) {
             fprintf(stderr, "error: block read access denying error\n");
+            destroy_transports_container(&container);
             return FAIL;
         }
-        return SUCCESS;
     } else if (strcmp(argv[1], "revoke_update") == 0) {
         if (argc != 6
             || 0 != mid_hermes_deny_update_access(mh, argv[4], strlen(argv[4]), argv[5], strlen(argv[5]))) {
             fprintf(stderr, "error: block update access denying error\n");
+            mid_hermes_destroy(&mh);
+            destroy_transports_container(&container);
             return FAIL;
         }
-        return SUCCESS;
     } else if (strcmp(argv[1], "rotate") == 0) {
         if (argc != 5
             || 0 != mid_hermes_rotate_block(mh, argv[4], strlen(argv[4]))) {
             fprintf(stderr, "error: block rotate error\n");
+            mid_hermes_destroy(&mh);
+            destroy_transports_container(&container);
             return FAIL;
         }
-        return SUCCESS;
     } else {
         fprintf(stderr, "error: undefined command %s\n\n%s\n", argv[1], HELP);
+        mid_hermes_destroy(&mh);
+        destroy_transports_container(&container);
         return FAIL;
     }
     mid_hermes_destroy(&mh);
-    transport_destroy(&cs_transport);
-    transport_destroy(&ds_transport);
-    transport_destroy(&ks_transport);
+    destroy_transports_container(&container);
     return SUCCESS;
 }
