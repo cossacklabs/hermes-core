@@ -36,8 +36,9 @@ typedef struct db_type{
 
 uint32_t db_get_public_key(void* cs, const uint8_t* user_id, const size_t user_id_length, uint8_t** pub_key, size_t* pub_key_length){
   char fpath[10*1024];
-  fprintf(stderr, ".. %s %i ..", user_id, user_id_length);
-  BUILD_TYPED_PATH(fpath, C(((db_t*)cs)->path), E(user_id, user_id_length));
+  fprintf(stderr, ".. %s %li ..", user_id, user_id_length);
+  db_t* db = (db_t*)cs;
+  BUILD_TYPED_PATH(fpath, C(db->path), E(user_id, user_id_length));
   return read_whole_file(fpath, pub_key, pub_key_length);  
 }
 
@@ -47,7 +48,8 @@ hm_cs_db_t* db_create(){
   cs->user_data=calloc(1, sizeof(db_t));
   assert(cs->user_data);
   cs->get_pub=db_get_public_key;
-  memcpy(((db_t*)(((hm_cs_db_t*)cs)->user_data))->path, CREDENTIAL_STORE_PATH, strlen(CREDENTIAL_STORE_PATH)+1);
+  db_t* db = (db_t*)(((hm_cs_db_t*)cs)->user_data);
+  memcpy(db->path, CREDENTIAL_STORE_PATH, strlen(CREDENTIAL_STORE_PATH)+1);
   create_directory(((db_t*)(((hm_cs_db_t*)cs)->user_data))->path);
   return cs;
 }

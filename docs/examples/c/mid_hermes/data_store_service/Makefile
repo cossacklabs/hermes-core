@@ -1,2 +1,17 @@
 all:
-	gcc -g -I../../../../../include -L../../../../../build  main.c ../common/transport.c db.c ../../utils/utils.c ../../utils/base64.c -lhermes_data_store -lhermes_rpc -lpthread -lhermes_common -lsoter -o ds
+	gcc -g -I../../../../../include -L../../../../../build  \
+	main.c \
+	../common/transport.c \
+	../common/session_callback.c \
+	../common/credential_store_client.c \
+	db.c \
+	../../utils/utils.c \
+	../../utils/base64.c \
+	-lhermes_data_store \
+	-lhermes_rpc \
+	-lpthread \
+	-lhermes_common \
+	-lhermes_credential_store \
+	-lhermes_secure_transport \
+	-lsoter \
+	-o ds

@@ -18,10 +18,12 @@
 *
 */
 
-
-
+#include <themis/secure_session.h>
 #include <hermes/credential_store/service.h>
+#include <hermes/secure_transport/transport.h>
+#include <hermes/common/errors.h>
 #include "../common/transport.h"
+#include "../common/config.h"
 #include "db.h"
 
 #include<sys/socket.h>
@@ -31,6 +33,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <signal.h>
+#include <string.h>
 
 #define SUCCESS 0
 #define FAIL 1
@@ -45,6 +48,24 @@ void exit_handler(int s){
   exit(1); 
 }
 
+int get_public_key_for_id_callback_from_db(const void *id, size_t id_length, void *key_buffer, size_t key_buffer_length,
+                                           void *user_data) {
+    hm_cs_db_t *db = (hm_cs_db_t *) user_data;
+    uint8_t *temp_buffer;
+    size_t temp_buffer_size;
+    if (db->get_pub(db->user_data, id, id_length, &temp_buffer, &temp_buffer_size) != HM_SUCCESS ) {
+        return THEMIS_FAIL;
+    };
+    if (temp_buffer_size > key_buffer_length) {
+        return THEMIS_FAIL;
+    }
+    memcpy(key_buffer, temp_buffer, temp_buffer_size);
+    free(temp_buffer);
+    temp_buffer = NULL;
+    return THEMIS_SUCCESS;
+};
+
+
 void* credential_store(void* arg){
   hm_rpc_transport_t* client_transport=transport_create((int64_t)arg);
   if(!client_transport){
@@ -56,7 +77,16 @@ void* credential_store(void* arg){
     transport_destroy(&client_transport);
     return NULL;
   }
-  hm_credential_store_service_t* service=hm_credential_store_service_create(client_transport, db);
+  secure_session_user_callbacks_t* session_callback = calloc(1, sizeof(secure_session_user_callbacks_t));
+  session_callback->user_data = db;
+  session_callback->get_public_key_for_id = get_public_key_for_id_callback_from_db;
+
+  hm_rpc_transport_t* secure_transport = create_secure_transport_with_callback(
+          credential_store_id, strlen(credential_store_id),
+          credential_store_private_key, sizeof(credential_store_private_key),
+          session_callback, client_transport, true);
+
+  hm_credential_store_service_t* service=hm_credential_store_service_create(secure_transport, db);
   if(!service){
     transport_destroy(&client_transport);
     perror("service creation error ...\n");

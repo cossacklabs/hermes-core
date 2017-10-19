@@ -25,8 +25,8 @@
 #include "../common/transport.h"
 #include "../../utils/base64.h"
 #include "../../utils/utils.h"
-#include "hermes/secure_transport/transport.h"
-#include "config.h"
+#include <hermes/secure_transport/transport.h>
+#include "../common/config.h"
 
 #include <argp.h>
 #include<sys/socket.h>
@@ -40,14 +40,6 @@
 
 #define SUCCESS 0
 #define FAIL 1
-
-#define CREDENTIAL_STORE_IP   "127.0.0.1"
-#define DATA_STORE_IP         "127.0.0.1"
-#define KEY_STORE_IP          "127.0.0.1"
-
-#define CREDENTIAL_STORE_PORT 8888
-#define DATA_STORE_PORT       8890
-#define KEY_STORE_PORT        8889
 
 const char const* HELP = "usage: client <command> <user id> <base64 encoded user private key>  <name of file for proceed> <meta> <for user>.\n"
         "           <command>                         - executes the command to be performed by the client, see below;\n"
@@ -68,29 +60,7 @@ const char const* HELP = "usage: client <command> <user id> <base64 encoded user
         "           revoke_read - deny read access for <for user> to <name of file to be processed> block in Hermes system\n"
         "           revoke_update - deny update access for <for user> to <name of file to be processed> block in Hermes system\n";
 
-hm_rpc_transport_t *server_connect(const char *ip, int port) {
-    int64_t sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock == -1) {
-        fprintf(stderr, "connection error (1) (%s:%i)\n", ip, port);
-        return NULL;
-    }
-    struct sockaddr_in server;
-    server.sin_addr.s_addr = inet_addr(ip);
-    server.sin_family = AF_INET;
-    server.sin_port = htons(port);
-    if (connect(sock, (struct sockaddr *) &server, sizeof(server)) < 0) {
-        fprintf(stderr, "connection error (2) (%s:%i)\n", ip, port);
-        return NULL;
-    }
 
-    hm_rpc_transport_t *transport = transport_create(sock);
-    if (!transport) {
-        close(sock);
-        fprintf(stderr, "connection error (3) (%s:%i)\n", ip, port);
-        return NULL;
-    }
-    return transport;
-}
 
 typedef struct transports_container_type{
     hm_rpc_transport_t* credential_store_transport;
@@ -135,23 +105,6 @@ int main(int argc, char **argv) {
         return FAIL;
     }
     transports_container_t container = {0};
-    container.raw_credential_store_transport = server_connect(CREDENTIAL_STORE_IP, CREDENTIAL_STORE_PORT);
-    if (!container.raw_credential_store_transport){
-        fprintf(stderr, "can't connect to credential store\n");
-        return FAIL;
-    }
-    container.raw_key_store_transport = server_connect(KEY_STORE_IP, KEY_STORE_PORT);
-    if (!container.raw_key_store_transport){
-        fprintf(stderr, "can't connect to key store\n");
-        destroy_transports_container(&container);
-        return FAIL;
-    }
-    container.raw_data_store_transport = server_connect(DATA_STORE_IP, DATA_STORE_PORT);
-    if (!container.raw_data_store_transport){
-        fprintf(stderr, "can't connect to data store\n");
-        destroy_transports_container(&container);
-        return FAIL;
-    }
 
     mid_hermes_t *mh = NULL;
     uint8_t sk[1024];
@@ -160,25 +113,45 @@ int main(int argc, char **argv) {
         destroy_transports_container(&container);
         return FAIL;
     }
+
+    container.raw_credential_store_transport = server_connect(CREDENTIAL_STORE_IP, CREDENTIAL_STORE_PORT);
+    if (!container.raw_credential_store_transport){
+        fprintf(stderr, "can't connect to credential store\n");
+        return FAIL;
+    }
     container.credential_store_transport = create_secure_transport(
             argv[2], strlen(argv[2]), sk, sk_length, credential_store_pk, sizeof(credential_store_pk),
-            credential_store_id, strlen(credential_store_id), container.raw_credential_store_transport);
+            credential_store_id, strlen(credential_store_id), container.raw_credential_store_transport, false);
     if(!container.credential_store_transport){
         fprintf(stderr, "can't initialize secure transport to credential store\n");
         destroy_transports_container(&container);
         return FAIL;
     }
+
+    container.raw_key_store_transport = server_connect(KEY_STORE_IP, KEY_STORE_PORT);
+    if (!container.raw_key_store_transport){
+        fprintf(stderr, "can't connect to key store\n");
+        destroy_transports_container(&container);
+        return FAIL;
+    }
     container.key_store_transport = create_secure_transport(
             argv[2], strlen(argv[2]), sk, sk_length, key_store_pk, sizeof(key_store_pk),
-            key_store_id, strlen(key_store_id), container.raw_key_store_transport);
+            key_store_id, strlen(key_store_id), container.raw_key_store_transport, false);
     if(!container.key_store_transport){
         fprintf(stderr, "can't initialize secure transport to key store\n");
         destroy_transports_container(&container);
         return FAIL;
     }
+
+    container.raw_data_store_transport = server_connect(DATA_STORE_IP, DATA_STORE_PORT);
+    if (!container.raw_data_store_transport){
+        fprintf(stderr, "can't connect to data store\n");
+        destroy_transports_container(&container);
+        return FAIL;
+    }
     container.data_store_transport = create_secure_transport(
             argv[2], strlen(argv[2]), sk, sk_length, data_store_pk, sizeof(data_store_pk),
-            data_store_id, strlen(data_store_id), container.raw_data_store_transport);
+            data_store_id, strlen(data_store_id), container.raw_data_store_transport, false);
     if(!container.data_store_transport){
         fprintf(stderr, "can't initialize secure transport to data store\n");
         destroy_transports_container(&container);
