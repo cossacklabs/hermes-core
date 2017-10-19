@@ -88,6 +88,7 @@ hermes_status_t mid_hermes_ll_token_save(
 
 hermes_status_t mid_hermes_ll_token_del(
         const mid_hermes_ll_user_t *user,
+        const mid_hermes_ll_user_t *owner,
         const mid_hermes_ll_buffer_t *block_id,
         hermes_key_store_t *key_store,
         bool is_update);

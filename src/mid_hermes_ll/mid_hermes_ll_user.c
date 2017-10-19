@@ -102,11 +102,16 @@ mid_hermes_ll_user_t *mid_hermes_ll_local_user_load_c(
         return NULL;
     }
     mid_hermes_ll_buffer_t *id_buffer = mid_hermes_ll_buffer_create(id, id_length);
+    if(!id_buffer){
+        return NULL;
+    }
     mid_hermes_ll_buffer_t *private_key_buffer = mid_hermes_ll_buffer_create(private_key, private_key_length);
-    mid_hermes_ll_user_t *user = NULL;
-    if (!id_buffer
-        || !private_key_buffer
-        || !(user = mid_hermes_ll_user_load(id_buffer, credential_store))) {
+    if(!private_key_buffer){
+        mid_hermes_ll_buffer_destroy(&id_buffer);
+        return NULL;
+    }
+    mid_hermes_ll_user_t *user = mid_hermes_ll_user_load(id_buffer, credential_store);;
+    if (!user){
         mid_hermes_ll_buffer_destroy(&id_buffer);
         mid_hermes_ll_buffer_destroy(&private_key_buffer);
         return NULL;
