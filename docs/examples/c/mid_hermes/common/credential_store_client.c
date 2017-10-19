@@ -17,16 +17,13 @@
 * along with Hermes-core.  If not, see <http://www.gnu.org/licenses/>.
 *
 */
+#include <hermes/credential_store/client.h>
 
+hm_credential_store_client_sync_t* create_credential_store_client(hm_rpc_transport_t* transport){
+    hm_credential_store_client_sync_t* credential_client = hm_credential_store_client_sync_create(transport);
+    if (!credential_client){
+        return NULL;
+    }
+    return credential_client;
+}
 
-
-#ifndef TRANSPORT_H
-#define TRANSPORT_H
-
-#include <hermes/rpc/transport.h>
-
-hm_rpc_transport_t *server_connect(const char *ip, int port);
-hm_rpc_transport_t* transport_create(int socket);
-uint32_t transport_destroy(hm_rpc_transport_t** transport);
-
-#endif //TRANSPORT_H

@@ -18,15 +18,14 @@
 *
 */
 
+#ifndef HERMES_CORE_SESSION_CALLBACK_H
+#define HERMES_CORE_SESSION_CALLBACK_H
 
+#include <themis/secure_session.h>
+#include <hermes/credential_store/client.h>
+#include <hermes/common/errors.h>
 
-#ifndef TRANSPORT_H
-#define TRANSPORT_H
+secure_session_user_callbacks_t* get_session_callback_with_credential_store(hm_rpc_transport_t* transport);
+int get_public_key_for_id_callback_from_db(const void *id, size_t id_length, void *key_buffer, size_t key_buffer_length, void *user_data);
 
-#include <hermes/rpc/transport.h>
-
-hm_rpc_transport_t *server_connect(const char *ip, int port);
-hm_rpc_transport_t* transport_create(int socket);
-uint32_t transport_destroy(hm_rpc_transport_t** transport);
-
-#endif //TRANSPORT_H
+#endif //HERMES_CORE_SESSION_CALLBACK_H

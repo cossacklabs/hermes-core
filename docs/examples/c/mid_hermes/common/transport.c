@@ -24,8 +24,34 @@
 
 #include <hermes/common/errors.h>
 #include <assert.h>
-#include<unistd.h>
+#include <unistd.h>
 #include <stdio.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+
+hm_rpc_transport_t *server_connect(const char *ip, int port) {
+    int64_t sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock == -1) {
+        fprintf(stderr, "connection error (1) (%s:%i)\n", ip, port);
+        return NULL;
+    }
+    struct sockaddr_in server;
+    server.sin_addr.s_addr = inet_addr(ip);
+    server.sin_family = AF_INET;
+    server.sin_port = htons(port);
+    if (connect(sock, (struct sockaddr *) &server, sizeof(server)) < 0) {
+        fprintf(stderr, "connection error (2) (%s:%i)\n", ip, port);
+        return NULL;
+    }
+
+    hm_rpc_transport_t *transport = transport_create(sock);
+    if (!transport) {
+        close(sock);
+        fprintf(stderr, "connection error (3) (%s:%i)\n", ip, port);
+        return NULL;
+    }
+    return transport;
+}
 
 typedef struct transport_type {
     int socket;
