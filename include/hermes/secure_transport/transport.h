@@ -33,11 +33,13 @@ hm_rpc_transport_t* create_secure_transport(
         const uint8_t *private_key, size_t private_key_length,
         const uint8_t *public_key, size_t public_key_length,
         const uint8_t *public_key_id, size_t public_key_id_length,
-        hm_rpc_transport_t* user_transport);
+        hm_rpc_transport_t* user_transport,
+        bool is_server);
 
 hm_rpc_transport_t* create_secure_transport_with_callback(
         const uint8_t *user_id, size_t user_id_length,
         const uint8_t *private_key, size_t private_key_length,
         secure_session_user_callbacks_t* callback,
-        hm_rpc_transport_t* user_transport);
+        hm_rpc_transport_t* user_transport,
+        bool is_server);
 #endif //HERMES_CORE_TRANSPORT_H

@@ -151,21 +151,23 @@ uint32_t hermes_transport_receive(void *transport_, uint8_t *buffer, size_t buff
 };
 
 // init_secure_session establish secure session using transport
-hermes_status_t init_secure_session(hm_rpc_transport_t* transport, secure_session_t* session){
+hermes_status_t init_secure_session(hm_rpc_transport_t* transport, secure_session_t* session, bool is_server){
     size_t buffer_size;
     // size of tempBuffer took from secure_session code and examples
     uint8_t tempBuffer[2048];
-    if (secure_session_generate_connect_request(session, NULL, &buffer_size) != THEMIS_BUFFER_TOO_SMALL){
-        return HM_FAIL;
-    }
-    if (secure_session_generate_connect_request(session, tempBuffer, &buffer_size) != THEMIS_SUCCESS){
-        return HM_FAIL;
-    }
+    // send client's connection request
+    if(!is_server){
+        if (secure_session_generate_connect_request(session, NULL, &buffer_size) != THEMIS_BUFFER_TOO_SMALL){
+            return HM_FAIL;
+        }
+        if (secure_session_generate_connect_request(session, tempBuffer, &buffer_size) != THEMIS_SUCCESS){
+            return HM_FAIL;
+        }
 
-    if(send_data(tempBuffer, buffer_size, transport) != HM_SUCCESS){
-        return HM_FAIL;
+        if(send_data(tempBuffer, buffer_size, transport) != HM_SUCCESS){
+            return HM_FAIL;
+        }
     }
-
     themis_status_t status;
     uint32_t data_size;
     uint32_t bytes_read;
@@ -179,6 +181,7 @@ hermes_status_t init_secure_session(hm_rpc_transport_t* transport, secure_sessio
         if(bytes_read == HM_FAIL){
             return HM_FAIL;
         };
+        buffer_size = sizeof(tempBuffer);
         // calculate unwrapped size
         status = secure_session_unwrap(session, tempBuffer, data_size, tempBuffer, &buffer_size);
         if (status == THEMIS_SSESSION_SEND_OUTPUT_TO_PEER){
@@ -198,7 +201,8 @@ hm_rpc_transport_t* create_secure_transport_with_callback(
         const uint8_t *user_id, size_t user_id_length,
         const uint8_t *private_key, size_t private_key_length,
         secure_session_user_callbacks_t* callback,
-        hm_rpc_transport_t* user_transport){
+        hm_rpc_transport_t* user_transport,
+        bool is_server){
 
     secure_transport_t* transport = calloc(1, sizeof(secure_transport_t));
     transport->user_transport = user_transport;
@@ -209,7 +213,7 @@ hm_rpc_transport_t* create_secure_transport_with_callback(
         destroy_secure_transport(&transport);
         return NULL;
     }
-    if(init_secure_session(user_transport, transport->session)!=HM_SUCCESS){
+    if(init_secure_session(user_transport, transport->session, is_server)!=HM_SUCCESS){
         destroy_secure_transport(&transport);
         return NULL;
     }
@@ -229,7 +233,8 @@ hm_rpc_transport_t* create_secure_transport(
         const uint8_t *private_key, const size_t private_key_length,
         const uint8_t *public_key, const size_t public_key_length,
         const uint8_t *public_key_id, const size_t public_key_id_length,
-        hm_rpc_transport_t* user_transport){
+        hm_rpc_transport_t* user_transport,
+        bool is_server){
     secure_session_callback_data_t* callback_data = malloc(sizeof(secure_session_callback_data_t));
     if(!callback_data){
         return NULL;
@@ -258,7 +263,8 @@ hm_rpc_transport_t* create_secure_transport(
     secure_session_callback->user_data = callback_data;
     secure_session_callback->get_public_key_for_id = get_public_key_for_id_wrapper;
     return create_secure_transport_with_callback(
-            user_id, user_id_length, private_key, private_key_length, secure_session_callback, user_transport);
+            user_id, user_id_length, private_key, private_key_length, secure_session_callback, user_transport,
+            is_server);
 }
 
 uint32_t destroy_rpc_secure_transport(hm_rpc_transport_t** transport_){
