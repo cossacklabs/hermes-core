@@ -90,6 +90,19 @@ uint32_t hm_key_store_set_wtoken(
             wtoken_length);
 }
 
+/*! \brief return \p read_token and \p owner_id of key for \p block_id and \p user_id from keystore
+ *
+ * @param db
+ * @param block_id
+ * @param block_id_length
+ * @param user_id
+ * @param user_id_length
+ * @param[out] read_token
+ * @param[out] read_token_length
+ * @param[out] owner_id
+ * @param[out] owner_id_length
+ * @return HM_INVALID_PARAMETER or result of keystore operation
+ */
 uint32_t hm_key_store_get_rtoken(
         hm_ks_db_t *db,
         const uint8_t *block_id, const size_t block_id_length,
@@ -105,6 +118,19 @@ uint32_t hm_key_store_get_rtoken(
             owner_id, owner_id_length);
 }
 
+/*! \brief return \p write_token and his owner's id \p owner_id from keystore
+ *
+ * @param db
+ * @param block_id
+ * @param block_id_length
+ * @param user_id
+ * @param user_id_length
+ * @param write_token
+ * @param write_token_length
+ * @param owner_id
+ * @param owner_id_length
+ * @return
+ */
 uint32_t hm_key_store_get_wtoken(
         hm_ks_db_t *db,
         const uint8_t *block_id, const size_t block_id_length,
@@ -120,6 +146,17 @@ uint32_t hm_key_store_get_wtoken(
             owner_id, owner_id_length);
 }
 
+/*! \brief delete read token of user with \p user_idfrom keystore if \p owner_id has write access
+ *
+ * @param[in] db keystore implementation
+ * @param[in] block_id
+ * @param[in] block_id_length
+ * @param[in] user_id id of user which read token will be deleted
+ * @param[in] user_id_length
+ * @param[in] owner_id user id who delete token for <user_id>
+ * @param[in] owner_id_length
+ * @return HM_FAIL | HM_INVALID_PARAMETER or result of keystore operation
+ */
 uint32_t hm_key_store_del_rtoken(
         hm_ks_db_t *db,
         const uint8_t *block_id, const size_t block_id_length,
@@ -139,6 +176,17 @@ uint32_t hm_key_store_del_rtoken(
     return db->del_rtoken(db->user_data, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length);
 }
 
+/*! \brief delete \p user_id's write token from keystore if \p owner_id has write access
+ *
+ * @param[in] db keystore implementation
+ * @param[in] block_id
+ * @param[in] block_id_length
+ * @param[in] user_id id of user which read token will be deleted
+ * @param[in] user_id_length
+ * @param[in] owner_id user id who delete token for <user_id>
+ * @param[in] owner_id_length
+ * @return HM_FAIL | HM_INVALID_PARAMETER or result of keystore operation
+ */
 uint32_t hm_key_store_del_wtoken(
         hm_ks_db_t *db,
         const uint8_t *block_id, const size_t block_id_length,
@@ -158,6 +206,19 @@ uint32_t hm_key_store_del_wtoken(
     return db->del_wtoken(db->user_data, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length);
 }
 
+/*! \brief return permissions of block with id \p block_id by \p index like keystore is ordered storage
+ *
+ * \p user_id will contain id of user which permissions will be returned and \p rights_masks will equals 0 if user has
+ * only read permissions and 1 if read|write permissions
+ * @param[in] db keystore
+ * @param[in] block_id
+ * @param[in] block_id_length
+ * @param[in] index index of permissions for block starting from 0
+ * @param[out] user_id
+ * @param[out] user_id_length
+ * @param[out] rights_mask
+ * @return HM_INVALID_PARAMETER or result of keystore operation
+ */
 uint32_t hm_key_store_get_indexed_rights(
         hm_ks_db_t *db,
         const uint8_t *block_id, const size_t block_id_length,

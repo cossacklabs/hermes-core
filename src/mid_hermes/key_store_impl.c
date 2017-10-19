@@ -81,6 +81,7 @@ hermes_status_t hermes_key_store_get_wtoken(
             owner_id, owner_id_length);
 }
 
+// hermes_key_store_set_rtoken set read <token> to keystore if token not null otherwise it delete read token
 hermes_status_t hermes_key_store_set_rtoken(
         hermes_key_store_t *key_store,
         const uint8_t *user_id, const size_t user_id_length,
