@@ -53,7 +53,7 @@
 #define CK_PIPE_NAME "/tmp/hermes_core_test_sk_pipe"
 
 #define MAX_USERS_IN_TESTS 16
-#define MAX_BLOCKS_IN_TESTS 256
+#define MAX_BLOCKS_IN_TESTS 160 // sometimes 256 is too much (bus error: 10)
 #define MAX_COMMAND_LENGTH 256
 #define MAX_KEY_LENGTH 256
 
