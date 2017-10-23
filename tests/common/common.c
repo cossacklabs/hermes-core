@@ -22,6 +22,12 @@
 #include <stdio.h>
 #include <assert.h>
 
+#ifndef _GNU_SOURCE
+  // empty implementation of tdestroy
+  void tdestroy(void *root, void (*free_node)(void *nodep)) {}
+#endif //_GNU_SOURCE
+
+
 void bin_array_to_hexdecimal_string(const uint8_t* in, const size_t in_length, char* out, size_t out_length){
   assert(in);
   assert(in_length);
