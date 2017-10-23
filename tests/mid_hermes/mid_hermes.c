@@ -170,7 +170,7 @@ typedef struct user_type{
 
 typedef struct block_type{
   uint8_t id[BLOCK_ID_LENGTH];
-  uint8_t data[MAX_BLOCK_LENGTH];
+  uint8_t data[MAX_DATA_LENGTH];
   size_t data_length;
   uint8_t meta[MAX_META_LENGTH];
   size_t meta_length;
@@ -230,8 +230,8 @@ void* client(void* param){
   sleep(3); //wait for credential store initialisation
   users_t users;
   gen_users(&users);
-  blocks_t blocks;
-  gen_blocks(&blocks);
+  blocks_t* blocks = malloc(sizeof(blocks_t));
+  gen_blocks(blocks);
   mid_hermes_t* mh=NULL;
   if(!credential_store_transport
      || !data_store_transport
@@ -254,11 +254,11 @@ void* client(void* param){
   uint8_t* id = NULL;
   size_t id_length;
   for(;i<MAX_BLOCKS_IN_TESTS;++i){
-    uint8_t* block=blocks.blocks[i].id;
+    uint8_t* block=blocks->blocks[i].id;
     size_t block_id_length=BLOCK_ID_LENGTH;
-    testsuite_fail_if(HM_SUCCESS!=mid_hermes_create_block(mh, &block, &(block_id_length), blocks.blocks[i].data, blocks.blocks[i].data_length, blocks.blocks[i].meta, blocks.blocks[i].meta_length), "data store client sync calling");
+    testsuite_fail_if(HM_SUCCESS!=mid_hermes_create_block(mh, &block, &(block_id_length), blocks->blocks[i].data, blocks->blocks[i].data_length, blocks->blocks[i].meta, blocks->blocks[i].meta_length), "data store client sync calling");
 
-    testsuite_fail_if(HM_SUCCESS!=mid_hermes_create_block(mh, &id, &id_length, blocks.blocks[i].data, blocks.blocks[i].data_length, blocks.blocks[i].meta, blocks.blocks[i].meta_length), "data store client sync calling");
+    testsuite_fail_if(HM_SUCCESS!=mid_hermes_create_block(mh, &id, &id_length, blocks->blocks[i].data, blocks->blocks[i].data_length, blocks->blocks[i].meta, blocks->blocks[i].meta_length), "data store client sync calling");
     testsuite_fail_if(!id, "block creation didn't return generated id");
     // free allocated memory by mid_hermes_create_block
     free(id);
@@ -266,19 +266,21 @@ void* client(void* param){
   }
   for(i=1;i<MAX_USERS_IN_TESTS;++i){
     for(j=0;j<(MAX_BLOCKS_IN_TESTS/MAX_USERS_IN_TESTS);++j){
-      testsuite_fail_if(HM_SUCCESS!=mid_hermes_grant_read_access(mh, blocks.blocks[i*j].id, BLOCK_ID_LENGTH, users.users[i].id, USER_ID_LENGTH), "data store client sync calling");
+      testsuite_fail_if(HM_SUCCESS!=mid_hermes_grant_read_access(mh, blocks->blocks[i*j].id, BLOCK_ID_LENGTH, users.users[i].id, USER_ID_LENGTH), "data store client sync calling");
     }
   }
   for(i=1;i<MAX_USERS_IN_TESTS;++i){
     for(j=0;j<(MAX_BLOCKS_IN_TESTS/MAX_USERS_IN_TESTS);++j){
-      testsuite_fail_if(HM_SUCCESS!=mid_hermes_grant_update_access(mh, blocks.blocks[i*j].id, BLOCK_ID_LENGTH, users.users[i].id, USER_ID_LENGTH), "data store client sync calling");
+      testsuite_fail_if(HM_SUCCESS!=mid_hermes_grant_update_access(mh, blocks->blocks[i*j].id, BLOCK_ID_LENGTH, users.users[i].id, USER_ID_LENGTH), "data store client sync calling");
     }
   }
   for(i=1;i<MAX_USERS_IN_TESTS;++i){
     for(j=0;j<(MAX_BLOCKS_IN_TESTS/MAX_USERS_IN_TESTS);++j){
-      testsuite_fail_if(HM_SUCCESS!=mid_hermes_deny_update_access(mh, blocks.blocks[i*j].id, BLOCK_ID_LENGTH, users.users[i].id, USER_ID_LENGTH), "data store client sync calling");
+      testsuite_fail_if(HM_SUCCESS!=mid_hermes_deny_update_access(mh, blocks->blocks[i*j].id, BLOCK_ID_LENGTH, users.users[i].id, USER_ID_LENGTH), "data store client sync calling");
     }
   }
+  // free allocated memory by gen_blocks
+  free(blocks);
   return (void*)TEST_SUCCESS;
 }
 
