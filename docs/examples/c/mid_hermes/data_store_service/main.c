@@ -54,24 +54,25 @@ void* data_store(void* arg){
     // create transport with credential store to use him as secure session callback for retrieving public keys
     hm_rpc_transport_t* raw_credential_store_transport = server_connect(CREDENTIAL_STORE_IP, CREDENTIAL_STORE_PORT);
     if (!raw_credential_store_transport){
-        fprintf(stderr, "can't connect to credential store\n");
-        return FAIL;
+        perror("can't connect to credential store\n");
+        return (void*)FAIL;
     }
     hm_rpc_transport_t* credential_store_transport = create_secure_transport(
             data_store_id, strlen(data_store_id), data_store_private_key, sizeof(data_store_private_key),
             credential_store_pk, sizeof(credential_store_pk),
             credential_store_id, strlen(credential_store_id), raw_credential_store_transport, false);
     if(!credential_store_transport){
-        fprintf(stderr, "can't initialize secure transport to credential store\n");
+        perror("can't initialize secure transport to credential store\n");
         transport_destroy(&raw_credential_store_transport);
-        return FAIL;
+        perror("can't create connection to credential store\n");
+        return (void*)FAIL;
     }
 
     // create secure transport with new client
     hm_rpc_transport_t* client_transport=transport_create((int64_t)arg);
     if(!client_transport){
-        perror("client transport creation error ...");
-        return NULL;
+        perror("client transport creation error ...\n");
+        return (void*)FAIL;
     }
 
     secure_session_user_callbacks_t* session_callback = get_session_callback_with_credential_store(credential_store_transport);
@@ -82,13 +83,14 @@ void* data_store(void* arg){
   hm_ds_db_t* db=db_create();
   if(!db){
     transport_destroy(&client_transport);
-    return NULL;
+    perror("can't create data store\n");
+    return (void*)FAIL;
   }
   hm_data_store_service_t* service=hm_data_store_service_create(secure_client_transport, db);
   if(!service){
     transport_destroy(&client_transport);
     perror("service creation error ...\n");
-    return NULL;
+    return (void*)FAIL;
   }
   fprintf(stderr, "service started ...\n");
   hm_data_store_service_start(service);

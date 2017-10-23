@@ -69,13 +69,14 @@ int get_public_key_for_id_callback_from_db(const void *id, size_t id_length, voi
 void* credential_store(void* arg){
   hm_rpc_transport_t* client_transport=transport_create((int64_t)arg);
   if(!client_transport){
-    perror("client transport creation error ...");
-    return NULL;
+    perror("client transport creation error ...\n");
+    return (void*)FAIL;
   }
   hm_cs_db_t* db=db_create();
   if(!db){
     transport_destroy(&client_transport);
-    return NULL;
+      perror("can't create credential store\n");
+    return (void*)FAIL;
   }
   secure_session_user_callbacks_t* session_callback = calloc(1, sizeof(secure_session_user_callbacks_t));
   session_callback->user_data = db;
@@ -90,7 +91,7 @@ void* credential_store(void* arg){
   if(!service){
     transport_destroy(&client_transport);
     perror("service creation error ...\n");
-    return NULL;
+    return (void*)FAIL;
   }
   fprintf(stderr, "service started ...\n");
   hm_credential_store_service_start(service);
@@ -104,7 +105,7 @@ int main(int argc, char** argv){
   struct sockaddr_in server , client;
   socket_desc = socket(AF_INET , SOCK_STREAM , 0);
   if (socket_desc == -1){
-    perror("Could not create socket");
+    perror("Could not create socket\n");
     return FAIL;
   }
   server.sin_family = AF_INET;
@@ -112,7 +113,7 @@ int main(int argc, char** argv){
   server.sin_port = htons( SERVER_PORT );
 
   if(bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0){
-      perror("bind failed. Error");
+      perror("bind failed. Error\n");
       return FAIL;
   }
   listen(socket_desc , 3);
