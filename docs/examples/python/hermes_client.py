@@ -26,7 +26,7 @@ import base64
 import hermes
 
 
-class Trasnport(object):
+class Transport(object):
     def __init__(self, host, port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((host, port))
