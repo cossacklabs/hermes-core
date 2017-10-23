@@ -251,10 +251,18 @@ void* client(void* param){
     return (void*)TEST_FAIL;
   }
   int j=0, i=0;
+  uint8_t* id = NULL;
+  size_t id_length;
   for(;i<MAX_BLOCKS_IN_TESTS;++i){
     uint8_t* block=blocks.blocks[i].id;
     size_t block_id_length=BLOCK_ID_LENGTH;
     testsuite_fail_if(HM_SUCCESS!=mid_hermes_create_block(mh, &block, &(block_id_length), blocks.blocks[i].data, blocks.blocks[i].data_length, blocks.blocks[i].meta, blocks.blocks[i].meta_length), "data store client sync calling");
+
+    testsuite_fail_if(HM_SUCCESS!=mid_hermes_create_block(mh, &id, &id_length, blocks.blocks[i].data, blocks.blocks[i].data_length, blocks.blocks[i].meta, blocks.blocks[i].meta_length), "data store client sync calling");
+    testsuite_fail_if(!id, "block creation didn't return generated id");
+    // free allocated memory by mid_hermes_create_block
+    free(id);
+    id = NULL;
   }
   for(i=1;i<MAX_USERS_IN_TESTS;++i){
     for(j=0;j<(MAX_BLOCKS_IN_TESTS/MAX_USERS_IN_TESTS);++j){

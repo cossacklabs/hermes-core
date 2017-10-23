@@ -107,8 +107,16 @@ hermes_status_t mid_hermes_create_block(
         return HM_FAIL;
 
     }
-    *id = bl->id->data;
-    *id_length = bl->id->length;
+    // if id was empty then copy generated id
+    if(!(*id)){
+        *id = malloc(bl->id->length);
+        if (!*id){
+            mid_hermes_ll_block_destroy(&bl);
+            return HM_FAIL;
+        }
+        memcpy(*id, bl->id->data, bl->id->length);
+        *id_length = bl->id->length;
+    }
     mid_hermes_ll_block_destroy(&bl);
     return HM_SUCCESS;
 }
