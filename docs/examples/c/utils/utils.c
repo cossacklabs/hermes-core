@@ -136,7 +136,7 @@ char* build_typed_path(char* to, ...){
   va_list valist;
   va_start(valist, to);
   char b64encoded[2048];
-  char t=va_arg(valist, int);
+  char t=(char)va_arg(valist, int);
   while(t != 'f'){
     switch(t){
     case 'c':{
@@ -154,7 +154,7 @@ char* build_typed_path(char* to, ...){
     default:
       return NULL;
     }
-    t=va_arg(valist, int);
+    t=(char)va_arg(valist, int);
   }
   return to;
 }

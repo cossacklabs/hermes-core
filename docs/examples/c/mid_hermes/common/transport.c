@@ -24,56 +24,90 @@
 
 #include <hermes/common/errors.h>
 #include <assert.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 
-typedef struct transport_type{
-  int socket;
-}transport_t;
-
-uint32_t transport_send(void* t, const uint8_t* buf, const size_t buf_length){
-  if(!t || !buf || !buf_length){
-    return HM_FAIL;
-  }
-  if(buf_length!=write(((transport_t*)t)->socket, buf, buf_length)){
-    return HM_FAIL;
-  }
-  return HM_SUCCESS;
-}
-
-uint32_t transport_recv(void* t, uint8_t* buf, size_t buf_length){
-  if(!t || !buf || !buf_length){
-    return HM_FAIL;
-  }
-  size_t readed_bytes, total_read=0;
-  while(total_read<buf_length){
-    if(!(readed_bytes=read(((transport_t*)t)->socket, buf+total_read, buf_length-total_read))){
-	return HM_FAIL;
+hm_rpc_transport_t *server_connect(const char *ip, int port) {
+    int64_t sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock == -1) {
+        fprintf(stderr, "connection error (1) (%s:%i)\n", ip, port);
+        return NULL;
     }
-    total_read+=readed_bytes;
-  }
-  return HM_SUCCESS;
+    struct sockaddr_in server;
+    server.sin_addr.s_addr = inet_addr(ip);
+    server.sin_family = AF_INET;
+    server.sin_port = htons(port);
+    if (connect(sock, (struct sockaddr *) &server, sizeof(server)) < 0) {
+        fprintf(stderr, "connection error (2) (%s:%i)\n", ip, port);
+        return NULL;
+    }
+
+    hm_rpc_transport_t *transport = transport_create(sock);
+    if (!transport) {
+        close(sock);
+        fprintf(stderr, "connection error (3) (%s:%i)\n", ip, port);
+        return NULL;
+    }
+    return transport;
 }
 
-hm_rpc_transport_t* transport_create(int socket){
-  if(socket<0){
-    return NULL;
-  }
-  hm_rpc_transport_t* res=calloc(1, sizeof(hm_rpc_transport_t));
-  assert(res);
-  res->user_data=calloc(1, sizeof(transport_t));
-  assert(res->user_data);
-  ((transport_t*)(res->user_data))->socket=socket;
-  res->send=transport_send;
-  res->recv=transport_recv;
-  return res;
+typedef struct transport_type {
+    int socket;
+} transport_t;
+
+uint32_t transport_send(void *t, const uint8_t *buf, const size_t buf_length) {
+    transport_t* transport = (transport_t *) t;
+    if (!t || !buf || !buf_length) {
+        return HM_FAIL;
+    }
+    ssize_t written = write(transport->socket, buf, buf_length);
+    if (buf_length !=written) {
+        return HM_FAIL;
+    }
+    return HM_SUCCESS;
 }
 
-uint32_t transport_destroy(hm_rpc_transport_t** t){
-  if(!t || !(*t) || !((*t)->user_data)){
-    return HM_FAIL;
-  }
-  close(((transport_t*)((*t)->user_data))->socket);
-  free((*t)->user_data);
-  free(*t);
-  *t=NULL;
-  return HM_SUCCESS;
+uint32_t transport_recv(void *t, uint8_t *buf, size_t buf_length) {
+    if (!t || !buf || !buf_length) {
+        return HM_FAIL;
+    }
+    ssize_t readed_bytes, total_read = 0;
+    while (total_read < buf_length) {
+        readed_bytes = read(((transport_t *) t)->socket, buf + total_read, buf_length - total_read);
+        if (readed_bytes < 0) {
+            return HM_FAIL;
+        }
+        total_read += readed_bytes;
+        if(readed_bytes == 0 || readed_bytes < buf_length){
+            break;
+        }
+    }
+    return HM_SUCCESS;
+}
+
+hm_rpc_transport_t *transport_create(int socket) {
+    if (socket < 0) {
+        return NULL;
+    }
+    hm_rpc_transport_t *res = calloc(1, sizeof(hm_rpc_transport_t));
+    assert(res);
+    res->user_data = calloc(1, sizeof(transport_t));
+    assert(res->user_data);
+    ((transport_t *) (res->user_data))->socket = socket;
+    res->send = transport_send;
+    res->recv = transport_recv;
+    return res;
+}
+
+uint32_t transport_destroy(hm_rpc_transport_t **t) {
+    if (!t || !(*t) || !((*t)->user_data)) {
+        return HM_FAIL;
+    }
+    close(((transport_t *) ((*t)->user_data))->socket);
+    free((*t)->user_data);
+    free(*t);
+    *t = NULL;
+    return HM_SUCCESS;
 }

@@ -28,37 +28,37 @@ include tests/data_store/data_store.mk
 include tests/mid_hermes/mid_hermes.mk
 include tests/mid_hermes_ll/mid_hermes_ll.mk
 
-rpc_test: CMD = $(CC) -o $(TEST_BIN_PATH)/rpc_test $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
+rpc_test: CMD = $(CC) -o $(TEST_BIN_PATH)/rpc_test $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH) $(CFLAGS) $(LDFLAGS) -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
 
 rpc_test: rpc_static $(RPC_TEST_OBJ) $(COMMON_TEST_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-credential_store_test: CMD = $(CC) -o $(TEST_BIN_PATH)/credential_store_test $(CREDENTIAL_STORE_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lhermes_credential_store -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
+credential_store_test: CMD = $(CC) -o $(TEST_BIN_PATH)/credential_store_test $(CREDENTIAL_STORE_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH) $(CFLAGS) $(LDFLAGS) -lhermes_credential_store -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
 
 credential_store_test: credential_store_static rpc_static $(CREDENTIAL_STORE_TEST_OBJ) $(COMMON_TEST_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-key_store_test: CMD = $(CC) -o $(TEST_BIN_PATH)/key_store_test $(KEY_STORE_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lhermes_key_store -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
+key_store_test: CMD = $(CC) -o $(TEST_BIN_PATH)/key_store_test $(KEY_STORE_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH) $(CFLAGS)  $(LDFLAGS) -lhermes_key_store -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
 
 key_store_test: key_store_static rpc_static $(KEY_STORE_TEST_OBJ) $(COMMON_TEST_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-data_store_test: CMD = $(CC) -o $(TEST_BIN_PATH)/data_store_test $(DATA_STORE_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS) -lhermes_data_store -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
+data_store_test: CMD = $(CC) -o $(TEST_BIN_PATH)/data_store_test $(DATA_STORE_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH) $(CFLAGS)  $(LDFLAGS) -lhermes_data_store -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
 
 data_store_test: data_store_static rpc_static $(DATA_STORE_TEST_OBJ) $(COMMON_TEST_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-mid_hermes_test: CMD = $(CC) -o $(TEST_BIN_PATH)/mid_hermes_test $(MID_HERMES_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH)  $(LDFLAGS)  -lhermes_mid_hermes -lhermes_credential_store -lhermes_key_store -lhermes_data_store -lhermes_mid_hermes_ll -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
+mid_hermes_test: CMD = $(CC) -o $(TEST_BIN_PATH)/mid_hermes_test $(MID_HERMES_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH) $(CFLAGS)  $(LDFLAGS)  -lhermes_mid_hermes -lhermes_credential_store -lhermes_key_store -lhermes_data_store -lhermes_mid_hermes_ll -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
 
 mid_hermes_test: data_store_static key_store_static credential_store_static mid_hermes_static rpc_static $(MID_HERMES_TEST_OBJ) $(COMMON_TEST_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-mid_hermes_ll_test: CMD = $(CC) -o $(TEST_BIN_PATH)/mid_hermes_ll_test $(MID_HERMES_OBJ) $(MID_HERMES_LL_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH) $(LDFLAGS) -lhermes_mid_hermes -lhermes_credential_store -lhermes_key_store -lhermes_data_store -lhermes_mid_hermes_ll -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
+mid_hermes_ll_test: CMD = $(CC) -o $(TEST_BIN_PATH)/mid_hermes_ll_test $(MID_HERMES_OBJ) $(MID_HERMES_LL_TEST_OBJ) $(COMMON_TEST_OBJ) -L$(BIN_PATH) $(CFLAGS) $(LDFLAGS) -lhermes_mid_hermes -lhermes_credential_store -lhermes_key_store -lhermes_data_store -lhermes_mid_hermes_ll -lhermes_rpc -lhermes_common -lthemis -lsoter $(COVERLDFLAGS) -lpthread
 
 mid_hermes_ll_test: data_store_static key_store_static credential_store_static mid_hermes_static mid_hermes_ll_static rpc_static $(MID_HERMES_TEST_OBJ) $(MID_HERMES_LL_TEST_OBJ) $(COMMON_TEST_OBJ)
 	@echo -n "link "

@@ -22,6 +22,7 @@
 
 #include "db.h"
 #include "../../utils/utils.h"
+#include "../../utils/base64.h"
 #include <assert.h>
 #include <string.h>
 #include <sys/stat.h>
