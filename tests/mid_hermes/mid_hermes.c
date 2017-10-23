@@ -279,6 +279,8 @@ void* client(void* param){
       testsuite_fail_if(HM_SUCCESS!=mid_hermes_deny_update_access(mh, blocks->blocks[i*j].id, BLOCK_ID_LENGTH, users.users[i].id, USER_ID_LENGTH), "data store client sync calling");
     }
   }
+  // free allocated memory by gen_blocks
+  free(blocks);
   return (void*)TEST_SUCCESS;
 }
 
