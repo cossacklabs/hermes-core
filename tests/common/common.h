@@ -41,6 +41,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+// this function is not available on MacOS
+#ifndef _GNU_SOURCE
+	void tdestroy(void *root, void (*free_node)(void *nodep));
+#endif //_GNU_SOURCE
+
 void bin_array_to_hexdecimal_string(const uint8_t* in, const size_t in_length, char* out, size_t out_length);
 void hexdecimal_string_to_bin_array(const char* in, const size_t in_length, uint8_t* out, size_t out_length);
 

@@ -66,6 +66,9 @@ bool mid_hermes_ll_buffer_is_equal(mid_hermes_ll_buffer_t* buffer1, mid_hermes_l
   return true;
 }
 
+// mid_hermes_ll_buffer_reset if data is null then buffer->data will be freed (if not null) and set null, length=0
+// otherwise data will be copied to buffer->data (buffer->data will be reallocated if buffer->length != length)
+// and buffer->length=length
 hermes_status_t mid_hermes_ll_buffer_reset(mid_hermes_ll_buffer_t* buffer, const uint8_t* data, const size_t length){
   HERMES_CHECK_IN_PARAM(buffer);
   if(buffer->data){
@@ -86,6 +89,7 @@ hermes_status_t mid_hermes_ll_buffer_reset(mid_hermes_ll_buffer_t* buffer, const
   if(data){
     buffer->data=malloc(length);
     buffer->length=length;
+    memcpy(buffer->data, data, length);
     return HM_SUCCESS;
   }
   buffer->data=NULL;
