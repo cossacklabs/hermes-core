@@ -272,7 +272,7 @@ uint32_t destroy_rpc_secure_transport(hm_rpc_transport_t** transport_){
         return HM_FAIL;
     }
     secure_transport_t* transport = (secure_transport_t*) ((*transport_)->user_data);
-    destroy_secure_transport(&transport);
+    return destroy_secure_transport(&transport);
 }
 
 // destroy_secure_transport free memory allocated for secure transport
