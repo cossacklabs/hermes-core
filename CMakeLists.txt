@@ -8,9 +8,9 @@ TARGET_LINK_LIBRARIES(hermes_client_example hermes_mid_hermes hermes_mid_hermes_
 
 
 FILE(GLOB CREDENTIAL_STORE_SOURCE_FILES docs/examples/c/mid_hermes/credential_store_service/*.c docs/examples/c/mid_hermes/common/transport.c docs/examples/c/utils/*.c)
-add_executable(credential_store_server_c ${CREDENTIAL_STORE_SOURCE_FILES})
-TARGET_LINK_LIBRARIES(credential_store_server_c hermes_mid_hermes hermes_mid_hermes_ll hermes_credential_store hermes_data_store hermes_key_store hermes_rpc pthread hermes_common themis soter hermes_secure_transport)
+add_executable(credential_store_server_c ${CREDENTIAL_STORE_SOURCE_FILES} )
 TARGET_INCLUDE_DIRECTORIES(credential_store_server_c PRIVATE docs/examples/c/mid_hermes/credential_store_service docs/examples/c/mid_hermes/utils)
+TARGET_LINK_LIBRARIES(credential_store_server_c hermes_mid_hermes hermes_mid_hermes_ll hermes_credential_store hermes_data_store hermes_key_store hermes_rpc pthread hermes_common themis soter hermes_secure_transport)
 
 FILE(GLOB KEY_STORE_SOURCE_FILES docs/examples/c/mid_hermes/key_store_service/*.c docs/examples/c/mid_hermes/common/*.c docs/examples/c/utils/*.c)
 add_executable(key_store_server_c ${KEY_STORE_SOURCE_FILES})
@@ -21,3 +21,8 @@ FILE(GLOB DATA_STORE_SOURCE_FILES docs/examples/c/mid_hermes/data_store_service/
 add_executable(data_store_server_c ${DATA_STORE_SOURCE_FILES})
 TARGET_LINK_LIBRARIES(data_store_server_c hermes_mid_hermes hermes_mid_hermes_ll hermes_credential_store hermes_data_store hermes_key_store hermes_rpc pthread hermes_common themis soter hermes_secure_transport)
 TARGET_INCLUDE_DIRECTORIES(data_store_server_c PRIVATE docs/examples/c/mid_hermes/data_store_service docs/examples/c/mid_hermes/utils)
+
+FILE(GLOB MID_HERMES_TEST_SOURCE_FILES tests/mid_hermes/*c tests/common/*.c)
+add_executable(mid_hermes_test ${MID_HERMES_TEST_SOURCE_FILES})
+TARGET_INCLUDE_DIRECTORIES(mid_hermes_test PRIVATE tests)
+TARGET_LINK_LIBRARIES(mid_hermes_test hermes_mid_hermes hermes_mid_hermes_ll hermes_credential_store hermes_data_store hermes_key_store hermes_rpc pthread hermes_common themis soter hermes_secure_transport)
