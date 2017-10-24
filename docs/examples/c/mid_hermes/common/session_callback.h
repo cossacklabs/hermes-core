@@ -26,6 +26,9 @@
 #include <hermes/common/errors.h>
 
 secure_session_user_callbacks_t* get_session_callback_with_credential_store(hm_rpc_transport_t* transport);
-int get_public_key_for_id_callback_from_db(const void *id, size_t id_length, void *key_buffer, size_t key_buffer_length, void *user_data);
+int get_public_key_for_id_from_local_credential_store_callback(
+        const void *id, size_t id_length, void *key_buffer, size_t key_buffer_length, void *user_data);
+int get_public_key_for_id_from_remote_credential_store_callback(
+        const void *id, size_t id_length, void *key_buffer, size_t key_buffer_length, void *user_data);
 
 #endif //HERMES_CORE_SESSION_CALLBACK_H
