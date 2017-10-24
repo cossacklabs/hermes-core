@@ -60,7 +60,7 @@ bool mid_hermes_ll_buffer_is_empty(mid_hermes_ll_buffer_t* buffer){
 bool mid_hermes_ll_buffer_is_equal(mid_hermes_ll_buffer_t* buffer1, mid_hermes_ll_buffer_t* buffer2){
   assert(buffer1);
   assert(buffer2);
-  if((buffer2->length)!=(buffer1->length) || 0!=memcmp(buffer1->data, buffer2->data, buffer1->length)){
+  if((buffer2->length)!=(buffer1->length) || 0!=cst_time_memcmp(buffer1->data, buffer2->data, buffer1->length)){
     return false;
   }
   return true;

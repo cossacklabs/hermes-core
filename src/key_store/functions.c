@@ -47,7 +47,7 @@ uint32_t hm_key_store_set_rtoken(
         return HM_INVALID_PARAMETER;
     }
     uint32_t res;
-    if (user_id_length != owner_id_length || 0 != memcmp(user_id, owner_id, user_id_length)) {
+    if (user_id_length != owner_id_length || 0 != cst_time_memcmp(user_id, owner_id, user_id_length)) {
         uint8_t *test_token = NULL, *test_id = NULL;
         size_t test_token_length = 0, test_id_length = 0;
         if (HM_SUCCESS != (res = db->get_rtoken(
@@ -74,7 +74,7 @@ uint32_t hm_key_store_set_wtoken(
         return HM_INVALID_PARAMETER;
     }
     uint32_t res;
-    if (user_id_length != owner_id_length || 0 != memcmp(user_id, owner_id, user_id_length)) {
+    if (user_id_length != owner_id_length || 0 != cst_time_memcmp(user_id, owner_id, user_id_length)) {
         uint8_t *test_token = NULL, *test_id = NULL;
         size_t test_token_length = 0, test_id_length = 0;
         if (HM_SUCCESS != (res = db->get_wtoken(

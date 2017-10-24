@@ -102,7 +102,7 @@ mid_hermes_ll_rights_list_node_t *mid_hermes_ll_rights_list_find(
     mid_hermes_ll_rights_list_node_t *node;
     while ((node = mid_hermes_ll_rights_list_iterator_next(iterator))) {
         if (node->user->id->length == user_id->length &&
-            0 == memcmp(node->user->id->data, user_id->data, user_id->length)) {
+            0 == cst_time_memcmp(node->user->id->data, user_id->data, user_id->length)) {
             mid_hermes_ll_rights_list_iterator_destroy(&iterator);
             return node;
         }

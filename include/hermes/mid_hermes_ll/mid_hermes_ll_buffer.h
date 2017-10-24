@@ -24,6 +24,7 @@
 #define MID_HERMES_LL_BUFFER_H
 
 #include <hermes/common/errors.h>
+#include <hermes/common/mem_cmp.h>
 
 #include <stdbool.h>
 #include <stdint.h>
