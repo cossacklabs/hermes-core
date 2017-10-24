@@ -25,7 +25,7 @@
 #include <hermes/secure_transport/transport.h>
 #include "../common/transport.h"
 #include "../common/config.h"
-#include "../common/session_callback.h"
+#include <hermes/secure_transport/session_callback.h>
 #include "db.h"
 
 #include<sys/socket.h>
@@ -75,7 +75,8 @@ void* data_store(void* arg){
         return (void*)FAIL;
     }
 
-    secure_session_user_callbacks_t* session_callback = get_session_callback_with_credential_store(credential_store_transport);
+    secure_session_user_callbacks_t* session_callback = get_session_callback_with_remote_credential_store(
+            credential_store_transport);
     hm_rpc_transport_t* secure_client_transport = create_secure_transport_with_callback(
             data_store_id, strlen(data_store_id),data_store_private_key, sizeof(data_store_private_key),
             session_callback, client_transport, true);

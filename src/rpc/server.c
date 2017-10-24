@@ -153,6 +153,7 @@ uint32_t hm_rpc_server_call(hm_rpc_server_t* server, void* user_data){
   uint8_t* func_signature=malloc(func_signature_length);
   assert(func_signature);
   if(HM_SUCCESS!=server->transport->recv(server->transport->user_data, func_signature, func_signature_length)){
+    free(func_signature);
     return HM_FAIL;    
   }
   uint32_t res=hm_rpc_server_call_func(server, func_signature, func_signature_length, user_data);
