@@ -23,6 +23,7 @@
 #include <hermes/secure_transport/transport.h>
 #include <hermes/common/errors.h>
 #include "../common/transport.h"
+#include "../common/session_callback.h"
 #include "../common/config.h"
 #include "db.h"
 
@@ -48,26 +49,8 @@ void exit_handler(int s){
   exit(1); 
 }
 
-int get_public_key_for_id_callback_from_db(const void *id, size_t id_length, void *key_buffer, size_t key_buffer_length,
-                                           void *user_data) {
-    hm_cs_db_t *db = (hm_cs_db_t *) user_data;
-    uint8_t *temp_buffer;
-    size_t temp_buffer_size;
-    if (db->get_pub(db->user_data, id, id_length, &temp_buffer, &temp_buffer_size) != HM_SUCCESS ) {
-        return THEMIS_FAIL;
-    };
-    if (temp_buffer_size > key_buffer_length) {
-        return THEMIS_FAIL;
-    }
-    memcpy(key_buffer, temp_buffer, temp_buffer_size);
-    free(temp_buffer);
-    temp_buffer = NULL;
-    return THEMIS_SUCCESS;
-};
-
-
 void* credential_store(void* arg){
-  hm_rpc_transport_t* client_transport=transport_create((int64_t)arg);
+  hm_rpc_transport_t* client_transport=transport_create((int)arg);
   if(!client_transport){
     perror("client transport creation error ...\n");
     return (void*)FAIL;
@@ -80,7 +63,7 @@ void* credential_store(void* arg){
   }
   secure_session_user_callbacks_t* session_callback = calloc(1, sizeof(secure_session_user_callbacks_t));
   session_callback->user_data = db;
-  session_callback->get_public_key_for_id = get_public_key_for_id_callback_from_db;
+  session_callback->get_public_key_for_id = get_public_key_for_id_from_local_credential_store_callback;
 
   hm_rpc_transport_t* secure_transport = create_secure_transport_with_callback(
           credential_store_id, strlen(credential_store_id),
