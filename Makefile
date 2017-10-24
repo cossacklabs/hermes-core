@@ -249,7 +249,7 @@ uninstall:
 	@echo -n "hermes uninstall "
 	@$(BUILD_CMD_)
 
-PACKAGE_NAME = hermes
+PACKAGE_NAME = hermes-core
 # check that it's git repo
 GIT_VERSION := $(shell if [ -d ".git" ]; then git version; fi 2>/dev/null)
 # check that repo has any tag
