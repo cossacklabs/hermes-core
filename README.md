@@ -16,7 +16,7 @@ The WRITE permissions are checked both on Client and Server so they cannot “fo
 **Hermes-core** is a proof of concept for Hermes – a practical data security scheme with the reference implementation, which enables distributed sharing and collaboration, enforcing access control cryptographically, while the maximum possible number of security guarantees for the protected data is preserved even in the case when one or more parts of the system are compromised. In Hermes-core a document equals a block and is not subdivided further as Hermes-core is a basic building block for the hierarchic infrastructure of Hermes.
 
 # For better understanding of the concepts behind Hermes and Hermes-core:
-- Read the scientific paper to understand Hermes and Hermes-core better.
+- Read the [scientific paper](https://github.com/cossacklabs/hermes-core/wiki/Hermes-Scientific-Paper-Redirect#hermes-scientific-paper) to understand Hermes and Hermes-core better.
 - Read the [documentation that accompanies Hermes-core](https://github.com/cossacklabs/hermes-core/wiki).
 - Fast forward to hands-on tutorials available for Hermes-core with Client side written in [C](https://github.com/cossacklabs/hermes-core/wiki/C-tutorial), [Python](https://github.com/cossacklabs/hermes-core/wiki/Python-tutorial), and [Go](https://github.com/cossacklabs/hermes-core/wiki/Go-tutorial). 
 
