@@ -69,7 +69,7 @@ void destroy_secure_session_callback(secure_session_user_callbacks_t** callback)
 // get_public_key_for_id_wrapper return public key linked with this connection if id is equals to id of public key
 int get_public_key_for_id_wrapper(const void *id, size_t id_length, void *key_buffer, size_t key_buffer_length, void *user_data){
     secure_session_callback_data_t* transport = (secure_session_callback_data_t*)(user_data);
-    if(transport->public_key_id_length == id_length && cst_time_memcmp(id, transport->public_key_id, id_length) == 0){
+    if(transport->public_key_id_length == id_length && memcmp(id, transport->public_key_id, id_length) == 0){
         if (key_buffer_length < transport->public_key_length){
             return THEMIS_FAIL;
         }

@@ -21,7 +21,6 @@
 #ifndef HERMES_CORE_TRANSPORT_H
 #define HERMES_CORE_TRANSPORT_H
 
-#include <hermes/common/mem_cmp.h>
 #include <hermes/rpc/transport.h>
 #include <themis/secure_session.h>
 

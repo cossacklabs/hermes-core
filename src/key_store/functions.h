@@ -26,7 +26,6 @@
 #include <hermes/rpc/param_pack.h>
 #include <hermes/rpc/client.h>
 #include <hermes/key_store/db.h>
-#include <hermes/common/mem_cmp.h>
 
 #include <stdint.h>
 #include <stdlib.h>

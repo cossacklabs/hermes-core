@@ -26,7 +26,6 @@
 #include <hermes/mid_hermes_ll/mid_hermes_ll_user.h>
 #include <hermes/mid_hermes_ll/mid_hermes_ll_token.h>
 #include <hermes/common/errors.h>
-#include <hermes/common/mem_cmp.h>
 
 
 typedef struct mid_hermes_ll_rights_list_node_type {
