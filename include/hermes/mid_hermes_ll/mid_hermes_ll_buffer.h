@@ -47,4 +47,7 @@ hermes_status_t mid_hermes_ll_buffer_reset(mid_hermes_ll_buffer_t *buffer, const
 
 hermes_status_t mid_hermes_ll_buffer_destroy(mid_hermes_ll_buffer_t **buffer);
 
+// same as above, but also set 0 into buffer-> data and length
+hermes_status_t mid_hermes_ll_buffer_destroy_secure(mid_hermes_ll_buffer_t** buffer);
+
 #endif //MID_HERMES_LL_BUFFER_H
