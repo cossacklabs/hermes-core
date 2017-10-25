@@ -191,6 +191,7 @@ int buffer_destroy(buffer_t **buffer) {
         (*buffer)->data_.data = NULL;
     }
     free(*buffer);
+    *buffer = NULL;
     return BUFFER_SUCCESS;
 }
 

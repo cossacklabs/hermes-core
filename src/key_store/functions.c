@@ -173,6 +173,8 @@ uint32_t hm_key_store_del_rtoken(
             &test_id, &test_id_length)) {
         return HM_FAIL;
     }
+    free(test_token);
+    free(test_id);
     return db->del_rtoken(db->user_data, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length);
 }
 
@@ -203,6 +205,8 @@ uint32_t hm_key_store_del_wtoken(
             &test_id, &test_id_length)) {
         return HM_FAIL;
     }
+    free(test_token);
+    free(test_id);
     return db->del_wtoken(db->user_data, block_id, block_id_length, user_id, user_id_length, owner_id, owner_id_length);
 }
 
