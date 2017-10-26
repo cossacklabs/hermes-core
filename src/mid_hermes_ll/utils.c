@@ -162,6 +162,7 @@ uint32_t hm_asym_decrypt(
     if (THEMIS_SUCCESS != themis_secure_message_unwrap(
             private_key, private_key_len, public_key, public_key_len, encrypted_data, encrypted_data_length,
             *data, &result_buffer_length)) {
+        memset(data, 0, result_buffer_length);
         free(*data);
         *data = NULL;
         return HM_FAIL;

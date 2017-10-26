@@ -63,7 +63,7 @@ mid_hermes_ll_buffer_t *mid_hermes_ll_token_get_data(mid_hermes_ll_token_t *toke
     if (HM_SUCCESS != hm_asym_decrypt(
             token->user->sk->data, token->user->sk->length, token->owner->pk->data, token->owner->pk->length,
             token->token->data, token->token->length, &(buffer->data), &(buffer->length))) {
-        mid_hermes_ll_buffer_destroy(&buffer);
+        mid_hermes_ll_buffer_destroy_secure(&buffer);
         return NULL;
     }
     return buffer;
@@ -82,11 +82,11 @@ mid_hermes_ll_token_t *mid_hermes_ll_token_get_token_for_user(
             token->user->sk->data, token->user->sk->length, for_user->pk->data, for_user->pk->length,
             buffer->data, buffer->length, &(encryption_buffer->data), &(encryption_buffer->length));
     if (HM_SUCCESS != res) {
-        mid_hermes_ll_buffer_destroy(&buffer);
+        mid_hermes_ll_buffer_destroy_secure(&buffer);
         mid_hermes_ll_buffer_destroy(&encryption_buffer);
         return NULL;
     }
-    mid_hermes_ll_buffer_destroy(&buffer);
+    mid_hermes_ll_buffer_destroy_secure(&buffer);
     return mid_hermes_ll_token_create(for_user, mid_hermes_ll_user_copy(token->user), encryption_buffer);
 }
 
