@@ -172,9 +172,9 @@ mid_hermes_ll_block_t *mid_hermes_ll_block_update(
     }
     mid_hermes_ll_buffer_destroy_secure(&rt);
     mid_hermes_ll_buffer_destroy_secure(&wt);
-    mid_hermes_ll_buffer_destroy(&(bl->data));
+    mid_hermes_ll_buffer_destroy_secure(&(bl->data));
     mid_hermes_ll_buffer_destroy(&(bl->meta));
-    mid_hermes_ll_buffer_destroy_secure(&(bl->block));
+    mid_hermes_ll_buffer_destroy(&(bl->block));
     bl->meta = meta;
     bl->data = data;
     bl->block = new_block;
@@ -221,7 +221,7 @@ mid_hermes_ll_block_t *mid_hermes_ll_block_rotate(mid_hermes_ll_block_t *bl, mid
     mid_hermes_ll_token_destroy(&(bl->wtoken));
     mid_hermes_ll_buffer_destroy_secure(&rt);
     mid_hermes_ll_buffer_destroy_secure(&wt);
-    mid_hermes_ll_buffer_destroy_secure(&(bl->block));
+    mid_hermes_ll_token_destroy(&(bl->block));
     bl->rtoken = new_rtoken;
     bl->wtoken = new_wtoken;
     bl->block = new_block;
@@ -556,8 +556,8 @@ hermes_status_t mid_hermes_ll_block_destroy(mid_hermes_ll_block_t **b) {
         return HM_FAIL;
     }
     mid_hermes_ll_buffer_destroy(&((*b)->id));
-    mid_hermes_ll_buffer_destroy(&((*b)->data));
-    mid_hermes_ll_buffer_destroy_secure(&((*b)->block));
+    mid_hermes_ll_buffer_destroy_secure(&((*b)->data));
+    mid_hermes_ll_buffer_destroy(&((*b)->block));
     mid_hermes_ll_buffer_destroy(&((*b)->meta));
     mid_hermes_ll_buffer_destroy_secure(&((*b)->mac));
     mid_hermes_ll_user_destroy(&((*b)->user));
