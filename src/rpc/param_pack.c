@@ -106,6 +106,7 @@ uint32_t hm_param_pack_destroy(hm_param_pack_t** pack){
   }
   if((*pack)->readed){
     free((*pack)->whole_data);
+    (*pack)->whole_data = NULL;
   } else {
     while((*pack)->param_count){
       switch((*pack)->nodes[(*pack)->param_count-1].type){
@@ -120,6 +121,7 @@ uint32_t hm_param_pack_destroy(hm_param_pack_t** pack){
     }
   }
   free(*pack);
+  *pack=NULL;
   return HM_SUCCESS;
 }
 
