@@ -26,8 +26,7 @@ dependencies:
   override:
     - make
     - sudo make install
-    - make test
 
 test:
   override:
-    - make check 
+    - make test 

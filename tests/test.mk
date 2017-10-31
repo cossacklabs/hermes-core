@@ -65,9 +65,9 @@ mid_hermes_ll_test: data_store_static key_store_static credential_store_static m
 	@$(BUILD_CMD)
 
 
-test: rpc_test credential_store_test key_store_test data_store_test mid_hermes_test mid_hermes_ll_test
+prepare_tests: rpc_test credential_store_test key_store_test data_store_test mid_hermes_test mid_hermes_ll_test
 
-check: 
+test: err prepare_tests
 	$(TEST_BIN_PATH)/rpc_test
 	$(TEST_BIN_PATH)/credential_store_test
 	$(TEST_BIN_PATH)/key_store_test

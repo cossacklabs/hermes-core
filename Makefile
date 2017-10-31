@@ -98,8 +98,6 @@ endif
 
 all: err core
 
-test_all: err test
-
 core: rpc_shared credential_store_shared data_store_shared key_store_shared mid_hermes_shared secure_transport_shared
 
 static_core: rpc_static credential_store_static data_store_static key_store_static mid_hermes_static secure_transport_static
