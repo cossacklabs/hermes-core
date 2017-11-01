@@ -231,6 +231,9 @@ install_shared_libs: err all make_install_dirs
 
 install: install_headers install_static_libs install_shared_libs
 
+# alias for now, will install hermes-libs later
+install_all: install
+
 ll_example: CMD = make docs/examples/c/mid_hermes_low_level/Makefile
 
 ll_example: static_core

@@ -74,3 +74,7 @@ test: err prepare_tests
 	$(TEST_BIN_PATH)/data_store_test
 	$(TEST_BIN_PATH)/mid_hermes_test
 	$(TEST_BIN_PATH)/mid_hermes_ll_test
+
+
+# same as test, used in build bot. maybe later will test more packages
+test_all: test
