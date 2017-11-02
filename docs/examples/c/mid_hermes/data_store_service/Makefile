@@ -2,7 +2,6 @@ all:
 	gcc -g -I../../../../../include -L../../../../../build  \
 	main.c \
 	../common/transport.c \
-	../common/session_callback.c \
 	../common/credential_store_client.c \
 	db.c \
 	../../utils/utils.c \

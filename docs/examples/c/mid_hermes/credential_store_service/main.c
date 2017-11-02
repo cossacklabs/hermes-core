@@ -23,7 +23,7 @@
 #include <hermes/secure_transport/transport.h>
 #include <hermes/common/errors.h>
 #include "../common/transport.h"
-#include "../common/session_callback.h"
+#include <hermes/secure_transport/session_callback.h>
 #include "../common/config.h"
 #include "db.h"
 
@@ -61,9 +61,7 @@ void* credential_store(void* arg){
       perror("can't create credential store\n");
     return (void*)FAIL;
   }
-  secure_session_user_callbacks_t* session_callback = calloc(1, sizeof(secure_session_user_callbacks_t));
-  session_callback->user_data = db;
-  session_callback->get_public_key_for_id = get_public_key_for_id_from_local_credential_store_callback;
+  secure_session_user_callbacks_t* session_callback = get_session_callback_with_local_credential_store(db);
 
   hm_rpc_transport_t* secure_transport = create_secure_transport_with_callback(
           credential_store_id, strlen(credential_store_id),

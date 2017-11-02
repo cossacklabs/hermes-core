@@ -19,7 +19,7 @@
 */
 
 #include <string.h>
-#include "session_callback.h"
+#include "../../include/hermes/secure_transport/session_callback.h"
 #include <hermes/credential_store/db.h>
 
 int get_public_key_for_id_from_remote_credential_store_callback(
@@ -27,9 +27,12 @@ int get_public_key_for_id_from_remote_credential_store_callback(
     hm_credential_store_client_sync_t* db = (hm_credential_store_client_sync_t*)user_data;
     size_t temp_buffer_size;
     uint8_t *temp_buffer;
-    if(hm_credential_store_client_sync_call_get_pub_key_by_id(db, id, id_length, &temp_buffer, &temp_buffer_size) != HM_SUCCESS || temp_buffer_size > key_buffer_length){
+    if(hm_credential_store_client_sync_call_get_pub_key_by_id(db, id, id_length, &temp_buffer, &temp_buffer_size) != HM_SUCCESS){
         return THEMIS_FAIL;
     };
+    if(temp_buffer_size > key_buffer_length){
+        return THEMIS_FAIL;
+    }
     memcpy(key_buffer, temp_buffer, temp_buffer_size);
     free(temp_buffer);
     temp_buffer = NULL;
@@ -53,7 +56,8 @@ int get_public_key_for_id_from_local_credential_store_callback(
     return THEMIS_SUCCESS;
 };
 
-secure_session_user_callbacks_t* get_session_callback_with_credential_store(hm_rpc_transport_t* transport){
+
+secure_session_user_callbacks_t* get_session_callback_with_remote_credential_store(hm_rpc_transport_t *transport){
     secure_session_user_callbacks_t* session_callback = calloc(1, sizeof(secure_session_user_callbacks_t));
     if(!session_callback){
         return NULL;
@@ -65,5 +69,12 @@ secure_session_user_callbacks_t* get_session_callback_with_credential_store(hm_r
 
     session_callback->user_data = db;
     session_callback->get_public_key_for_id = get_public_key_for_id_from_remote_credential_store_callback;
+    return session_callback;
+}
+
+secure_session_user_callbacks_t* get_session_callback_with_local_credential_store(hm_cs_db_t* credential_store){
+    secure_session_user_callbacks_t* session_callback = calloc(1, sizeof(secure_session_user_callbacks_t));
+    session_callback->user_data = credential_store;
+    session_callback->get_public_key_for_id = get_public_key_for_id_from_local_credential_store_callback;
     return session_callback;
 }

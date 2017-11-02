@@ -23,11 +23,16 @@
 
 #include <themis/secure_session.h>
 #include <hermes/credential_store/client.h>
+#include <hermes/credential_store/db.h>
 #include <hermes/common/errors.h>
 
-secure_session_user_callbacks_t* get_session_callback_with_credential_store(hm_rpc_transport_t* transport);
+//get_session_callback_with_remote_credential_store return secure_session callback that fetch public keys from remote
+//credential store
+secure_session_user_callbacks_t* get_session_callback_with_remote_credential_store(hm_rpc_transport_t *transport);
+secure_session_user_callbacks_t* get_session_callback_with_local_credential_store(hm_cs_db_t* credential_store);
 int get_public_key_for_id_from_local_credential_store_callback(
         const void *id, size_t id_length, void *key_buffer, size_t key_buffer_length, void *user_data);
+
 int get_public_key_for_id_from_remote_credential_store_callback(
         const void *id, size_t id_length, void *key_buffer, size_t key_buffer_length, void *user_data);
 

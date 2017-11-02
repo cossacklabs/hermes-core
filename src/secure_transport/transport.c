@@ -24,6 +24,8 @@
 #include "hermes/secure_transport/transport.h"
 #include "utils.h"
 
+#define TEMP_BUFFER_SIZE (2048)
+
 typedef struct secure_transport_type {
     // transport that will be wrapped
     hm_rpc_transport_t* user_transport;
@@ -154,7 +156,7 @@ uint32_t hermes_transport_receive(void *transport_, uint8_t *buffer, size_t buff
 hermes_status_t init_secure_session(hm_rpc_transport_t* transport, secure_session_t* session, bool is_server){
     size_t buffer_size;
     // size of tempBuffer took from secure_session code and examples
-    uint8_t tempBuffer[2048];
+    uint8_t tempBuffer[TEMP_BUFFER_SIZE];
     // send client's connection request
     if(!is_server){
         if (secure_session_generate_connect_request(session, NULL, &buffer_size) != THEMIS_BUFFER_TOO_SMALL){
@@ -163,7 +165,6 @@ hermes_status_t init_secure_session(hm_rpc_transport_t* transport, secure_sessio
         if (secure_session_generate_connect_request(session, tempBuffer, &buffer_size) != THEMIS_SUCCESS){
             return HM_FAIL;
         }
-
         if(send_data(tempBuffer, buffer_size, transport) != HM_SUCCESS){
             return HM_FAIL;
         }
@@ -173,7 +174,7 @@ hermes_status_t init_secure_session(hm_rpc_transport_t* transport, secure_sessio
     uint32_t bytes_read;
     while(!secure_session_is_established(session)){
         data_size = read_data_size(transport);
-        if (data_size == HM_FAIL){
+        if (data_size == HM_FAIL || data_size > TEMP_BUFFER_SIZE){
             return HM_FAIL;
         }
         // receive response

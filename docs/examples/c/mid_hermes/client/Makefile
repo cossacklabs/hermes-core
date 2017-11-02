@@ -2,7 +2,6 @@ all:
 	gcc -g -I../../../../../include -L../../../../../build  \
 	    hermes_client.c \
 	    ../common/transport.c \
-	    ../common/session_callback.c \
 	    ../../utils/utils.c \
 	    ../../utils/base64.c \
 	    -lhermes_mid_hermes \
