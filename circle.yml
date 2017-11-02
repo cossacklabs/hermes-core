@@ -25,7 +25,8 @@ dependencies:
 
   override:
     - make
-    - sudo make install
+    - sudo make clean install
+    - sudo ldconfig
 
 test:
   override:
