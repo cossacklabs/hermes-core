@@ -24,6 +24,7 @@
 #define MID_HERMES_LL_BUFFER_H
 
 #include <hermes/common/errors.h>
+#include <hermes/common/mem_cmp.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -45,5 +46,8 @@ bool mid_hermes_ll_buffer_is_equal(mid_hermes_ll_buffer_t *buffer1, mid_hermes_l
 hermes_status_t mid_hermes_ll_buffer_reset(mid_hermes_ll_buffer_t *buffer, const uint8_t *data, const size_t length);
 
 hermes_status_t mid_hermes_ll_buffer_destroy(mid_hermes_ll_buffer_t **buffer);
+
+// same as `mid_hermes_ll_buffer_destroy`, but also set 0 into buffer-> data and length
+hermes_status_t mid_hermes_ll_buffer_destroy_secure(mid_hermes_ll_buffer_t** buffer);
 
 #endif //MID_HERMES_LL_BUFFER_H

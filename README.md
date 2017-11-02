@@ -1,28 +1,32 @@
 
 # Hermes-core library 0.5 PoC
 
-**Hermes** is a cryptography-based method of providing protected data storage and sharing that allows enforcing cryptographically checked CRUD permissions to data blocks and doesn't let server that's running Hermes do anything worse than DoS.
+**Hermes-core** is a proof of concept for **Hermes**.
 
-**Hermes** operates with data that is subdivided into blocks, which represent the hierarchy of recordsets and groups of recordsets (documents and collections). Each blob of data is encrypted using a symmetric key, from which a set of hashes is generated. Possession of a symmetric key by a user allows reading and carrying out other processes on hashes (including with writing data).
+**Hermes** is a cryptography-based method of providing protected data storage and sharing that allows enforcing cryptographically checked CRUD permissions to data blocks and doesn't let server that's running Hermes do anything worse than DoS. In other words, Hermes enables collaboration and distributed data sharing through enforcing access control with the help of cryptographic methods.
 
-There are 3 storage entities in Hermes that constitute the **Server** side: 
+**Hermes** operates with data that is subdivided into records, which represent the hierarchy of recordsets and groups of recordsets. Each blob of data is encrypted using a symmetric key, from which a set of hashes is generated. Possession of a symmetric key by a user allows reading and carrying out other processes on hashes (including with writing data).
+
+In **Hermes-core** a document equals a block and is not subdivided further as Hermes-core is a basic building block for the hierarchic infrastructure of Hermes.
+
+There are 3 storage entities in **Hermes** (and, consequently, in **Hermes-core**) that constitute the **Server** side: 
 - **Data store** contains the hierarchy of encrypted objects.
 - **Credential store** stores keys and hashes, asymmetrically encrypted in such a way that can only be decrypted by authorised user’s private key. Those can contain access control key which grants READ access and Update Tag which allows performing WRITE operations.
-- **Keystore** contains the symmetric keys (for READ and UPDATE), with as many copies of these keys as there are users authorised to access to the record, where every copy is wrapped (asymmetrically encrypted) with a public credential of the respective authorised user. If the permissions to READ and to WRITE extend to not just blocks, but to the list of blocks, they turn into permissions to DELETE/ADD elements. 
+- **Keystore** contains the symmetric keys (for READ and UPDATE), with as many copies of these keys as there are users authorised to access to the record, where every copy is wrapped (asymmetrically encrypted) with a public credential of the respective authorised user. If the permissions to READ and to WRITE extend to not just blocks, but to the list of blocks, they turn into permissions to DELETE/ADD elements.  
+
 The 4th entity of Hermes is **Client**:
 - **Client** (or clients) is the active entity in the Hermes architecture, the one that actually produces or consumes the data. The Client only possesses the keypair that allows decrypting the asymmetrically encrypted data from the Server. The READ permissions are always checked on Client. The absence of the key for performing READ operations will not allow the Client to decrypt the downloaded piece of data.
 The WRITE permissions are checked both on Client and Server so they cannot “fool” each other.
 
-**Hermes-core** is a proof of concept for Hermes – a practical data security scheme with the reference implementation, which enables distributed sharing and collaboration, enforcing access control cryptographically, while the maximum possible number of security guarantees for the protected data is preserved even in the case when one or more parts of the system are compromised. In Hermes-core a document equals a block and is not subdivided further as Hermes-core is a basic building block for the hierarchic infrastructure of Hermes.
-
 # For better understanding of the concepts behind Hermes and Hermes-core:
-- Read the [scientific paper](https://github.com/cossacklabs/hermes-core/wiki/Hermes-Scientific-Paper-Redirect#hermes-scientific-paper) to understand Hermes and Hermes-core better.
+- Read the [scientific paper](https://github.com/cossacklabs/hermes-core/wiki/Hermes-Scientific-Paper-Redirect#hermes-scientific-paper) to understand Hermes better.
 - Read the [documentation that accompanies Hermes-core](https://github.com/cossacklabs/hermes-core/wiki).
-- Fast forward to hands-on tutorials available for Hermes-core with Client side written in [C](https://github.com/cossacklabs/hermes-core/wiki/C-tutorial), [Python](https://github.com/cossacklabs/hermes-core/wiki/Python-tutorial), and [Go](https://github.com/cossacklabs/hermes-core/wiki/Go-tutorial). 
+- Fast forward to hands-on tutorials available for Hermes-core with Client side written in [C](https://github.com/cossacklabs/hermes-core/wiki/C-tutorial), [Python](https://github.com/cossacklabs/hermes-core/wiki/Python-tutorial), and [Go](https://github.com/cossacklabs/hermes-core/wiki/Go-tutorial).
+- We also advise you to check out the ever-evolving [Implementing Hermes-based Security Systems](https://github.com/cossacklabs/hermes-core/wiki/Hermes-Scientific-Paper-Redirect#implementing-hermes-based-security-systems) document to find out more about Hermes-core and implementing Hermes-based systems in the real world.
 
 *** 
 ### Repository status    
-This repository holds public proof-of-concept version of Hermes - Hermes-core, which should be used for studying and verification of the methodology and cryptographic backend. 
+This repository holds public proof-of-concept version of **Hermes** - **Hermes-core**, which should be used for studying and verification of the methodology and cryptographic backend. 
 ***
 ### License
 There is a separate, commercial licensed Hermes version for industrial use (its core crypto code is similar to this repository, yet it holds additional convenience interfaces and services). 

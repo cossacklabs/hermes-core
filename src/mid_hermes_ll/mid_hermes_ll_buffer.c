@@ -60,7 +60,7 @@ bool mid_hermes_ll_buffer_is_empty(mid_hermes_ll_buffer_t* buffer){
 bool mid_hermes_ll_buffer_is_equal(mid_hermes_ll_buffer_t* buffer1, mid_hermes_ll_buffer_t* buffer2){
   assert(buffer1);
   assert(buffer2);
-  if((buffer2->length)!=(buffer1->length) || 0!=memcmp(buffer1->data, buffer2->data, buffer1->length)){
+  if((buffer2->length)!=(buffer1->length) || 0!=cst_time_memcmp(buffer1->data, buffer2->data, buffer1->length)){
     return false;
   }
   return true;
@@ -102,7 +102,21 @@ hermes_status_t mid_hermes_ll_buffer_destroy(mid_hermes_ll_buffer_t** buffer){
   HERMES_CHECK_IN_PARAM(*buffer);
   free((*buffer)->data);
   free(*buffer);
+  (*buffer)->data=NULL;
   *buffer=NULL;
   return HM_SUCCESS;
 }
+
+hermes_status_t mid_hermes_ll_buffer_destroy_secure(mid_hermes_ll_buffer_t** buffer){
+  HERMES_CHECK_IN_PARAM(buffer);
+  HERMES_CHECK_IN_PARAM(*buffer);
+  memset(((*buffer)->data), 0, (*buffer)->length);
+  (*buffer)->length=0;
+  free((*buffer)->data);
+  free(*buffer);
+  (*buffer)->data=NULL;
+  *buffer=NULL;
+  return HM_SUCCESS;
+}
+
 

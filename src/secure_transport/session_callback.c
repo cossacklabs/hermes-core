@@ -20,6 +20,7 @@
 
 #include <string.h>
 #include "../../include/hermes/secure_transport/session_callback.h"
+#include <hermes/credential_store/db.h>
 
 int get_public_key_for_id_from_remote_credential_store_callback(
         const void *id, size_t id_length, void *key_buffer, size_t key_buffer_length, void *user_data){
