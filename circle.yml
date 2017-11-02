@@ -25,7 +25,6 @@ dependencies:
 
   override:
     - make
-    - make clean
     - sudo make install
 
 test:
