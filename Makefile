@@ -464,7 +464,7 @@ secure_transport_static: common_static $(SECURE_TRANSPORT_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
-secure_transport_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(SECURE_TRANSPORT_BIN).$(SHARED_EXT) $(SECURE_TRANSPORT_OBJ) $(LDFLAGS) -lthemis -lsoter
+secure_transport_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(SECURE_TRANSPORT_BIN).$(SHARED_EXT) $(SECURE_TRANSPORT_OBJ) $(CREDENTIAL_STORE_OBJ) $(RPC_OBJ) $(LDFLAGS) -lthemis -lsoter -l$(COMMON_BIN)
 
 secure_transport_shared: common_static $(SECURE_TRANSPORT_OBJ)
 	@echo -n "link "
