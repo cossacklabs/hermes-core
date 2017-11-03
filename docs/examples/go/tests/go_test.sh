@@ -23,10 +23,10 @@ KEYSTORE_PUBLIC=VUVDMgAAAC3QMLOAAoms9u5nTh1Ir3AnTPt5RkMJY9leIfF6uMIxms/Bkywp
 DATASTORE_PUBLIC=VUVDMgAAAC0VCQ/fAt88d2N8vDFVAKbDJHsXew8HgB55PIrVfhELXrEf1N89
 CONFIG_PATH=docs/examples/go/config.conf
 
-echo -n "$PUBLIC_KEY" | base64 -d > $DB_DIR/`echo -n $USER_ID|base64`
-echo -n "$PUBLIC_KEY2" | base64 -d > $DB_DIR/`echo -n $USER_ID2|base64`
-echo -n $KEYSTORE_PUBLIC | base64 -d > $DB_DIR/`echo -n "key_store_server" | base64`
-echo -n $DATASTORE_PUBLIC | base64 -d > $DB_DIR/`echo -n "data_store_server" | base64`
+echo -n "$PUBLIC_KEY" | base64 --decode > $DB_DIR/`echo -n $USER_ID|base64`
+echo -n "$PUBLIC_KEY2" | base64 --decode > $DB_DIR/`echo -n $USER_ID2|base64`
+echo -n $KEYSTORE_PUBLIC | base64 --decode > $DB_DIR/`echo -n "key_store_server" | base64`
+echo -n $DATASTORE_PUBLIC | base64 --decode > $DB_DIR/`echo -n "data_store_server" | base64`
 
 # add block
 echo "add block"
