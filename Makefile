@@ -93,6 +93,7 @@ include src/data_store/data_store.mk
 include src/key_store/key_store.mk
 include src/mid_hermes_ll/mid_hermes_ll.mk
 include src/mid_hermes/mid_hermes.mk
+include src/secure_transport/secure_transport.mk
 endif
 
 
@@ -178,6 +179,19 @@ mid_hermes_ll_static: common_static $(MID_HERMES_LL_OBJ)
 mid_hermes_ll_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(MID_HERMES_LL_BIN).$(SHARED_EXT) $(MID_HERMES_LL_OBJ) $(MID_HERMES_OBJ) $(KEY_STORE_OBJ) $(DATA_STORE_OBJ) $(CREDENTIAL_STORE_OBJ) $(RPC_OBJ) $(LDFLAGS) -l$(COMMON_BIN) -lthemis -lsoter
 
 mid_hermes_ll_shared: common_static $(MID_HERMES_OBJ) $(MID_HERMES_LL_OBJ)
+	@echo -n "link "
+	@$(BUILD_CMD)
+
+
+secure_transport_static: CMD = $(AR) rcs $(BIN_PATH)/lib$(SECURE_TRANSPORT_BIN).a $(SECURE_TRANSPORT_OBJ)
+
+secure_transport_static: common_static $(SECURE_TRANSPORT_OBJ)
+	@echo -n "link "
+	@$(BUILD_CMD)
+
+secure_transport_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(SECURE_TRANSPORT_BIN).$(SHARED_EXT) $(SECURE_TRANSPORT_OBJ) $(CREDENTIAL_STORE_OBJ) $(RPC_OBJ) $(LDFLAGS) -lthemis -lsoter -l$(COMMON_BIN)
+
+secure_transport_shared: common_static $(SECURE_TRANSPORT_OBJ)
 	@echo -n "link "
 	@$(BUILD_CMD)
 
@@ -455,17 +469,3 @@ rpm: test core static_core collect_headers install_shell_scripts strip symlink_r
          $(BINARY_LIBRARY_MAP)
 # it's just for printing .rpm files
 	@find $(BIN_PATH) -name \*.rpm
-
-
-include src/secure_transport/secure_transport.mk
-secure_transport_static: CMD = $(AR) rcs $(BIN_PATH)/lib$(SECURE_TRANSPORT_BIN).a $(SECURE_TRANSPORT_OBJ)
-
-secure_transport_static: common_static $(SECURE_TRANSPORT_OBJ)
-	@echo -n "link "
-	@$(BUILD_CMD)
-
-secure_transport_shared: CMD = $(CC) -shared -o $(BIN_PATH)/lib$(SECURE_TRANSPORT_BIN).$(SHARED_EXT) $(SECURE_TRANSPORT_OBJ) $(CREDENTIAL_STORE_OBJ) $(RPC_OBJ) $(LDFLAGS) -lthemis -lsoter -l$(COMMON_BIN)
-
-secure_transport_shared: common_static $(SECURE_TRANSPORT_OBJ)
-	@echo -n "link "
-	@$(BUILD_CMD)
