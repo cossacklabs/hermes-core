@@ -23,62 +23,21 @@ package gohermes
 /*
 #cgo LDFLAGS: -lhermes_mid_hermes -lhermes_mid_hermes_ll -lhermes_credential_store -lhermes_data_store -lhermes_key_store -lhermes_rpc -lhermes_common -lthemis -lsoter
 #include <hermes/mid_hermes/mid_hermes.h>
-#include "transport.h"
 #include <string.h>
 */
 import "C"
 
 import (
-	"crypto/rand"
-	"encoding/binary"
 	"errors"
 	"runtime"
 	"unsafe"
 )
 
-func pseudo_uuid() (uint64, error) {
-
-	b := make([]byte, 8)
-	_, err := rand.Read(b)
-	if err != nil {
-		return 0, err
-	}
-	return binary.BigEndian.Uint64(b), nil
-}
-
-type HermesTransport interface {
-	Send(buf []byte) error
-	Recv(buf []byte) error
-}
-
-var transport_map = make(map[uint64]HermesTransport)
-
-//export go_transport_send
-func go_transport_send(transport C.uint64_t, buf unsafe.Pointer, buf_length C.size_t) C.int {
-	p := transport_map[uint64(transport)]
-	b := (*[1 << 30]byte)(buf)[0:buf_length] //convert {buf, buf_length} to []byte
-	err := p.Send(b)
-	if nil != err {
-		return 1
-	}
-	return 0
-}
-
-//export go_transport_recv
-func go_transport_recv(transport C.uint64_t, buf unsafe.Pointer, buf_length C.size_t) C.int {
-	p := transport_map[uint64(transport)]
-	b := (*[1 << 30]byte)(buf)[0:buf_length]
-	err := p.Recv(b)
-	if nil != err {
-		return 1
-	}
-	return 0
-}
-
 type MidHermes struct {
-	credential_store_transport_ref, data_store_transport_ref, key_store_transport_ref uint64
-	credential_store_transport, data_store_transport, key_store_transport             *C.hm_rpc_transport_t
-	mid_hermes                                                                        *C.mid_hermes_t
+	mid_hermes                 *C.mid_hermes_t
+	credential_store_transport *HermesTransport
+	key_store_transport        *HermesTransport
+	data_store_transport       *HermesTransport
 }
 
 func MidHermes_finalize(mid_hermes *MidHermes) {
@@ -86,39 +45,21 @@ func MidHermes_finalize(mid_hermes *MidHermes) {
 }
 
 func NewMidHermes(
-	id []byte,
-	private_key []byte,
-	credential_store_transport HermesTransport,
-	data_store_transport HermesTransport,
-	key_store_transport HermesTransport) (*MidHermes, error) {
-	credential_store_transport_ref, err := pseudo_uuid()
-	if nil != err {
-		return nil, err
-	}
-	data_store_transport_ref, err := pseudo_uuid()
-	if nil != err {
-		return nil, err
-	}
-	key_store_transport_ref, err := pseudo_uuid()
-	if nil != err {
-		return nil, err
-	}
-	transport_map[credential_store_transport_ref] = credential_store_transport
-	transport_map[data_store_transport_ref] = data_store_transport
-	transport_map[key_store_transport_ref] = key_store_transport
+	id []byte, private_key []byte,
+	credential_store_transport *HermesTransport,
+	data_store_transport *HermesTransport,
+	key_store_transport *HermesTransport) (*MidHermes, error) {
+
 	mh := &MidHermes{
-		credential_store_transport_ref: credential_store_transport_ref,
-		data_store_transport_ref:       data_store_transport_ref,
-		key_store_transport_ref:        key_store_transport_ref,
-		credential_store_transport:     C.transport_create(C.uint64_t(credential_store_transport_ref)),
-		data_store_transport:           C.transport_create(C.uint64_t(data_store_transport_ref)),
-		key_store_transport:            C.transport_create(C.uint64_t(key_store_transport_ref))}
+		credential_store_transport: credential_store_transport,
+		data_store_transport:       data_store_transport,
+		key_store_transport:        key_store_transport}
 	mh.mid_hermes = C.mid_hermes_create(
 		(*C.uint8_t)(unsafe.Pointer(&id[0])), C.size_t(len(id)),
 		(*C.uint8_t)(unsafe.Pointer(&private_key[0])), C.size_t(len(private_key)),
-		mh.credential_store_transport,
-		mh.data_store_transport,
-		mh.key_store_transport)
+		mh.key_store_transport.GetHermesTransport(),
+		mh.data_store_transport.GetHermesTransport(),
+		mh.credential_store_transport.GetHermesTransport())
 	if nil == mh.mid_hermes {
 		return nil, errors.New("MidHermes object creation error")
 	}
@@ -128,16 +69,16 @@ func NewMidHermes(
 
 func (mh *MidHermes) Close() error {
 	C.mid_hermes_destroy(&(mh.mid_hermes))
-	C.transport_destroy(&(mh.credential_store_transport))
-	C.transport_destroy(&(mh.data_store_transport))
-	C.transport_destroy(&(mh.key_store_transport))
 	return nil
 }
 
 func (mh *MidHermes) AddBlock(id []byte, data []byte, meta []byte) error {
-	id_ptr := (*C.uint8_t)(C.malloc(C.size_t(len(id))))
+	var id_ptr *C.uint8_t = nil
 	id_length := C.size_t(len(id))
-	C.memcpy(unsafe.Pointer(id_ptr), unsafe.Pointer(&id[0]), id_length)
+	if len(id) > 0 {
+		id_ptr = (*C.uint8_t)(C.malloc(C.size_t(len(id))))
+		C.memcpy(unsafe.Pointer(id_ptr), unsafe.Pointer(&id[0]), id_length)
+	}
 	if 0 != C.mid_hermes_create_block(
 		mh.mid_hermes,
 		&id_ptr, &id_length,

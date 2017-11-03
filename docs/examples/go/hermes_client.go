@@ -27,21 +27,22 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"github.com/BurntSushi/toml"
 )
 
-type Transport struct {
+type TCPTransport struct {
 	connection net.Conn
 }
 
-func NewTransport(uri string) (Transport, error) {
+func NewTransport(uri string) (TCPTransport, error) {
 	conn, err := net.Dial("tcp", uri)
 	if err != nil {
-		return Transport{}, err
+		return TCPTransport{}, err
 	}
-	return Transport{conn}, nil
+	return TCPTransport{conn}, nil
 }
 
-func (t Transport) Send(buf []byte) error {
+func (t TCPTransport) Write(buf []byte) error {
 	var total_send = 0
 	for total_send < len(buf) {
 		sended, err := t.connection.Write(buf[total_send:])
@@ -53,7 +54,7 @@ func (t Transport) Send(buf []byte) error {
 	return nil
 }
 
-func (t Transport) Recv(buf []byte) error {
+func (t TCPTransport) Read(buf []byte) error {
 	var total_received = 0
 	for total_received < len(buf) {
 		received, err := t.connection.Read(buf[total_received:])
@@ -65,73 +66,113 @@ func (t Transport) Recv(buf []byte) error {
 	return nil
 }
 
-func (t Transport) Close() {
+func (t TCPTransport) Close() {
 	t.connection.Close()
 }
 
-func usage() string {
-	return `Usage of ./hermes_client:
+type Config struct {
+	Id         string
+	PrivateKey string `toml:"private_key"`
+
+	CredentialStoreUrl       string `toml:"credential_store_url"`
+	CredentialStoreId        string `toml:"credential_store_id"`
+	CredentialStorePublicKey string `toml:"credential_store_public_key"`
+
+	DataStoreUrl       string `toml:"data_store_url"`
+	DataStoreId        string `toml:"data_store_id"`
+	DataStorePublicKey string `toml:"data_store_public_key"`
+
+	KeyStoreUrl       string `toml:"key_store_url"`
+	KeyStoreId        string `toml:"key_store_id"`
+	KeyStorePublicKey string `toml:"key_store_public_key"`
+}
+
+func usage() {
+	fmt.Println(`hermes_client:
   -command string
-	command
-  -credential_store_uri string
-	Credential Store URI (default "127.0.0.1:8888")
-  -data_store_uri string
-	Data Store URI (default "127.0.0.1:8889")
+    	command [add_block | read_block | update_block | delete_block | rotate_block | grant_read_access | grant_update_access | revoke_read_access | revoke_update_access ]
   -doc string
-	doc
+    	doc
   -for_user string
-	for user id
-  -id string
-	user id
-  -key_store_uri string
-	Key Store URI (default "127.0.0.1:8890")
+    	for user id
   -meta string
-	meta
-  -private_key string
-	user private key`
+    	meta`)
 }
 
 func main() {
-	var credential_store_uri = flag.String("credential_store_uri", "127.0.0.1:8888", "Credential Store URI")
-	var key_store_uri = flag.String("key_store_uri", "127.0.0.1:8890", "Key Store URI")
-	var data_store_uri = flag.String("data_store_uri", "127.0.0.1:8889", "Data Store URI")
-	var id = flag.String("id", "", "user id")
-	var private_key = flag.String("private_key", "", "user private key")
+	var config = flag.String("config", "client.conf", "Config with settings")
 	var doc_file_name = flag.String("doc", "", "doc")
 	var meta = flag.String("meta", "", "meta")
 	var for_user = flag.String("for_user", "", "for user id")
 	var command = flag.String("command", "", "command [add_block | read_block | update_block | delete_block | rotate_block | grant_read_access | grant_update_access | revoke_read_access | revoke_update_access ]")
 	flag.Parse()
+	var conf Config
+	if _, err := toml.DecodeFile(*config, &conf); err != nil {
+		panic(err)
+	}
+	flag.Usage = usage
 
-	if *id == "" || *private_key == "" || *doc_file_name == "" || *command == "" {
-		fmt.Println(usage())
+	if conf.Id == "" || conf.PrivateKey == "" ||
+		conf.CredentialStoreId == "" || conf.CredentialStorePublicKey == "" || conf.CredentialStoreUrl == "" ||
+		conf.KeyStoreUrl == "" || conf.KeyStoreId == "" || conf.KeyStorePublicKey == "" ||
+		conf.DataStoreUrl == "" || conf.DataStoreId == "" || conf.DataStorePublicKey == "" {
+		fmt.Println("all parameters from config file are required")
+		flag.Usage()
 		return
 	}
-	sk, err := base64.StdEncoding.DecodeString(*private_key)
+	if *doc_file_name == "" || *command == "" {
+		fmt.Println("<command> and <doc> parameters are required")
+	}
+	privateKey, err := base64.StdEncoding.DecodeString(conf.PrivateKey)
 	if nil != err {
 		panic(err)
 		return
 	}
-	CredentialStoreTransport, err := NewTransport(*credential_store_uri)
+	CredentialStoreTransport, err := NewTransport(conf.CredentialStoreUrl)
 	if nil != err {
 		panic(err)
 		return
+	}
+	credentialPublic, err := base64.StdEncoding.DecodeString(conf.CredentialStorePublicKey)
+	if err != nil {
+		panic(err)
 	}
 	defer CredentialStoreTransport.Close()
-	DataStoreTransport, err := NewTransport(*data_store_uri)
+	secureCredentialTransport, err := gohermes.NewSecureTransport([]byte(conf.Id), privateKey, []byte(conf.CredentialStoreId), credentialPublic, CredentialStoreTransport, false)
+	if err != nil {
+		panic(err)
+	}
+
+	dataStorePublic, err := base64.StdEncoding.DecodeString(conf.DataStorePublicKey)
+	if err != nil {
+		panic(err)
+	}
+	DataStoreTransport, err := NewTransport(conf.DataStoreUrl)
 	if nil != err {
 		panic(err)
 		return
 	}
 	defer DataStoreTransport.Close()
-	KeyStoreTransport, err := NewTransport(*key_store_uri)
+	secureDataStoreTransport, err := gohermes.NewSecureTransport([]byte(conf.Id), privateKey, []byte(conf.DataStoreId), dataStorePublic, DataStoreTransport, false)
+	if err != nil {
+		panic(err)
+	}
+
+	keyPublic, err := base64.StdEncoding.DecodeString(conf.KeyStorePublicKey)
+	if err != nil {
+		panic(err)
+	}
+	KeyStoreTransport, err := NewTransport(conf.KeyStoreUrl)
 	if nil != err {
 		panic(err)
-		return
 	}
 	defer KeyStoreTransport.Close()
+	secureKeyStoreTransport, err := gohermes.NewSecureTransport([]byte(conf.Id), privateKey, []byte(conf.KeyStoreId), keyPublic, KeyStoreTransport, false)
+	if err != nil {
+		panic(err)
+	}
 
-	mid_hermes, err := gohermes.NewMidHermes([]byte(*id), sk, KeyStoreTransport, DataStoreTransport, CredentialStoreTransport)
+	mid_hermes, err := gohermes.NewMidHermes([]byte(conf.Id), privateKey, secureCredentialTransport, secureDataStoreTransport, secureKeyStoreTransport)
 	if nil != err {
 		panic(err)
 		return
@@ -141,7 +182,7 @@ func main() {
 	switch *command {
 	case "add_block":
 		if *meta == "" {
-			fmt.Println(usage())
+			flag.Usage()
 		}
 		data, err := ioutil.ReadFile(*doc_file_name)
 		if nil != err {
@@ -160,7 +201,7 @@ func main() {
 		fmt.Println(string(meta))
 	case "update_block":
 		if *meta == "" {
-			fmt.Println(usage())
+			flag.Usage()
 		}
 		data, err := ioutil.ReadFile(*doc_file_name)
 		if nil != err {
@@ -182,7 +223,7 @@ func main() {
 		}
 	case "grant_read_access":
 		if *for_user == "" {
-			fmt.Println(usage())
+			flag.Usage()
 			return
 		}
 		err := mid_hermes.GrantReadAccess([]byte(*doc_file_name), []byte(*for_user))
@@ -191,7 +232,7 @@ func main() {
 		}
 	case "grant_update_access":
 		if *for_user == "" {
-			fmt.Println(usage())
+			flag.Usage()
 			return
 		}
 		err := mid_hermes.GrantUpdateAccess([]byte(*doc_file_name), []byte(*for_user))
@@ -200,7 +241,7 @@ func main() {
 		}
 	case "revoke_read_access":
 		if *for_user == "" {
-			fmt.Println(usage())
+			flag.Usage()
 			return
 		}
 		err := mid_hermes.RevokeReadAccess([]byte(*doc_file_name), []byte(*for_user))
@@ -209,7 +250,7 @@ func main() {
 		}
 	case "revoke_update_access":
 		if *for_user == "" {
-			fmt.Println(usage())
+			flag.Usage()
 			return
 		}
 		err := mid_hermes.RevokeUpdateAccess([]byte(*doc_file_name), []byte(*for_user))
@@ -217,7 +258,7 @@ func main() {
 			panic(err)
 		}
 	default:
-		fmt.Println(usage(), *for_user)
+		flag.Usage()
 	}
 	fmt.Println("success")
 }
