@@ -71,9 +71,6 @@ func (t TCPTransport) Close() {
 }
 
 type Config struct {
-	Id         string
-	PrivateKey string `toml:"private_key"`
-
 	CredentialStoreUrl       string `toml:"credential_store_url"`
 	CredentialStoreId        string `toml:"credential_store_id"`
 	CredentialStorePublicKey string `toml:"credential_store_public_key"`
@@ -101,9 +98,11 @@ func usage() {
 
 func main() {
 	var config = flag.String("config", "client.conf", "Config with settings")
-	var doc_file_name = flag.String("doc", "", "doc")
+	var userId = flag.String("id", "", "User's id that run command")
+	var userPrivateKey = flag.String("private_key", "", "User's private key")
+	var docFileName = flag.String("doc", "", "doc")
 	var meta = flag.String("meta", "", "meta")
-	var for_user = flag.String("for_user", "", "for user id")
+	var forUser = flag.String("for_user", "", "for user id")
 	var command = flag.String("command", "", "command [add_block | read_block | update_block | delete_block | rotate_block | grant_read_access | grant_update_access | revoke_read_access | revoke_update_access ]")
 	flag.Parse()
 	var conf Config
@@ -112,7 +111,7 @@ func main() {
 	}
 	flag.Usage = usage
 
-	if conf.Id == "" || conf.PrivateKey == "" ||
+	if *userId == "" || *userPrivateKey == "" ||
 		conf.CredentialStoreId == "" || conf.CredentialStorePublicKey == "" || conf.CredentialStoreUrl == "" ||
 		conf.KeyStoreUrl == "" || conf.KeyStoreId == "" || conf.KeyStorePublicKey == "" ||
 		conf.DataStoreUrl == "" || conf.DataStoreId == "" || conf.DataStorePublicKey == "" {
@@ -120,10 +119,10 @@ func main() {
 		flag.Usage()
 		return
 	}
-	if *doc_file_name == "" || *command == "" {
+	if *docFileName == "" || *command == "" {
 		fmt.Println("<command> and <doc> parameters are required")
 	}
-	privateKey, err := base64.StdEncoding.DecodeString(conf.PrivateKey)
+	privateKey, err := base64.StdEncoding.DecodeString(*userPrivateKey)
 	if nil != err {
 		panic(err)
 		return
@@ -138,7 +137,7 @@ func main() {
 		panic(err)
 	}
 	defer CredentialStoreTransport.Close()
-	secureCredentialTransport, err := gohermes.NewSecureTransport([]byte(conf.Id), privateKey, []byte(conf.CredentialStoreId), credentialPublic, CredentialStoreTransport, false)
+	secureCredentialTransport, err := gohermes.NewSecureTransport([]byte(*userId), privateKey, []byte(conf.CredentialStoreId), credentialPublic, CredentialStoreTransport, false)
 	if err != nil {
 		panic(err)
 	}
@@ -153,7 +152,7 @@ func main() {
 		return
 	}
 	defer DataStoreTransport.Close()
-	secureDataStoreTransport, err := gohermes.NewSecureTransport([]byte(conf.Id), privateKey, []byte(conf.DataStoreId), dataStorePublic, DataStoreTransport, false)
+	secureDataStoreTransport, err := gohermes.NewSecureTransport([]byte(*userId), privateKey, []byte(conf.DataStoreId), dataStorePublic, DataStoreTransport, false)
 	if err != nil {
 		panic(err)
 	}
@@ -167,12 +166,12 @@ func main() {
 		panic(err)
 	}
 	defer KeyStoreTransport.Close()
-	secureKeyStoreTransport, err := gohermes.NewSecureTransport([]byte(conf.Id), privateKey, []byte(conf.KeyStoreId), keyPublic, KeyStoreTransport, false)
+	secureKeyStoreTransport, err := gohermes.NewSecureTransport([]byte(*userId), privateKey, []byte(conf.KeyStoreId), keyPublic, KeyStoreTransport, false)
 	if err != nil {
 		panic(err)
 	}
 
-	mid_hermes, err := gohermes.NewMidHermes([]byte(conf.Id), privateKey, secureCredentialTransport, secureDataStoreTransport, secureKeyStoreTransport)
+	mid_hermes, err := gohermes.NewMidHermes([]byte(*userId), privateKey, secureCredentialTransport, secureDataStoreTransport, secureKeyStoreTransport)
 	if nil != err {
 		panic(err)
 		return
@@ -184,16 +183,16 @@ func main() {
 		if *meta == "" {
 			flag.Usage()
 		}
-		data, err := ioutil.ReadFile(*doc_file_name)
+		data, err := ioutil.ReadFile(*docFileName)
 		if nil != err {
 			panic(err)
 		}
-		err = mid_hermes.AddBlock([]byte(*doc_file_name), data, []byte(*meta))
+		err = mid_hermes.AddBlock([]byte(*docFileName), data, []byte(*meta))
 		if nil != err {
 			panic(err)
 		}
 	case "read_block":
-		data, meta, err := mid_hermes.ReadBlock([]byte(*doc_file_name))
+		data, meta, err := mid_hermes.ReadBlock([]byte(*docFileName))
 		if nil != err {
 			panic(err)
 		}
@@ -203,57 +202,57 @@ func main() {
 		if *meta == "" {
 			flag.Usage()
 		}
-		data, err := ioutil.ReadFile(*doc_file_name)
+		data, err := ioutil.ReadFile(*docFileName)
 		if nil != err {
 			panic(err)
 		}
-		err = mid_hermes.UpdateBlock([]byte(*doc_file_name), data, []byte(*meta))
+		err = mid_hermes.UpdateBlock([]byte(*docFileName), data, []byte(*meta))
 		if nil != err {
 			panic(err)
 		}
 	case "delete_block":
-		err := mid_hermes.DeleteBlock([]byte(*doc_file_name))
+		err := mid_hermes.DeleteBlock([]byte(*docFileName))
 		if nil != err {
 			panic(err)
 		}
 	case "rotate_block":
-		err := mid_hermes.RotateBlock([]byte(*doc_file_name))
+		err := mid_hermes.RotateBlock([]byte(*docFileName))
 		if nil != err {
 			panic(err)
 		}
 	case "grant_read_access":
-		if *for_user == "" {
+		if *forUser == "" {
 			flag.Usage()
 			return
 		}
-		err := mid_hermes.GrantReadAccess([]byte(*doc_file_name), []byte(*for_user))
+		err := mid_hermes.GrantReadAccess([]byte(*docFileName), []byte(*forUser))
 		if nil != err {
 			panic(err)
 		}
 	case "grant_update_access":
-		if *for_user == "" {
+		if *forUser == "" {
 			flag.Usage()
 			return
 		}
-		err := mid_hermes.GrantUpdateAccess([]byte(*doc_file_name), []byte(*for_user))
+		err := mid_hermes.GrantUpdateAccess([]byte(*docFileName), []byte(*forUser))
 		if nil != err {
 			panic(err)
 		}
 	case "revoke_read_access":
-		if *for_user == "" {
+		if *forUser == "" {
 			flag.Usage()
 			return
 		}
-		err := mid_hermes.RevokeReadAccess([]byte(*doc_file_name), []byte(*for_user))
+		err := mid_hermes.RevokeReadAccess([]byte(*docFileName), []byte(*forUser))
 		if nil != err {
 			panic(err)
 		}
 	case "revoke_update_access":
-		if *for_user == "" {
+		if *forUser == "" {
 			flag.Usage()
 			return
 		}
-		err := mid_hermes.RevokeUpdateAccess([]byte(*doc_file_name), []byte(*for_user))
+		err := mid_hermes.RevokeUpdateAccess([]byte(*docFileName), []byte(*forUser))
 		if nil != err {
 			panic(err)
 		}
