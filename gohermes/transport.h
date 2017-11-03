@@ -17,8 +17,8 @@
 // along with Hermes-core.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
-#ifndef GO_MID_HERMES_H
-#define GO_MID_HERMES_H
+#ifndef GO_TRANSPORT_H
+#define GO_TRANSPORT_H
 
 #include <hermes/mid_hermes/mid_hermes.h>
 #include <hermes/rpc/transport.h>
