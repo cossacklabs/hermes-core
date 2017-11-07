@@ -20,18 +20,13 @@
 
 
 #include "transport.h"
-
 #include <hermes/common/errors.h>
-
-typedef struct transport_type{
-  PyObject* python_transport;
-}transport_t;
 
 uint32_t transport_send(void* transport, const uint8_t* buf, const size_t buf_length){
   if(!transport || !buf || !buf_length){
     return HM_FAIL;
   }
-  PyObject_CallMethod(((transport_t*)transport)->python_transport, "send", "y#", (const char*)buf, buf_length);
+  PyObject_CallMethod((PyObject*)transport, "send", "y#", (const char*)buf, buf_length);
   return HM_SUCCESS;
 }
 
@@ -39,7 +34,7 @@ uint32_t transport_recv(void* transport, uint8_t* buf, size_t buf_length){
   if(!transport || !buf || !buf_length){
     return HM_FAIL;
   }
-  PyObject* result=PyObject_CallMethod(((transport_t*)transport)->python_transport, "receive", "I", buf_length);
+  PyObject* result=PyObject_CallMethod((PyObject*)transport, "receive", "I", buf_length);
   if(!result){
     return HM_FAIL;
   }
@@ -56,13 +51,9 @@ hm_rpc_transport_t* transport_create(PyObject* transport){
   if(!result){
     return NULL;
   }
-  result->user_data=calloc(1, sizeof(transport_t));
-  if(!result->user_data){
-      free(result);
-      return NULL;
-  };
+  // not assign transport itself to avoid free hm_rpc_transport_t->user_data without PY_DECREF
+  result->user_data=transport;
   Py_INCREF(transport);
-  ((transport_t*)(result->user_data))->python_transport=transport;
   result->send=transport_send;
   result->recv=transport_recv;
   return result;
@@ -72,8 +63,7 @@ uint32_t transport_destroy(hm_rpc_transport_t** transport){
   if(!transport || !(*transport) || !((*transport)->user_data)){
     return HM_FAIL;
   }
-  Py_XDECREF(((transport_t*)((*transport)->user_data))->python_transport);
-  free((*transport)->user_data);
+  Py_XDECREF((PyObject*)(*transport)->user_data);
   free(*transport);
   *transport=NULL;
   return HM_SUCCESS;
