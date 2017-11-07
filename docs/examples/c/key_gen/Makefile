@@ -14,5 +14,5 @@ $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c
 	$(CC) $(CFLAGS) -g -c $< -o $@
 
 clean:
-	rm -rf $(OBJ_PATH)
-	rm -f key_pair_gen
+	@rm -rf $(OBJ_PATH)
+	@rm -f key_pair_gen

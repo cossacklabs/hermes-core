@@ -254,9 +254,73 @@ ll_example: static_core
 	@echo -n "make midHermes lowLevel example"
 	@$(BUILD_CMD_)
 
+mid_hermes_example_client: CMD = cd docs/examples/c/mid_hermes/client && make
 
-examples: static_core ll_example hermes_example
-	
+mid_hermes_example_client:
+	@echo -n "make midHermes example client"
+	@$(BUILD_CMD_)
+
+
+mid_hermes_example_client_clean: CMD  = cd docs/examples/c/mid_hermes/client && make clean;
+
+mid_hermes_example_client_clean:
+	@echo -n "make midHermes example client clean"
+	@$(BUILD_CMD_)
+
+mid_hermes_example_credential_store: CMD = cd docs/examples/c/mid_hermes/credential_store_service && make;
+
+mid_hermes_example_credential_store:
+	@echo -n "make midHermes example credential store"
+	@$(BUILD_CMD_)
+
+mid_hermes_example_credential_store_clean: CMD = cd docs/examples/c/mid_hermes/credential_store_service && make clean;
+
+mid_hermes_example_credential_store_clean:
+	@echo -n "make midHermes example credential store clean"
+	@$(BUILD_CMD_)
+
+mid_hermes_example_key_store: CMD = cd docs/examples/c/mid_hermes/key_store_service && make;
+
+mid_hermes_example_key_store:
+	@echo -n "make midHermes example key store"
+	@$(BUILD_CMD_)
+
+mid_hermes_example_key_store_clean: CMD = cd docs/examples/c/mid_hermes/key_store_service && make clean;
+
+mid_hermes_example_key_store_clean:
+	@echo -n "make midHermes example key store clean"
+	@$(BUILD_CMD_)
+
+mid_hermes_example_data_store: CMD = cd docs/examples/c/mid_hermes/data_store_service && make;
+
+mid_hermes_example_data_store:
+	@echo -n "make midHermes example data store"
+	@$(BUILD_CMD_)
+
+mid_hermes_example_data_store_clean: CMD = cd docs/examples/c/mid_hermes/data_store_service && make clean;
+
+mid_hermes_example_data_store_clean:
+	@echo -n "make midHermes example data store"
+	@$(BUILD_CMD_)
+
+ckeygen: CMD = cd docs/examples/c/key_gen && make
+
+ckeygen:
+	@echo -n "make C keygen"
+	@$(BUILD_CMD_)
+
+ckeygen_clean: CMD = cd docs/examples/c/key_gen && make clean;
+
+ckeygen_clean:
+	@echo -n "make C keygen clean"
+	@$(BUILD_CMD_)
+
+examples: static_core ckeygen ll_example mid_hermes_example_client mid_hermes_example_credential_store mid_hermes_example_key_store mid_hermes_example_data_store
+
+examples_clean: ckeygen_clean mid_hermes_example_client_clean mid_hermes_example_credential_store_clean mid_hermes_example_key_store_clean mid_hermes_example_data_store_clean
+
+examples_clean:
+	@$(BUILD_CMD_)
 
 uninstall: CMD = rm -rf $(PREFIX)/include/hermes && rm -f $(PREFIX)/lib/libhermes*.a && rm -f $(PREFIX)/lib/libhermes*.$(SHARED_EXT)
 
