@@ -23,49 +23,71 @@
 
 #include <hermes/mid_hermes/mid_hermes.h>
 #include "transport.h"
+#include "secure_transport.h"
 
 static PyObject *HermesError;
+extern PyTypeObject pyhermes_SecureHermesTransportType;
 
 typedef struct {
     PyObject_HEAD
-    hm_rpc_transport_t *credential_store_transport;
-    hm_rpc_transport_t *data_store_transport;
-    hm_rpc_transport_t *key_store_transport;
+    PyObject *credential_store_transport;
+    PyObject *data_store_transport;
+    PyObject *key_store_transport;
     mid_hermes_t *mid_hermes;
 } pyhermes_MidHermesObject;
 
 static void MidHermes_dealloc(pyhermes_MidHermesObject *self) {
     mid_hermes_destroy(&(self->mid_hermes));
-    transport_destroy(&(self->data_store_transport));
-    transport_destroy(&(self->key_store_transport));
-    transport_destroy(&(self->credential_store_transport));
+    Py_DECREF(self->credential_store_transport);
+    Py_DECREF(self->key_store_transport);
+    Py_DECREF(self->data_store_transport);
     Py_TYPE(self)->tp_free((PyObject *) self);
 }
 
 static int MidHermes_init(pyhermes_MidHermesObject *self, PyObject *args, PyObject *kwds) {
     PyObject *credential_store_transport = NULL, *data_store_transport = NULL, *key_store_transport = NULL;
     const char *id = NULL, *sk = NULL;
-    int id_length = 0, sk_length = 0;
+    Py_ssize_t id_length = 0, sk_length = 0;
     static char *kwlist[] = {"id", "private_key", "cs_transport", "ds_transport", "ks_transport", NULL};
     if (!PyArg_ParseTupleAndKeywords(
             args, kwds, "s#s#OOO", kwlist, &id, &id_length, &sk, &sk_length, &credential_store_transport,
             &data_store_transport, &key_store_transport)) {
         return -1;
     }
-    self->credential_store_transport = transport_create(credential_store_transport);
-    self->data_store_transport = transport_create(data_store_transport);
-    self->key_store_transport = transport_create(key_store_transport);
-    if (!(self->credential_store_transport)
-        || !(self->data_store_transport)
-        || !(self->key_store_transport)
-        || !(self->mid_hermes = mid_hermes_create(
-            (const uint8_t *) id, (size_t) id_length, (const uint8_t *) sk, sk_length,
-            self->key_store_transport, self->data_store_transport, self->credential_store_transport))) {
-        transport_destroy(&(self->data_store_transport));
-        transport_destroy(&(self->key_store_transport));
-        transport_destroy(&(self->credential_store_transport));
+
+    if (! PyObject_TypeCheck(credential_store_transport, &pyhermes_SecureHermesTransportType)) {
+        PyErr_SetString(PyExc_TypeError, "cs_transport is not HermesTransport type");
         return -1;
     }
+    if (! PyObject_TypeCheck(key_store_transport, &pyhermes_SecureHermesTransportType)) {
+        PyErr_SetString(PyExc_TypeError, "ks_transport is not HermesTransport type");
+        return -1;
+    }
+    if (! PyObject_TypeCheck(data_store_transport, &pyhermes_SecureHermesTransportType)) {
+        PyErr_SetString(PyExc_TypeError, "ds_transport is not HermesTransport type");
+        return -1;
+    }
+    hm_rpc_transport_t* credential_hermes_transport = ((pyhermes_SecureHermesTransportObject_t*)credential_store_transport)->hermes_transport;
+    hm_rpc_transport_t* key_hermes_transport = ((pyhermes_SecureHermesTransportObject_t*)key_store_transport)->hermes_transport;
+    hm_rpc_transport_t* data_hermes_transport = ((pyhermes_SecureHermesTransportObject_t*)data_store_transport)->hermes_transport;
+
+    if (!(credential_store_transport)
+        || !(data_store_transport)
+        || !(key_store_transport)
+        || !(self->mid_hermes = mid_hermes_create(
+            (const uint8_t *) id, (size_t) id_length, (const uint8_t *) sk, (size_t)sk_length,
+            key_hermes_transport, data_hermes_transport, credential_hermes_transport))) {
+        return -1;
+    }
+    self->credential_store_transport = credential_store_transport;
+    Py_INCREF(credential_store_transport);
+
+    self->data_store_transport = data_store_transport;
+    Py_INCREF(data_store_transport);
+
+    self->key_store_transport = key_store_transport;
+    Py_INCREF(key_store_transport);
+
     return 0;
 }
 
@@ -113,7 +135,7 @@ static PyObject *MidHermes_updBlock(pyhermes_MidHermesObject *self, PyObject *ar
     if (0 != mid_hermes_update_block(
             self->mid_hermes, (const uint8_t *) block_id, block_id_length, (const uint8_t *) block, block_length,
             (const uint8_t *) meta, meta_length)) {
-        PyErr_SetString(HermesError, "MidHermes.delBlock error");
+        PyErr_SetString(HermesError, "MidHermes.updBlock error");
         return NULL;
     }
     Py_RETURN_NONE;
@@ -251,7 +273,7 @@ static PyMethodDef MidHermes_methods[] = {
 
 static PyTypeObject pyhermes_MidHermesType = {
         PyVarObject_HEAD_INIT(NULL, 0)
-        "hermes.MidHermes",             /* tp_name */
+        "pyhermes.MidHermes",             /* tp_name */
         sizeof(pyhermes_MidHermesObject), /* tp_basicsize */
         0,                         /* tp_itemsize */
         (destructor) MidHermes_dealloc,         /* tp_dealloc */
@@ -292,37 +314,45 @@ static PyTypeObject pyhermes_MidHermesType = {
 
 static PyModuleDef pyhermesmodule = {
         PyModuleDef_HEAD_INIT,
-        "hermes",
-        "Hermes",
+        "pyhermes",
+        "PyHermes",
         -1,
         NULL, NULL, NULL, NULL, NULL
 };
 
 
-PyMODINIT_FUNC PyInit_hermes(void) {
+PyMODINIT_FUNC PyInit_pyhermes(void) {
     PyObject *m;
 
-    if (PyType_Ready(&pyhermes_MidHermesType) < 0)
+    if (PyType_Ready(&pyhermes_MidHermesType) < 0){
         return NULL;
+    }
+
+    if (PyType_Ready(&pyhermes_SecureHermesTransportType) < 0){
+        return NULL;
+    }
 
     m = PyModule_Create(&pyhermesmodule);
     if (m == NULL)
         return NULL;
 
-    HermesError = PyErr_NewException("hermes.HermesError", NULL, NULL);
+    HermesError = PyErr_NewException("pyhermes.HermesError", NULL, NULL);
     Py_INCREF(HermesError);
     PyModule_AddObject(m, "HermesError", HermesError);
 
     Py_INCREF(&pyhermes_MidHermesType);
     PyModule_AddObject(m, "MidHermes", (PyObject *) &pyhermes_MidHermesType);
+
+    Py_INCREF(&pyhermes_SecureHermesTransportType);
+    PyModule_AddObject(m, "SecureHermesTransport", (PyObject*) &pyhermes_SecureHermesTransportType);
     return m;
 }
 
 int main(int argc, char *argv[]) {
-    PyImport_AppendInittab("hermes", PyInit_hermes);
+    PyImport_AppendInittab("pyhermes", PyInit_pyhermes);
     //  Py_SetProgramName(argv[0]);
     Py_Initialize();
-    PyImport_ImportModule("hermes");
+    PyImport_ImportModule("pyhermes");
     return 0;
 }
 
