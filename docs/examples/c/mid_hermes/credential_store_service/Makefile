@@ -1,5 +1,5 @@
 all:
-	gcc -g -I../../../../../include -L../../../../../build  \
+	@gcc -g -I../../../../../include -L../../../../../build  \
 	main.c \
 	../common/transport.c \
 	../common/credential_store_client.c \
@@ -11,4 +11,9 @@ all:
 	-lpthread \
 	-lhermes_common \
 	-lhermes_secure_transport \
+	-lthemis \
+    -lsoter \
 	-o cs
+
+clean:
+	@rm ./cs

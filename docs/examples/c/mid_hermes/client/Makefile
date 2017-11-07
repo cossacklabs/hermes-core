@@ -1,5 +1,5 @@
 all:
-	gcc -g -I../../../../../include -L../../../../../build  \
+	@gcc -g -I../../../../../include -L../../../../../build  \
 	    hermes_client.c \
 	    ../common/transport.c \
 	    ../../utils/utils.c \
@@ -16,3 +16,6 @@ all:
 	    -lthemis \
 	    -lsoter \
 	    -o client
+
+clean:
+	@rm ./client
