@@ -476,7 +476,7 @@ deb: test core static_core collect_headers install_shell_scripts strip symlink_r
 #libhermes
 	@fpm --input-type dir \
 		 --output-type deb \
-		 --name libhermes \
+		 --name lib$(PACKAGE_NAME) \
 		 --license $(LICENSE_NAME) \
 		 --url '$(COSSACKLABS_URL)' \
 		 --description '$(SHORT_DESCRIPTION)' \
