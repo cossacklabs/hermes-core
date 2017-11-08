@@ -154,7 +154,7 @@ commands:
 > Note: This open-source version of Hermes-core is only checked to work on Linux.     
 
 To build Hermes-core, some dependencies need to be satisfied. You need to install:
-* The standard build environment (Debian-like systems you need to install ‘build-essential’ package through `$ apt-get install build-essentials openssl-dev`),
+* The standard build environment (for Debian-like systems you need to install `build-essential` development libraries and header files through `$ apt-get install build-essential openssl-dev`),
 * Our crypto SDK [Themis](https://github.com/cossacklabs/themis/wiki/Building-and-installing).  
 
 ## Download and install   
