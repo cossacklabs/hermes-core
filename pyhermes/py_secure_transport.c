@@ -23,10 +23,11 @@
 
 #include <hermes/mid_hermes/mid_hermes.h>
 #include <hermes/secure_transport/transport.h>
-#include "secure_transport.h"
+#include "py_secure_transport.h"
 #include "transport.h"
+#include "py_transport_wrapper.h"
 
-static PyObject *HermesTransportError;
+extern PyObject *HermesTransportError;
 
 static void SecureHermesTransport_dealloc(pyhermes_SecureHermesTransportObject_t *self) {
     transport_destroy(&(self->raw_transport));
@@ -49,7 +50,7 @@ static int SecureHermesTransport_init(pyhermes_SecureHermesTransportObject_t *se
 
     static char *kwlist[] = {"user_id", "private_key", "public_key_id", "public_key", "transport", "is_server", NULL};
     if (!PyArg_ParseTupleAndKeywords(
-            args, kwds, "s#s#s#s#OB;", kwlist,
+            args, kwds, "s#s#s#s#OB", kwlist,
             &id, &id_length,
             &private_key, &private_key_length,
             &public_key_id, &public_key_id_length,
@@ -96,6 +97,16 @@ static PyObject *SecureHermesTransport_new(PyTypeObject *type, PyObject *args, P
     return (PyObject *) self;
 }
 
+static PyObject* SecureHermesTransport_get_hermes_transport(pyhermes_SecureHermesTransportObject_t* self, PyObject *unused){
+    return HermesTransportWrapper_FromHmRpcTransport(self->hermes_transport);
+}
+
+static PyMethodDef SecureHermesTransport_methods[] = {
+        {"get_hermes_transport", (PyCFunction)SecureHermesTransport_get_hermes_transport, METH_NOARGS,
+                PyDoc_STR("return hermes transport object")},
+        {NULL,	NULL},
+};
+
 PyTypeObject pyhermes_SecureHermesTransportType = {
         PyVarObject_HEAD_INIT(NULL, 0)
         "pyhermes.SecureHermesTransport",             /* tp_name */
@@ -124,7 +135,7 @@ PyTypeObject pyhermes_SecureHermesTransportType = {
         0,                         /* tp_weaklistoffset */
         0,                         /* tp_iter */
         0,                         /* tp_iternext */
-        NULL,             /* tp_methods */
+        SecureHermesTransport_methods,             /* tp_methods */
         NULL,             /* tp_members */
         0,                         /* tp_getset */
         0,                         /* tp_base */

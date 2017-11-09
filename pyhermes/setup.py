@@ -21,7 +21,10 @@
 from distutils.core import setup, Extension
 
 py_c_hermes = Extension(
-    'pyhermes', sources=['pyhermes.c', 'transport.c', 'secure_transport.c'],
+    'pyhermes',
+    sources=['pyhermes.c', 'transport.c', 'py_secure_transport.c', 'py_midhermes.c', 'py_transport_wrapper.c',
+             'py_transport.c'
+             ],
     include_dirs=['../include'],
     library_dirs=['../build'],
     libraries=['hermes_mid_hermes', 'hermes_mid_hermes_ll', 'hermes_credential_store', 'hermes_data_store',

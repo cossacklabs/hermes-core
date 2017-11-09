@@ -22,6 +22,7 @@
 #include "transport.h"
 #include <hermes/common/errors.h>
 
+
 uint32_t transport_send(void* transport, const uint8_t* buf, const size_t buf_length){
   if(!transport || !buf || !buf_length){
     return HM_FAIL;

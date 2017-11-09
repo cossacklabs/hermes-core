@@ -18,16 +18,15 @@
 *
 */
 
-
-
-#ifndef TRANSPORT_H
-#define TRANSPORT_H
+#ifndef HERMES_CORE_MIDHERMES_H
+#define HERMES_CORE_MIDHERMES_H
 
 #include <Python.h>
-#include <hermes/rpc/transport.h>
+#include <hermes/mid_hermes/mid_hermes.h>
+#include "py_secure_transport.h"
+#include "py_transport_wrapper.h"
 
-PyObject *HermesTransportError;
-hm_rpc_transport_t* transport_create(PyObject* transport);
-uint32_t transport_destroy(hm_rpc_transport_t** t);
+extern PyObject *HermesTransportError;
+extern PyObject *HermesError;
 
-#endif //TRANSPORT_H
+#endif //HERMES_CORE_MIDHERMES_H

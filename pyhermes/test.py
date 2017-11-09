@@ -3,7 +3,7 @@ import socket
 import base64
 import queue
 import threading
-from unittest import TestCase, main
+from unittest import TestCase, main, skip
 
 import pyhermes
 
@@ -26,10 +26,15 @@ class TCPTransport:
             total_sent = total_sent + sent
 
     def receive(self, needed_length):
-        data = self.socket.recv(needed_length)
-        if not data:
-            raise RuntimeError("socket connection broken")
-        return data
+        output = []
+        while needed_length:
+            data = self.socket.recv(needed_length)
+            if not data:
+                raise RuntimeError("socket connection broken")
+            needed_length -= len(data)
+            output.append(data)
+
+        return b''.join(output)
 
 
 class BufferTransport:
@@ -68,7 +73,7 @@ class TestHermesTransport(TestCase):
                 result.put(hermes_transport, False)
         return f
 
-    def test_transport(self):
+    def test_secure_transport(self):
         buffer_in = queue.Queue()
         buffer_out = queue.Queue()
         result = queue.Queue()
@@ -87,6 +92,15 @@ class TestHermesTransport(TestCase):
 
         # wait result from threads
         transportA, transportB = [result.get(timeout=self.TIMEOUT) for _ in range(2)]
+
+
+    def test_transport(self):
+        buffer_in = queue.Queue(2)
+        buffer_out = queue.Queue(2)
+        transportClient = BufferTransport(buffer_out, buffer_in)
+        transportServer = BufferTransport(buffer_in, buffer_out)
+        hermes_transport_server = pyhermes.HermesTransport(transportServer)
+        hermes_transport_client = pyhermes.HermesTransport(transportClient)
 
 
 class TestHermes(TestCase):
@@ -110,7 +124,7 @@ class TestHermes(TestCase):
     #DATA_STORE_PRIVATE = base64.b64decode(b"UkVDMgAAAC0tLpmOAEJCDkGPTr+l2jo+LWUbB7uSX567nzgmMfODl4wWTAH4")
     DATA_STORE_PUBLIC = base64.b64decode(b"VUVDMgAAAC0VCQ/fAt88d2N8vDFVAKbDJHsXew8HgB55PIrVfhELXrEf1N89")
 
-    def test_full(self):
+    def test_secure_midhermes(self):
         try:
             credential_store_transport1 = pyhermes.SecureHermesTransport(
                 self.USER_ID1, self.PRIVATE_KEY1, self.CREDENTIAL_ID, self.CREDENTIAL_PUBLIC,
@@ -133,7 +147,29 @@ class TestHermes(TestCase):
                 TCPTransport("127.0.0.1", 8890), False)
         except ConnectionRefusedError:
             self.skipTest("credential|key|data store service not started on 8888|8889|8890 port respectively")
+            return
 
+        self._test_mid_hermes(credential_store_transport1, key_store_transport1, data_store_transport1,
+                              credential_store_transport2, key_store_transport2, data_store_transport2)
+
+    def test_simple_transport_mid_hermes(self):
+        # TODO test midhermes without secure session transport
+        try:
+            credential_store_transport1 = pyhermes.HermesTransport(TCPTransport("127.0.0.1", 8888))
+            key_store_transport1 = pyhermes.HermesTransport(TCPTransport("127.0.0.1", 8889))
+            data_store_transport1 = pyhermes.HermesTransport(TCPTransport("127.0.0.1", 8890))
+
+            credential_store_transport2 = pyhermes.HermesTransport(TCPTransport("127.0.0.1", 8888))
+            key_store_transport2 = pyhermes.HermesTransport(TCPTransport("127.0.0.1", 8889))
+            data_store_transport2 = pyhermes.HermesTransport(TCPTransport("127.0.0.1", 8890))
+        except ConnectionRefusedError:
+            self.skipTest("credential|key|data store service not started on 8888|8889|8890 port respectively")
+            return
+        self._test_mid_hermes(credential_store_transport1, key_store_transport1, data_store_transport1,
+                              credential_store_transport2, key_store_transport2, data_store_transport2)
+
+    def _test_mid_hermes(self, credential_store_transport1, key_store_transport1, data_store_transport1,
+                         credential_store_transport2, key_store_transport2, data_store_transport2):
         mid_hermes1 = pyhermes.MidHermes(
             self.USER_ID1, self.PRIVATE_KEY1,
             credential_store_transport1, data_store_transport1,
