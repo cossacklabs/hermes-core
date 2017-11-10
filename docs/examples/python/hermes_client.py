@@ -98,7 +98,7 @@ args = parser.parse_args()
 with open(args.private_key, 'rb') as f:
     private_key = f.read()
 
-with open(args.config, 'rb') as f:
+with open(args.config, 'r') as f:
     config = json.load(f)
 
 credential_store_transport = Transport(config['credential_store_host'], config['credential_store_port'])

@@ -22,7 +22,7 @@
 #include <Python.h>
 
 PyObject *HermesError;
-extern PyObject *HermesTransportError;
+PyObject *HermesTransportError;
 extern PyTypeObject pyhermes_SecureHermesTransportType;
 extern PyTypeObject pyhermes_MidHermesType;
 extern PyTypeObject pyhermes_HermesTransportType;
