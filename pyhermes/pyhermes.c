@@ -46,15 +46,15 @@ PyMODINIT_FUNC PyInit_pyhermes(void)
 void initpyhermes(void)
 #endif
 {
-    if (PyType_Ready(&pyhermes_MidHermesType) < 0){
+    if (PyType_Ready(&pyhermes_MidHermesType) < 0) {
         INITERROR;
     }
 
-    if (PyType_Ready(&pyhermes_SecureHermesTransportType) < 0){
+    if (PyType_Ready(&pyhermes_SecureHermesTransportType) < 0) {
         INITERROR;
     }
 
-    if (PyType_Ready(&pyhermes_HermesTransportType) < 0){
+    if (PyType_Ready(&pyhermes_HermesTransportType) < 0) {
         INITERROR;
     }
 
@@ -79,10 +79,10 @@ void initpyhermes(void)
     PyModule_AddObject(m, "MidHermes", (PyObject *) &pyhermes_MidHermesType);
 
     Py_INCREF(&pyhermes_SecureHermesTransportType);
-    PyModule_AddObject(m, "SecureHermesTransport", (PyObject*) &pyhermes_SecureHermesTransportType);
+    PyModule_AddObject(m, "SecureHermesTransport", (PyObject *) &pyhermes_SecureHermesTransportType);
 
     Py_INCREF(&pyhermes_HermesTransportType);
-    PyModule_AddObject(m, "HermesTransport", (PyObject*) &pyhermes_HermesTransportType);
+    PyModule_AddObject(m, "HermesTransport", (PyObject *) &pyhermes_HermesTransportType);
 
 #if PY_MAJOR_VERSION >= 3
     return m;

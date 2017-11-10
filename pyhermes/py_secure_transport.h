@@ -21,10 +21,10 @@
 #ifndef HERMES_CORE_SECURE_TRANSPORT_H
 #define HERMES_CORE_SECURE_TRANSPORT_H
 
-typedef struct pyhermes_SecureHermesTransportObject_type{
+typedef struct pyhermes_SecureHermesTransportObject_type {
     PyObject_HEAD
-    hm_rpc_transport_t* hermes_transport;
-    hm_rpc_transport_t* raw_transport;
+    hm_rpc_transport_t *hermes_transport;
+    hm_rpc_transport_t *raw_transport;
 } pyhermes_SecureHermesTransportObject_t;
 
 #endif //HERMES_CORE_SECURE_TRANSPORT_H

@@ -38,10 +38,10 @@ static void SecureHermesTransport_dealloc(pyhermes_SecureHermesTransportObject_t
 // SecureHermesTransport(id, private, publicId, public, transport)
 static int SecureHermesTransport_init(pyhermes_SecureHermesTransportObject_t *self, PyObject *args, PyObject *kwds) {
     PyObject *transport = NULL;
-    const char* id = NULL;
-    const char* private_key = NULL;
-    const char* public_key_id = NULL;
-    const char* public_key = NULL;
+    const char *id = NULL;
+    const char *private_key = NULL;
+    const char *public_key_id = NULL;
+    const char *public_key = NULL;
     Py_ssize_t id_length = 0;
     Py_ssize_t private_key_length = 0;
     Py_ssize_t public_key_id_length = 0;
@@ -58,23 +58,23 @@ static int SecureHermesTransport_init(pyhermes_SecureHermesTransportObject_t *se
             &transport, &is_server)) {
         return -1;
     }
-    if(id_length == 0 || private_key_length == 0 || public_key_id_length == 0 || public_key_length == 0){
+    if (id_length == 0 || private_key_length == 0 || public_key_id_length == 0 || public_key_length == 0) {
         return -1;
     }
 
-    hm_rpc_transport_t* raw_transport = transport_create(transport);
-    if (!raw_transport){
+    hm_rpc_transport_t *raw_transport = transport_create(transport);
+    if (!raw_transport) {
         return -1;
     }
 
-    hm_rpc_transport_t* secure_transport = create_secure_transport(
-            (uint8_t*)id, (size_t)id_length,
-            (uint8_t*)private_key, (size_t)private_key_length,
-            (uint8_t*)public_key, (size_t)public_key_length,
-            (uint8_t*)public_key_id, (size_t)public_key_id_length,
+    hm_rpc_transport_t *secure_transport = create_secure_transport(
+            (uint8_t *) id, (size_t) id_length,
+            (uint8_t *) private_key, (size_t) private_key_length,
+            (uint8_t *) public_key, (size_t) public_key_length,
+            (uint8_t *) public_key_id, (size_t) public_key_id_length,
             raw_transport,
             is_server == 1);
-    if(!secure_transport){
+    if (!secure_transport) {
         transport_destroy(&raw_transport);
         return -1;
     }
@@ -97,14 +97,15 @@ static PyObject *SecureHermesTransport_new(PyTypeObject *type, PyObject *args, P
     return (PyObject *) self;
 }
 
-static PyObject* SecureHermesTransport_get_hermes_transport(pyhermes_SecureHermesTransportObject_t* self, PyObject *unused){
+static PyObject *
+SecureHermesTransport_get_hermes_transport(pyhermes_SecureHermesTransportObject_t *self, PyObject *unused) {
     return HermesTransportWrapper_FromHmRpcTransport(self->hermes_transport);
 }
 
 static PyMethodDef SecureHermesTransport_methods[] = {
-        {"get_hermes_transport", (PyCFunction)SecureHermesTransport_get_hermes_transport, METH_NOARGS,
+        {"get_hermes_transport", (PyCFunction) SecureHermesTransport_get_hermes_transport, METH_NOARGS,
                 PyDoc_STR("return hermes transport object")},
-        {NULL,	NULL},
+        {NULL, NULL},
 };
 
 PyTypeObject pyhermes_SecureHermesTransportType = {

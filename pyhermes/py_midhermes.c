@@ -47,38 +47,38 @@ static int MidHermes_init(pyhermes_MidHermesObject *self, PyObject *args, PyObje
         return -1;
     }
 
-    PyObject* transport = PyObject_CallMethod(credential_store_transport, "get_hermes_transport", NULL);
-    if(!HermesTransportWrapper_Check(transport)){
+    PyObject *transport = PyObject_CallMethod(credential_store_transport, "get_hermes_transport", NULL);
+    if (!HermesTransportWrapper_Check(transport)) {
         //Py_DECREF(transport);
         PyErr_SetString(PyExc_TypeError, "credential_store return transport with incorrect type");
         return -1;
     }
-    hm_rpc_transport_t* credential_hermes_transport = ((pyhermes_HermesTransportWrapperObject_t*)transport)->hermes_transport;
+    hm_rpc_transport_t *credential_hermes_transport = ((pyhermes_HermesTransportWrapperObject_t *) transport)->hermes_transport;
     //Py_DECREF(transport);
 
     transport = PyObject_CallMethod(key_store_transport, "get_hermes_transport", NULL);
-    if(HermesTransportWrapper_Check(transport) != 1){
+    if (HermesTransportWrapper_Check(transport) != 1) {
         //Py_DECREF(transport);
         PyErr_SetString(PyExc_TypeError, "credential_store return transport with incorrect type");
         return -1;
     }
-    hm_rpc_transport_t* key_hermes_transport = ((pyhermes_HermesTransportWrapperObject_t*)transport)->hermes_transport;
+    hm_rpc_transport_t *key_hermes_transport = ((pyhermes_HermesTransportWrapperObject_t *) transport)->hermes_transport;
     //Py_DECREF(transport);
 
     transport = PyObject_CallMethod(data_store_transport, "get_hermes_transport", NULL);
-    if(HermesTransportWrapper_Check(transport) != 1){
+    if (HermesTransportWrapper_Check(transport) != 1) {
         //Py_DECREF(transport);
         PyErr_SetString(PyExc_TypeError, "credential_store return transport with incorrect type");
         return -1;
     }
-    hm_rpc_transport_t* data_hermes_transport = ((pyhermes_HermesTransportWrapperObject_t*)transport)->hermes_transport;
+    hm_rpc_transport_t *data_hermes_transport = ((pyhermes_HermesTransportWrapperObject_t *) transport)->hermes_transport;
     //Py_DECREF(transport);
 
     if (!(credential_store_transport)
         || !(data_store_transport)
         || !(key_store_transport)
         || !(self->mid_hermes = mid_hermes_create(
-            (const uint8_t *) id, (size_t) id_length, (const uint8_t *) sk, (size_t)sk_length,
+            (const uint8_t *) id, (size_t) id_length, (const uint8_t *) sk, (size_t) sk_length,
             key_hermes_transport, data_hermes_transport, credential_hermes_transport))) {
         return -1;
     }
@@ -262,15 +262,25 @@ static PyObject *MidHermes_denyUpdateAccess(pyhermes_MidHermesObject *self, PyOb
 
 
 static PyMethodDef MidHermes_methods[] = {
-        {"addBlock", (PyCFunction)MidHermes_addBlock, METH_VARARGS|METH_KEYWORDS, "add (block, meta) to hermes"},
-        {"getBlock", (PyCFunction)MidHermes_getBlock, METH_VARARGS|METH_KEYWORDS, "return (block, meta) from hermes"},
-        {"updBlock", (PyCFunction)MidHermes_updBlock, METH_VARARGS|METH_KEYWORDS, "update (block, meta) in hermes"},
-        {"delBlock", (PyCFunction)MidHermes_delBlock, METH_VARARGS|METH_KEYWORDS, "delete (block, meta) from hermes"},
-        {"rotateBlock", (PyCFunction)MidHermes_rotateBlock, METH_VARARGS|METH_KEYWORDS, "rotete block in hermes"},
-        {"grantReadAccess", (PyCFunction)MidHermes_grantReadAccess, METH_VARARGS|METH_KEYWORDS, "grant read access to user for block"},
-        {"grantUpdateAccess", (PyCFunction)MidHermes_grantUpdateAccess, METH_VARARGS|METH_KEYWORDS, "grant update access to user for block"},
-        {"denyReadAccess", (PyCFunction)MidHermes_denyReadAccess, METH_VARARGS|METH_KEYWORDS, "deny read access to user for block"},
-        {"denyUpdateAccess", (PyCFunction)MidHermes_denyUpdateAccess, METH_VARARGS|METH_KEYWORDS, "deny update access to user for block"},
+        {"addBlock",          (PyCFunction) MidHermes_addBlock,
+                                                                         METH_VARARGS |
+                                                                         METH_KEYWORDS, "add (block, meta) to hermes"},
+        {"getBlock",          (PyCFunction) MidHermes_getBlock,          METH_VARARGS |
+                                                                         METH_KEYWORDS, "return (block, meta) from hermes"},
+        {"updBlock",          (PyCFunction) MidHermes_updBlock,          METH_VARARGS |
+                                                                         METH_KEYWORDS, "update (block, meta) in hermes"},
+        {"delBlock",          (PyCFunction) MidHermes_delBlock,          METH_VARARGS |
+                                                                         METH_KEYWORDS, "delete (block, meta) from hermes"},
+        {"rotateBlock",       (PyCFunction) MidHermes_rotateBlock,       METH_VARARGS |
+                                                                         METH_KEYWORDS, "rotete block in hermes"},
+        {"grantReadAccess",   (PyCFunction) MidHermes_grantReadAccess,   METH_VARARGS |
+                                                                         METH_KEYWORDS, "grant read access to user for block"},
+        {"grantUpdateAccess", (PyCFunction) MidHermes_grantUpdateAccess, METH_VARARGS |
+                                                                         METH_KEYWORDS, "grant update access to user for block"},
+        {"denyReadAccess",    (PyCFunction) MidHermes_denyReadAccess,    METH_VARARGS |
+                                                                         METH_KEYWORDS, "deny read access to user for block"},
+        {"denyUpdateAccess",  (PyCFunction) MidHermes_denyUpdateAccess,  METH_VARARGS |
+                                                                         METH_KEYWORDS, "deny update access to user for block"},
         {NULL}  /* Sentinel */
 };
 

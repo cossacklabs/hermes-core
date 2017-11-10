@@ -27,7 +27,9 @@
 #include <hermes/rpc/transport.h>
 
 PyObject *HermesTransportError;
-hm_rpc_transport_t* transport_create(PyObject* transport);
-uint32_t transport_destroy(hm_rpc_transport_t** t);
+
+hm_rpc_transport_t *transport_create(PyObject *transport);
+
+uint32_t transport_destroy(hm_rpc_transport_t **t);
 
 #endif //TRANSPORT_H

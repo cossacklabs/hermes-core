@@ -1,6 +1,26 @@
+#
+# Copyright (c) 2017 Cossack Labs Limited
+#
+# This file is a part of Hermes-core.
+#
+# Hermes-core is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Hermes-core is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Hermes-core.  If not, see <http://www.gnu.org/licenses/>.
+#
+#
 # coding: utf-8
 import socket
 import base64
+
 try:
     from queue import Queue
 except ImportError:
@@ -10,7 +30,6 @@ import threading
 from unittest import TestCase, main
 
 import pyhermes
-
 
 QUEUE_TIMEOUT = THREAD_TIMEOUT = 2
 
@@ -76,6 +95,7 @@ class TestHermesTransport(TestCase):
                 result.put(hermes_transport, True)
             else:
                 result.put(hermes_transport, False)
+
         return f
 
     def test_secure_transport(self):
@@ -126,15 +146,15 @@ class TestHermes(TestCase):
     PUBLIC_KEY2 = base64.b64decode(b'VUVDMgAAAC0lAFeZAqw+nKzco1l2qtXELqVr7fmpsMf4hSrOa/TkAu5OQ6Cy')
 
     CREDENTIAL_ID = b"credential_store"
-    #CREDENTIAL_PRIVATE = base64.b64decode(b"UkVDMgAAAC1P6i5PAMI1t4G2xrmsMKi4TDVZ6ut6NsAOltsVcGga6qjEZBLp")
+    # CREDENTIAL_PRIVATE = base64.b64decode(b"UkVDMgAAAC1P6i5PAMI1t4G2xrmsMKi4TDVZ6ut6NsAOltsVcGga6qjEZBLp")
     CREDENTIAL_PUBLIC = base64.b64decode(b"VUVDMgAAAC1x1lf9Az0bNDSYU8TG8XcBBwsciK6nOo4H9/VeSb2carumNQla")
 
     KEY_STORE_ID = b"key_store_server"
-    #KEY_STORE_PRIVATE = base64.b64decode(b"UkVDMgAAAC1Mgh02ALY2AAa2J6peDmvEOQSN6+M8m6s/ZqTp0ffiZGcHsTgY")
+    # KEY_STORE_PRIVATE = base64.b64decode(b"UkVDMgAAAC1Mgh02ALY2AAa2J6peDmvEOQSN6+M8m6s/ZqTp0ffiZGcHsTgY")
     KEY_STORE_PUBLIC = base64.b64decode(b"VUVDMgAAAC3QMLOAAoms9u5nTh1Ir3AnTPt5RkMJY9leIfF6uMIxms/Bkywp")
 
     DATA_STORE_ID = b"data_store_server"
-    #DATA_STORE_PRIVATE = base64.b64decode(b"UkVDMgAAAC0tLpmOAEJCDkGPTr+l2jo+LWUbB7uSX567nzgmMfODl4wWTAH4")
+    # DATA_STORE_PRIVATE = base64.b64decode(b"UkVDMgAAAC0tLpmOAEJCDkGPTr+l2jo+LWUbB7uSX567nzgmMfODl4wWTAH4")
     DATA_STORE_PUBLIC = base64.b64decode(b"VUVDMgAAAC0VCQ/fAt88d2N8vDFVAKbDJHsXew8HgB55PIrVfhELXrEf1N89")
 
     def test_secure_midhermes(self):

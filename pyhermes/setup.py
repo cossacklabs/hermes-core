@@ -34,5 +34,27 @@ setup(
     name='pyhermes',
     version='0.5',
     description='python bindings for Hermes',
-    ext_modules=[py_c_hermes])
+    ext_modules=[py_c_hermes],
 
+    url='https://cossacklabs.com',
+    author='CossackLabs',
+    author_email='dev@cossacklabs.com',
+    classifiers=[
+        "Intended Audience :: Developers",
+        "Natural Language :: English",
+        #"Operating System :: MacOS :: MacOS X",
+        "Operating System :: POSIX",
+        #"Operating System :: POSIX :: BSD",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python",
+        #"Programming Language :: Python :: 2",
+        #"Programming Language :: Python :: 2.6",
+        #"Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.2",
+        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: Implementation :: CPython",
+    ],
+)

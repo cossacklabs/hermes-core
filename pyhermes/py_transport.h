@@ -24,9 +24,9 @@
 #include "transport.h"
 #include "py_transport_wrapper.h"
 
-typedef struct pyhermes_HermesTransportObject_type{
+typedef struct pyhermes_HermesTransportObject_type {
     PyObject_HEAD
-    hm_rpc_transport_t* hermes_transport;
+    hm_rpc_transport_t *hermes_transport;
 } pyhermes_HermesTransportObject_t;
 
 #endif //HERMES_CORE_PY_TRANSPORT_H

@@ -36,8 +36,8 @@ static int HermesTransport_init(pyhermes_HermesTransportObject_t *self, PyObject
         return -1;
     }
 
-    hm_rpc_transport_t* hermes_transport = transport_create(transport);
-    if (!hermes_transport){
+    hm_rpc_transport_t *hermes_transport = transport_create(transport);
+    if (!hermes_transport) {
         return -1;
     }
 
@@ -59,14 +59,14 @@ static PyObject *HermesTransport_new(PyTypeObject *type, PyObject *args, PyObjec
     return (PyObject *) self;
 }
 
-static PyObject* HermesTransport_get_hermes_transport(pyhermes_HermesTransportObject_t* self, PyObject *unused){
+static PyObject *HermesTransport_get_hermes_transport(pyhermes_HermesTransportObject_t *self, PyObject *unused) {
     return HermesTransportWrapper_FromHmRpcTransport(self->hermes_transport);
 }
 
 static PyMethodDef HermesTransport_methods[] = {
-        {"get_hermes_transport", (PyCFunction)HermesTransport_get_hermes_transport, METH_NOARGS,
+        {"get_hermes_transport", (PyCFunction) HermesTransport_get_hermes_transport, METH_NOARGS,
                 PyDoc_STR("return hermes transport object")},
-        {NULL,	NULL},
+        {NULL, NULL},
 };
 
 PyTypeObject pyhermes_HermesTransportType = {
