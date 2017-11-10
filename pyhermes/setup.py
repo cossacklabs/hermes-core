@@ -20,14 +20,41 @@
 
 from distutils.core import setup, Extension
 
-pyChermes = Extension(
-    'hermes', sources = ['pyhermes.c', 'transport.c'], include_dirs=['../include'], library_dirs=['../build'],
+py_c_hermes = Extension(
+    'pyhermes',
+    sources=['pyhermes.c', 'transport.c', 'py_secure_transport.c', 'py_midhermes.c', 'py_transport_wrapper.c',
+             'py_transport.c'
+             ],
+    include_dirs=['../include'],
+    library_dirs=['../build'],
     libraries=['hermes_mid_hermes', 'hermes_mid_hermes_ll', 'hermes_credential_store', 'hermes_data_store',
-               'hermes_key_store', 'hermes_rpc', 'hermes_common', 'themis', 'soter'])
+               'hermes_key_store', 'hermes_rpc', 'hermes_common', 'themis', 'soter', 'hermes_secure_transport'])
 
 setup(
-    name='hermes',
+    name='pyhermes',
     version='0.5',
     description='python bindings for Hermes',
-    ext_modules=[pyChermes])
+    ext_modules=[py_c_hermes],
 
+    url='https://cossacklabs.com',
+    author='CossackLabs',
+    author_email='dev@cossacklabs.com',
+    classifiers=[
+        "Intended Audience :: Developers",
+        "Natural Language :: English",
+        #"Operating System :: MacOS :: MacOS X",
+        "Operating System :: POSIX",
+        #"Operating System :: POSIX :: BSD",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python",
+        #"Programming Language :: Python :: 2",
+        #"Programming Language :: Python :: 2.6",
+        #"Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.2",
+        "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: Implementation :: CPython",
+    ],
+)

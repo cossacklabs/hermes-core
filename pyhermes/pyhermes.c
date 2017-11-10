@@ -21,308 +21,81 @@
 
 #include <Python.h>
 
-#include <hermes/mid_hermes/mid_hermes.h>
-#include "transport.h"
+PyObject *HermesError;
+extern PyObject *HermesTransportError;
+extern PyTypeObject pyhermes_SecureHermesTransportType;
+extern PyTypeObject pyhermes_MidHermesType;
+extern PyTypeObject pyhermes_HermesTransportType;
 
-static PyObject *HermesError;
-
-typedef struct {
-    PyObject_HEAD
-    hm_rpc_transport_t *credential_store_transport;
-    hm_rpc_transport_t *data_store_transport;
-    hm_rpc_transport_t *key_store_transport;
-    mid_hermes_t *mid_hermes;
-} pyhermes_MidHermesObject;
-
-static void MidHermes_dealloc(pyhermes_MidHermesObject *self) {
-    mid_hermes_destroy(&(self->mid_hermes));
-    transport_destroy(&(self->data_store_transport));
-    transport_destroy(&(self->key_store_transport));
-    transport_destroy(&(self->credential_store_transport));
-    Py_TYPE(self)->tp_free((PyObject *) self);
-}
-
-static int MidHermes_init(pyhermes_MidHermesObject *self, PyObject *args, PyObject *kwds) {
-    PyObject *credential_store_transport = NULL, *data_store_transport = NULL, *key_store_transport = NULL;
-    const char *id = NULL, *sk = NULL;
-    int id_length = 0, sk_length = 0;
-    static char *kwlist[] = {"id", "private_key", "cs_transport", "ds_transport", "ks_transport", NULL};
-    if (!PyArg_ParseTupleAndKeywords(
-            args, kwds, "s#s#OOO", kwlist, &id, &id_length, &sk, &sk_length, &credential_store_transport,
-            &data_store_transport, &key_store_transport)) {
-        return -1;
-    }
-    self->credential_store_transport = transport_create(credential_store_transport);
-    self->data_store_transport = transport_create(data_store_transport);
-    self->key_store_transport = transport_create(key_store_transport);
-    if (!(self->credential_store_transport)
-        || !(self->data_store_transport)
-        || !(self->key_store_transport)
-        || !(self->mid_hermes = mid_hermes_create(
-            (const uint8_t *) id, (size_t) id_length, (const uint8_t *) sk, sk_length,
-            self->key_store_transport, self->data_store_transport, self->credential_store_transport))) {
-        transport_destroy(&(self->data_store_transport));
-        transport_destroy(&(self->key_store_transport));
-        transport_destroy(&(self->credential_store_transport));
-        return -1;
-    }
-    return 0;
-}
-
-static PyObject *MidHermes_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
-    pyhermes_MidHermesObject *self;
-    self = (pyhermes_MidHermesObject *) type->tp_alloc(type, 0);
-    if (!self) {
-        PyErr_SetString(HermesError, "MidHermes memory allocation error");
-        return NULL;
-    }
-    if (0 != MidHermes_init(self, args, kwds)) {
-        PyErr_SetString(HermesError, "MidHermes object creation error");
-        return NULL;
-    }
-    return (PyObject *) self;
-}
-
-static PyObject *MidHermes_addBlock(pyhermes_MidHermesObject *self, PyObject *args, PyObject *kwds) {
-    const char *block_id = NULL, *block = NULL, *meta = NULL;
-    size_t block_id_length = 0, block_length = 0, meta_length = 0;
-    static char *kwlist[] = {"id", "data", "meta", NULL};
-    if (!PyArg_ParseTupleAndKeywords(
-            args, kwds, "y#y#y#", kwlist, &block_id, &block_id_length, &block, &block_length, &meta, &meta_length)) {
-        PyErr_SetString(HermesError, "MidHermes.addBlock invalid parameters");
-        return NULL;
-    }
-    if (0 != mid_hermes_create_block(
-            self->mid_hermes, (uint8_t **) (&block_id), &block_id_length, (const uint8_t *) block, block_length,
-            (const uint8_t *) meta, meta_length)) {
-        PyErr_SetString(HermesError, "MidHermes.addBlock error");
-        return NULL;
-    }
-    Py_RETURN_NONE;
-}
-
-static PyObject *MidHermes_updBlock(pyhermes_MidHermesObject *self, PyObject *args, PyObject *kwds) {
-    const char *block_id = NULL, *block = NULL, *meta = NULL;
-    size_t block_id_length = 0, block_length = 0, meta_length = 0;
-    static char *kwlist[] = {"id", "data", "meta", NULL};
-    if (!PyArg_ParseTupleAndKeywords(
-            args, kwds, "y#y#y#", kwlist, &block_id, &block_id_length, &block, &block_length, &meta, &meta_length)) {
-        PyErr_SetString(HermesError, "MidHermes.updBlock invalid parameters");
-        return NULL;
-    }
-    if (0 != mid_hermes_update_block(
-            self->mid_hermes, (const uint8_t *) block_id, block_id_length, (const uint8_t *) block, block_length,
-            (const uint8_t *) meta, meta_length)) {
-        PyErr_SetString(HermesError, "MidHermes.delBlock error");
-        return NULL;
-    }
-    Py_RETURN_NONE;
-}
-
-static PyObject *MidHermes_delBlock(pyhermes_MidHermesObject *self, PyObject *args, PyObject *kwds) {
-    const char *block_id = NULL;
-    size_t block_id_length = 0;
-    static char *kwlist[] = {"id", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "y#", kwlist, &block_id, &block_id_length)) {
-        PyErr_SetString(HermesError, "MidHermes.delBlock invalid parameters");
-        return NULL;
-    }
-    if (0 != mid_hermes_delete_block(self->mid_hermes, (const uint8_t *) block_id, block_id_length)) {
-        PyErr_SetString(HermesError, "MidHermes.delBlock error");
-        return NULL;
-    }
-    Py_RETURN_NONE;
-}
-
-static PyObject *MidHermes_getBlock(pyhermes_MidHermesObject *self, PyObject *args, PyObject *kwds) {
-    const char *block_id = NULL, *block = NULL, *meta = NULL;
-    size_t block_id_length = 0, block_length = 0, meta_length = 0;
-    static char *kwlist[] = {"id", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "y#", kwlist, &block_id, &block_id_length)) {
-        PyErr_SetString(HermesError, "MidHermes.getBlock invalid parameters");
-        return NULL;
-    }
-    if (0 != mid_hermes_read_block(
-            self->mid_hermes, (const uint8_t *) block_id, block_id_length, (uint8_t **) (&block), &block_length,
-            (uint8_t **) (&meta), &meta_length)) {
-        PyErr_SetString(HermesError, "MidHermes.getBlock error");
-        return NULL;
-    }
-    return Py_BuildValue("y#y#", block, block_length, meta, meta_length);
-}
-
-static PyObject *MidHermes_rotateBlock(pyhermes_MidHermesObject *self, PyObject *args, PyObject *kwds) {
-    const char *block_id = NULL;
-    size_t block_id_length = 0;
-    static char *kwlist[] = {"id", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "y#", kwlist, &block_id, &block_id_length)) {
-        PyErr_SetString(HermesError, "MidHermes.rotateBlock invalid parameters");
-        return NULL;
-    }
-    if (0 != mid_hermes_rotate_block(
-            self->mid_hermes, (const uint8_t *) block_id, block_id_length)) {
-        PyErr_SetString(HermesError, "MidHermes.rotateBlock error");
-        return NULL;
-    }
-    Py_RETURN_NONE;
-}
-
-static PyObject *MidHermes_grantReadAccess(pyhermes_MidHermesObject *self, PyObject *args, PyObject *kwds) {
-    const char *block_id = NULL, *user_id = NULL;
-    size_t block_id_length = 0, user_id_length = 0;
-    static char *kwlist[] = {"id", "user", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "y#y#", kwlist, &block_id, &block_id_length, &user_id,
-                                     &user_id_length)) {
-        PyErr_SetString(HermesError, "MidHermes.grantReadAccess invalid parameters");
-        return NULL;
-    }
-    if (0 != mid_hermes_grant_read_access(
-            self->mid_hermes, (const uint8_t *) block_id, block_id_length, (const uint8_t *) user_id, user_id_length)) {
-        PyErr_SetString(HermesError, "MidHermes.grantReadAccess error");
-        return NULL;
-    }
-    Py_RETURN_NONE;
-}
-
-static PyObject *MidHermes_grantUpdateAccess(pyhermes_MidHermesObject *self, PyObject *args, PyObject *kwds) {
-    const char *block_id = NULL, *user_id = NULL;
-    size_t block_id_length = 0, user_id_length = 0;
-    static char *kwlist[] = {"id", "user", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "y#y#", kwlist, &block_id, &block_id_length, &user_id,
-                                     &user_id_length)) {
-        PyErr_SetString(HermesError, "MidHermes.grantUpdateAccess invalid parameters");
-        return NULL;
-    }
-    if (0 != mid_hermes_grant_update_access(
-            self->mid_hermes, (const uint8_t *) block_id, block_id_length, (const uint8_t *) user_id, user_id_length)) {
-        PyErr_SetString(HermesError, "MidHermes.grantUpdateAccess error");
-        return NULL;
-    }
-    Py_RETURN_NONE;
-}
-
-static PyObject *MidHermes_denyReadAccess(pyhermes_MidHermesObject *self, PyObject *args, PyObject *kwds) {
-    const char *block_id = NULL, *user_id = NULL;
-    size_t block_id_length = 0, user_id_length = 0;
-    static char *kwlist[] = {"id", "user", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "y#y#", kwlist, &block_id, &block_id_length, &user_id,
-                                     &user_id_length)) {
-        PyErr_SetString(HermesError, "MidHermes.denyReadAccess invalid parameters");
-        return NULL;
-    }
-    if (0 != mid_hermes_deny_read_access(
-            self->mid_hermes, (const uint8_t *) block_id, block_id_length, (const uint8_t *) user_id, user_id_length)) {
-        PyErr_SetString(HermesError, "MidHermes.denyReadAccess error");
-        return NULL;
-    }
-    Py_RETURN_NONE;
-}
-
-static PyObject *MidHermes_denyUpdateAccess(pyhermes_MidHermesObject *self, PyObject *args, PyObject *kwds) {
-    const char *block_id = NULL, *user_id = NULL;
-    size_t block_id_length = 0, user_id_length = 0;
-    static char *kwlist[] = {"id", "user", NULL};
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "y#y#", kwlist, &block_id, &block_id_length, &user_id,
-                                     &user_id_length)) {
-        PyErr_SetString(HermesError, "MidHermes.denyUpdateAccess invalid parameters");
-        return NULL;
-    }
-    if (0 != mid_hermes_deny_update_access(
-            self->mid_hermes, (const uint8_t *) block_id, block_id_length, (const uint8_t *) user_id, user_id_length)) {
-        PyErr_SetString(HermesError, "MidHermes.denyUpdateAccess error");
-        return NULL;
-    }
-    Py_RETURN_NONE;
-}
-
-
-static PyMethodDef MidHermes_methods[] = {
-        {"addBlock", (PyCFunction)MidHermes_addBlock, METH_VARARGS|METH_KEYWORDS, "add (block, meta) to hermes"},
-        {"getBlock", (PyCFunction)MidHermes_getBlock, METH_VARARGS|METH_KEYWORDS, "return (block, meta) from hermes"},
-        {"updBlock", (PyCFunction)MidHermes_updBlock, METH_VARARGS|METH_KEYWORDS, "update (block, meta) in hermes"},
-        {"delBlock", (PyCFunction)MidHermes_delBlock, METH_VARARGS|METH_KEYWORDS, "delete (block, meta) from hermes"},
-        {"rotateBlock", (PyCFunction)MidHermes_rotateBlock, METH_VARARGS|METH_KEYWORDS, "rotete block in hermes"},
-        {"grantReadAccess", (PyCFunction)MidHermes_grantReadAccess, METH_VARARGS|METH_KEYWORDS, "grant read access to user for block"},
-        {"grantUpdateAccess", (PyCFunction)MidHermes_grantUpdateAccess, METH_VARARGS|METH_KEYWORDS, "grant update access to user for block"},
-        {"denyReadAccess", (PyCFunction)MidHermes_denyReadAccess, METH_VARARGS|METH_KEYWORDS, "deny read access to user for block"},
-        {"denyUpdateAccess", (PyCFunction)MidHermes_denyUpdateAccess, METH_VARARGS|METH_KEYWORDS, "deny update access to user for block"},
-        {NULL}  /* Sentinel */
-};
-
-static PyTypeObject pyhermes_MidHermesType = {
-        PyVarObject_HEAD_INIT(NULL, 0)
-        "hermes.MidHermes",             /* tp_name */
-        sizeof(pyhermes_MidHermesObject), /* tp_basicsize */
-        0,                         /* tp_itemsize */
-        (destructor) MidHermes_dealloc,         /* tp_dealloc */
-        0,                         /* tp_print */
-        0,                         /* tp_getattr */
-        0,                         /* tp_setattr */
-        0,                         /* tp_reserved */
-        0,                         /* tp_repr */
-        0,                         /* tp_as_number */
-        0,                         /* tp_as_sequence */
-        0,                         /* tp_as_mapping */
-        0,                         /* tp_hash  */
-        0,                         /* tp_call */
-        0,                         /* tp_str */
-        0,                         /* tp_getattro */
-        0,                         /* tp_setattro */
-        0,                         /* tp_as_buffer */
-        Py_TPFLAGS_DEFAULT,        /* tp_flags */
-        "MidHermes objects",           /* tp_doc */
-        0,                         /* tp_traverse */
-        0,                         /* tp_clear */
-        0,                         /* tp_richcompare */
-        0,                         /* tp_weaklistoffset */
-        0,                         /* tp_iter */
-        0,                         /* tp_iternext */
-        MidHermes_methods,             /* tp_methods */
-        NULL,             /* tp_members */
-        0,                         /* tp_getset */
-        0,                         /* tp_base */
-        0,                         /* tp_dict */
-        0,                         /* tp_descr_get */
-        0,                         /* tp_descr_set */
-        0,                         /* tp_dictoffset */
-        NULL,//(initproc)MidHermes_init,      /* tp_init */
-        0,                         /* tp_alloc */
-        MidHermes_new,                 /* tp_new */
-};
+#if PY_MAJOR_VERSION >= 3
 
 static PyModuleDef pyhermesmodule = {
         PyModuleDef_HEAD_INIT,
-        "hermes",
-        "Hermes",
+        "pyhermes",
+        "PyHermes",
         -1,
         NULL, NULL, NULL, NULL, NULL
 };
 
+#define INITERROR return NULL
 
-PyMODINIT_FUNC PyInit_hermes(void) {
+PyMODINIT_FUNC PyInit_pyhermes(void)
+#else
+#define INITERROR return
+
+void initpyhermes(void)
+#endif
+{
+    if (PyType_Ready(&pyhermes_MidHermesType) < 0) {
+        INITERROR;
+    }
+
+    if (PyType_Ready(&pyhermes_SecureHermesTransportType) < 0) {
+        INITERROR;
+    }
+
+    if (PyType_Ready(&pyhermes_HermesTransportType) < 0) {
+        INITERROR;
+    }
+
     PyObject *m;
-
-    if (PyType_Ready(&pyhermes_MidHermesType) < 0)
-        return NULL;
-
+#if PY_MAJOR_VERSION >= 3
     m = PyModule_Create(&pyhermesmodule);
+#else
+    m =  Py_InitModule("pyhermes", NULL);
+#endif
     if (m == NULL)
-        return NULL;
+        INITERROR;
 
-    HermesError = PyErr_NewException("hermes.HermesError", NULL, NULL);
+    HermesError = PyErr_NewException("pyhermes.HermesError", NULL, NULL);
     Py_INCREF(HermesError);
     PyModule_AddObject(m, "HermesError", HermesError);
 
+    HermesTransportError = PyErr_NewException("pyhermes.HermesTransportError", NULL, NULL);
+    Py_INCREF(HermesTransportError);
+    PyModule_AddObject(m, "HermesTransportError", HermesTransportError);
+
     Py_INCREF(&pyhermes_MidHermesType);
     PyModule_AddObject(m, "MidHermes", (PyObject *) &pyhermes_MidHermesType);
+
+    Py_INCREF(&pyhermes_SecureHermesTransportType);
+    PyModule_AddObject(m, "SecureHermesTransport", (PyObject *) &pyhermes_SecureHermesTransportType);
+
+    Py_INCREF(&pyhermes_HermesTransportType);
+    PyModule_AddObject(m, "HermesTransport", (PyObject *) &pyhermes_HermesTransportType);
+
+#if PY_MAJOR_VERSION >= 3
     return m;
+#endif
 }
 
 int main(int argc, char *argv[]) {
-    PyImport_AppendInittab("hermes", PyInit_hermes);
+#if PY_MAJOR_VERSION >= 3
+    PyImport_AppendInittab("pyhermes", PyInit_pyhermes);
+#endif
     //  Py_SetProgramName(argv[0]);
     Py_Initialize();
-    PyImport_ImportModule("hermes");
+    PyImport_ImportModule("pyhermes");
     return 0;
 }
 

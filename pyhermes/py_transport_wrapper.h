@@ -18,18 +18,18 @@
 *
 */
 
+#ifndef HERMES_CORE_PY_TRANSPORT_WRAPPER_H
+#define HERMES_CORE_PY_TRANSPORT_WRAPPER_H
 
+typedef struct pyhermes_HermesTransportWrapperObject_type {
+    PyObject_HEAD
+    hm_rpc_transport_t *hermes_transport;
+} pyhermes_HermesTransportWrapperObject_t;
 
-#ifndef TRANSPORT_H
-#define TRANSPORT_H
+PyTypeObject pyhermes_HermesTransportWrapperType;
 
-#include <Python.h>
-#include <hermes/rpc/transport.h>
+PyObject *HermesTransportWrapper_FromHmRpcTransport(hm_rpc_transport_t *transport);
 
-PyObject *HermesTransportError;
+int HermesTransportWrapper_Check(PyObject *transport);
 
-hm_rpc_transport_t *transport_create(PyObject *transport);
-
-uint32_t transport_destroy(hm_rpc_transport_t **t);
-
-#endif //TRANSPORT_H
+#endif //HERMES_CORE_PY_TRANSPORT_WRAPPER_H

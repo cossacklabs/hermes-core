@@ -381,7 +381,7 @@ collect_headers:
 
 COSSACKLABS_URL = https://www.cossacklabs.com
 MAINTAINER = "Cossack Labs Limited <dev@cossacklabs.com>"
-LICENSE_NAME = "Apache License Version 2.0"
+LICENSE_NAME = "GNU Affero General Public License v3.0"
 SHORT_DESCRIPTION = Hermes is a cryptography-based method of providing protected data storage and sharing
 RPM_SUMMARY = "Hermes is a cryptography-based method of providing protected data \
 	storage and sharing that allows enforcing cryptographically checked CRUD \

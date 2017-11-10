@@ -7,3 +7,6 @@ tests/db/**
 cmake-build-debug/**
 
 hermes_env/**
+pyhermes/__pycache__/
+pyhermes/build/
+*.py[cod]
