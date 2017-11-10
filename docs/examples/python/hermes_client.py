@@ -23,7 +23,8 @@
 import socket
 import argparse
 import base64
-import hermes
+import json
+import pyhermes
 
 
 class Transport(object):
@@ -88,40 +89,36 @@ parser.add_argument('--doc', dest='doc_file_name', required=True,
 parser.add_argument('--meta', dest='meta', help='document meta data')
 parser.add_argument('--for_user', dest='for_user',
                     help='peer user identifier')
-parser.add_argument('--credential_store_host', dest='credential_store_host',
-                    default='127.0.0.1', help='host to credential store server')
-parser.add_argument('--credential_store_port', dest='credential_store_port',
-                    type=int, default=8888,
-                    help='port of credential store server')
-
-parser.add_argument('--data_store_host', dest='data_store_host',
-                    default='127.0.0.1', help='host to data store server')
-parser.add_argument('--data_store_port', dest='data_store_port',
-                    type=int, default=8889,
-                    help='port of data store server')
 
 
-parser.add_argument('--key_store_host', dest='key_store_host',
-                    default='127.0.0.1', help='host to key store server')
-parser.add_argument('--key_store_port', dest='key_store_port',
-                    type=int, default=8890,
-                    help='port of key store server')
+parser.add_argument('--config', dest='config', help='Path to config file', default='config.json')
 
 args = parser.parse_args()
-
-credential_store_transport = Trasnport(
-    args.credential_store_host, args.credential_store_port)
-data_store_transport = Trasnport(
-    args.data_store_host, args.data_store_port)
-key_store_transport = Trasnport(
-    args.key_store_host, args.key_store_port)
 
 with open(args.private_key, 'rb') as f:
     private_key = f.read()
 
-mid_hermes = hermes.MidHermes(
-    args.id, private_key, credential_store_transport,
-    data_store_transport, key_store_transport)
+with open(args.config, 'rb') as f:
+    config = json.load(f)
+
+credential_store_transport = Transport(config['credential_store_host'], config['credential_store_port'])
+key_store_transport = Transport(config['key_store_host'], config['key_store_port'])
+data_store_transport = Transport(config['data_store_host'], config['data_store_port'])
+
+credential_store_secure_transport = pyhermes.SecureHermesTransport(
+    args.id.encode('utf-8'), private_key, config['credential_store_id'].encode("utf-8"),
+    base64.b64decode(config['credential_store_public_key'].encode('utf-8')), credential_store_transport, False)
+key_store_secure_transport = pyhermes.SecureHermesTransport(
+    args.id.encode('utf-8'), private_key, config['key_store_id'].encode("utf-8"),
+    base64.b64decode(config['key_store_public_key'].encode('utf-8')), key_store_transport, False)
+data_store_secure_transport = pyhermes.SecureHermesTransport(
+    args.id.encode('utf-8'), private_key, config['data_store_id'].encode("utf-8"),
+    base64.b64decode(config['data_store_public_key'].encode('utf-8')), data_store_transport, False)
+
+
+mid_hermes = pyhermes.MidHermes(
+    args.id, private_key, credential_store_secure_transport,
+    data_store_secure_transport, key_store_secure_transport)
 
 if not (args.add or args.read or args.update or args.delete or args.rotate or
             args.grant_read or args.grant_update or args.revoke_update or
@@ -129,6 +126,7 @@ if not (args.add or args.read or args.update or args.delete or args.rotate or
     print("choose any command add|read|update|delete|rotate|grant_read|grant_update|"
           "revoke_read|revoke_update")
     exit(1)
+
 
 if args.add and args.meta is not None:
     block = open(args.doc_file_name, 'rb').read()

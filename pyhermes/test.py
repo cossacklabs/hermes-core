@@ -1,11 +1,18 @@
 # coding: utf-8
 import socket
 import base64
-import queue
+try:
+    from queue import Queue
+except ImportError:
+    from Queue import Queue
+
 import threading
-from unittest import TestCase, main, skip
+from unittest import TestCase, main
 
 import pyhermes
+
+
+QUEUE_TIMEOUT = THREAD_TIMEOUT = 2
 
 
 class TCPTransport:
@@ -38,15 +45,15 @@ class TCPTransport:
 
 
 class BufferTransport:
-    def __init__(self, buffer_in: queue.Queue, buffer_out: queue.Queue):
+    def __init__(self, buffer_in, buffer_out):
         self.buffer_in = buffer_in
         self.buffer_out = buffer_out
 
     def send(self, msg):
-        self.buffer_out.put(msg)
+        self.buffer_out.put(msg, timeout=QUEUE_TIMEOUT)
 
     def receive(self, needed_length):
-        data = self.buffer_in.get()
+        data = self.buffer_in.get(timeout=QUEUE_TIMEOUT)
         if not data or len(data) != needed_length:
             raise RuntimeError("socket connection broken")
         self.buffer_in.task_done()
@@ -54,8 +61,6 @@ class BufferTransport:
 
 
 class TestHermesTransport(TestCase):
-    TIMEOUT = 1
-
     USER_ID1 = b'user1'
     PRIVATE_KEY1 = base64.b64decode(b'UkVDMgAAAC0Tj5tGAPfpgfYMBACxX6onvlWvcc2Gb9ZylBlJdjebTpV3OCIx')
     PUBLIC_KEY1 = base64.b64decode(b'VUVDMgAAAC2ISqIZApjrN6BCVmWoJdbhjN2EmBAfLq3VKEdRnz0gVdYcIDQp')
@@ -74,33 +79,41 @@ class TestHermesTransport(TestCase):
         return f
 
     def test_secure_transport(self):
-        buffer_in = queue.Queue()
-        buffer_out = queue.Queue()
-        result = queue.Queue()
+        buffer_in = Queue()
+        buffer_out = Queue()
+        result = Queue()
         transportClient = BufferTransport(buffer_out, buffer_in)
         transportServer = BufferTransport(buffer_in, buffer_out)
 
-        server_thread = threading.Thread(target=self.create_transport(self.USER_ID1, self.PRIVATE_KEY1, self.USER_ID2, self.PUBLIC_KEY2, transportServer, True, result))
+        server_thread = threading.Thread(target=self.create_transport(
+            self.USER_ID1, self.PRIVATE_KEY1, self.USER_ID2, self.PUBLIC_KEY2, transportServer, True, result))
         server_thread.start()
-        client_thread = threading.Thread(target=self.create_transport(self.USER_ID2, self.PRIVATE_KEY2, self.USER_ID1, self.PUBLIC_KEY1, transportClient, False, result))
+
+        client_thread = threading.Thread(target=self.create_transport(
+            self.USER_ID2, self.PRIVATE_KEY2, self.USER_ID1, self.PUBLIC_KEY1, transportClient, False, result))
         client_thread.start()
 
-        server_thread.join(timeout=self.TIMEOUT)
-        client_thread.join(timeout=self.TIMEOUT)
+        server_thread.join(timeout=THREAD_TIMEOUT)
+        client_thread.join(timeout=THREAD_TIMEOUT)
         buffer_in.join()
         buffer_out.join()
 
         # wait result from threads
-        transportA, transportB = [result.get(timeout=self.TIMEOUT) for _ in range(2)]
-
+        transportA, transportB = [result.get(timeout=QUEUE_TIMEOUT) for _ in range(2)]
 
     def test_transport(self):
-        buffer_in = queue.Queue(2)
-        buffer_out = queue.Queue(2)
+        buffer_in = Queue(5)
+        buffer_out = Queue(5)
         transportClient = BufferTransport(buffer_out, buffer_in)
         transportServer = BufferTransport(buffer_in, buffer_out)
         hermes_transport_server = pyhermes.HermesTransport(transportServer)
         hermes_transport_client = pyhermes.HermesTransport(transportClient)
+
+    def test_get_hermes_transport(self):
+        """check correct decreasing reference on C side"""
+        transport = pyhermes.HermesTransport(None)
+        transport.get_hermes_transport()
+        transport.get_hermes_transport()
 
 
 class TestHermes(TestCase):
@@ -145,7 +158,7 @@ class TestHermes(TestCase):
             data_store_transport2 = pyhermes.SecureHermesTransport(
                 self.USER_ID1, self.PRIVATE_KEY1, self.DATA_STORE_ID, self.DATA_STORE_PUBLIC,
                 TCPTransport("127.0.0.1", 8890), False)
-        except ConnectionRefusedError:
+        except (ConnectionRefusedError, pyhermes.HermesTransportError):
             self.skipTest("credential|key|data store service not started on 8888|8889|8890 port respectively")
             return
 
@@ -217,6 +230,7 @@ class TestHermes(TestCase):
             pass
 
         mid_hermes1.delBlock(block_id)
+
 
 if __name__ == '__main__':
     main()

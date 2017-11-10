@@ -27,6 +27,8 @@ extern PyTypeObject pyhermes_SecureHermesTransportType;
 extern PyTypeObject pyhermes_MidHermesType;
 extern PyTypeObject pyhermes_HermesTransportType;
 
+#if PY_MAJOR_VERSION >= 3
+
 static PyModuleDef pyhermesmodule = {
         PyModuleDef_HEAD_INIT,
         "pyhermes",
@@ -35,24 +37,35 @@ static PyModuleDef pyhermesmodule = {
         NULL, NULL, NULL, NULL, NULL
 };
 
-PyMODINIT_FUNC PyInit_pyhermes(void) {
-    PyObject *m;
+#define INITERROR return NULL
 
+PyMODINIT_FUNC PyInit_pyhermes(void)
+#else
+#define INITERROR return
+
+void initpyhermes(void)
+#endif
+{
     if (PyType_Ready(&pyhermes_MidHermesType) < 0){
-        return NULL;
+        INITERROR;
     }
 
     if (PyType_Ready(&pyhermes_SecureHermesTransportType) < 0){
-        return NULL;
+        INITERROR;
     }
 
     if (PyType_Ready(&pyhermes_HermesTransportType) < 0){
-        return NULL;
+        INITERROR;
     }
 
+    PyObject *m;
+#if PY_MAJOR_VERSION >= 3
     m = PyModule_Create(&pyhermesmodule);
+#else
+    m =  Py_InitModule("pyhermes", NULL);
+#endif
     if (m == NULL)
-        return NULL;
+        INITERROR;
 
     HermesError = PyErr_NewException("pyhermes.HermesError", NULL, NULL);
     Py_INCREF(HermesError);
@@ -71,11 +84,15 @@ PyMODINIT_FUNC PyInit_pyhermes(void) {
     Py_INCREF(&pyhermes_HermesTransportType);
     PyModule_AddObject(m, "HermesTransport", (PyObject*) &pyhermes_HermesTransportType);
 
+#if PY_MAJOR_VERSION >= 3
     return m;
+#endif
 }
 
 int main(int argc, char *argv[]) {
+#if PY_MAJOR_VERSION >= 3
     PyImport_AppendInittab("pyhermes", PyInit_pyhermes);
+#endif
     //  Py_SetProgramName(argv[0]);
     Py_Initialize();
     PyImport_ImportModule("pyhermes");

@@ -24,12 +24,12 @@
 #include "py_transport_wrapper.h"
 
 PyObject* HermesTransportWrapper_FromHmRpcTransport(hm_rpc_transport_t* transport){
-    pyhermes_HermesTransportWrapperObject_t* object = (pyhermes_HermesTransportWrapperObject_t*) PyObject_MALLOC(sizeof(pyhermes_HermesTransportWrapperObject_t));
+    pyhermes_HermesTransportWrapperObject_t* object = (pyhermes_HermesTransportWrapperObject_t*)PyObject_New(pyhermes_HermesTransportWrapperObject_t, &pyhermes_HermesTransportWrapperType);
     if(!object){
         return PyErr_NoMemory();
     }
-    (void)PyObject_INIT(object, &pyhermes_HermesTransportWrapperType);
     object->hermes_transport = transport;
+    Py_INCREF(object);
     return (PyObject*)object;
 }
 
