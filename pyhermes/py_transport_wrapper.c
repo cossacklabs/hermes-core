@@ -18,9 +18,6 @@
 *
 */
 
-#include <Python.h>
-#include <hermes/rpc/transport.h>
-#include "transport.h"
 #include "py_transport_wrapper.h"
 
 PyObject *HermesTransportWrapper_FromHmRpcTransport(hm_rpc_transport_t *transport) {

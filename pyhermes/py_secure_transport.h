@@ -21,6 +21,12 @@
 #ifndef HERMES_CORE_SECURE_TRANSPORT_H
 #define HERMES_CORE_SECURE_TRANSPORT_H
 
+#include <Python.h>
+#include <hermes/secure_transport/transport.h>
+#include "transport.h"
+#include "py_transport_wrapper.h"
+
+
 typedef struct pyhermes_SecureHermesTransportObject_type {
     PyObject_HEAD
     hm_rpc_transport_t *hermes_transport;
