@@ -26,7 +26,7 @@
 #include <Python.h>
 #include <hermes/rpc/transport.h>
 
-PyObject *HermesTransportError;
+extern PyObject *HermesTransportError;
 
 hm_rpc_transport_t *transport_create(PyObject *transport);
 

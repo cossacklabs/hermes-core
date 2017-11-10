@@ -19,13 +19,9 @@
 */
 
 
-#include <Python.h>
 
-#include <hermes/mid_hermes/mid_hermes.h>
-#include <hermes/secure_transport/transport.h>
+
 #include "py_secure_transport.h"
-#include "transport.h"
-#include "py_transport_wrapper.h"
 
 extern PyObject *HermesTransportError;
 

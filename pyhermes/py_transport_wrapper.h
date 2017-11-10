@@ -21,12 +21,16 @@
 #ifndef HERMES_CORE_PY_TRANSPORT_WRAPPER_H
 #define HERMES_CORE_PY_TRANSPORT_WRAPPER_H
 
+#include <Python.h>
+#include <hermes/rpc/transport.h>
+#include "transport.h"
+
 typedef struct pyhermes_HermesTransportWrapperObject_type {
     PyObject_HEAD
     hm_rpc_transport_t *hermes_transport;
 } pyhermes_HermesTransportWrapperObject_t;
 
-PyTypeObject pyhermes_HermesTransportWrapperType;
+extern PyTypeObject pyhermes_HermesTransportWrapperType;
 
 PyObject *HermesTransportWrapper_FromHmRpcTransport(hm_rpc_transport_t *transport);
 
