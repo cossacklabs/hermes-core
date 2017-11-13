@@ -24,7 +24,9 @@
 #define TRANSPORT_H
 
 #include <Python.h>
+#include "bytesobject.h"
 #include <hermes/rpc/transport.h>
+#include <hermes/common/errors.h>
 
 extern PyObject *HermesTransportError;
 
