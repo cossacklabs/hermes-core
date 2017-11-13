@@ -20,13 +20,15 @@
 # coding: utf-8
 import socket
 import base64
+import threading
 
 try:
+    # Python3
     from queue import Queue
 except ImportError:
+    # Python2
     from Queue import Queue
 
-import threading
 from unittest import TestCase, main
 
 import pyhermes
@@ -34,7 +36,7 @@ import pyhermes
 QUEUE_TIMEOUT = THREAD_TIMEOUT = 2
 
 
-class TCPTransport:
+class TCPTransport(object):
     def __init__(self, host, port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((host, port))
@@ -63,7 +65,7 @@ class TCPTransport:
         return b''.join(output)
 
 
-class BufferTransport:
+class BufferTransport(object):
     def __init__(self, buffer_in, buffer_out):
         self.buffer_in = buffer_in
         self.buffer_out = buffer_out
@@ -92,9 +94,9 @@ class TestHermesTransport(TestCase):
         def f():
             hermes_transport = pyhermes.SecureHermesTransport(user_id, private, public_id, public, transport, is_server)
             if is_server:
-                result.put(hermes_transport, True)
+                result.put((hermes_transport, True), timeout=QUEUE_TIMEOUT)
             else:
-                result.put(hermes_transport, False)
+                result.put((hermes_transport, False), timeout=QUEUE_TIMEOUT)
 
         return f
 
@@ -122,8 +124,8 @@ class TestHermesTransport(TestCase):
         transportA, transportB = [result.get(timeout=QUEUE_TIMEOUT) for _ in range(2)]
 
     def test_transport(self):
-        buffer_in = Queue(5)
-        buffer_out = Queue(5)
+        buffer_in = Queue()
+        buffer_out = Queue()
         transportClient = BufferTransport(buffer_out, buffer_in)
         transportServer = BufferTransport(buffer_in, buffer_out)
         hermes_transport_server = pyhermes.HermesTransport(transportServer)
@@ -178,7 +180,7 @@ class TestHermes(TestCase):
             data_store_transport2 = pyhermes.SecureHermesTransport(
                 self.USER_ID1, self.PRIVATE_KEY1, self.DATA_STORE_ID, self.DATA_STORE_PUBLIC,
                 TCPTransport("127.0.0.1", 8890), False)
-        except (ConnectionRefusedError, pyhermes.HermesTransportError):
+        except (IOError, pyhermes.HermesTransportError):
             self.skipTest("credential|key|data store service not started on 8888|8889|8890 port respectively")
             return
 
@@ -195,7 +197,7 @@ class TestHermes(TestCase):
             credential_store_transport2 = pyhermes.HermesTransport(TCPTransport("127.0.0.1", 8888))
             key_store_transport2 = pyhermes.HermesTransport(TCPTransport("127.0.0.1", 8889))
             data_store_transport2 = pyhermes.HermesTransport(TCPTransport("127.0.0.1", 8890))
-        except ConnectionRefusedError:
+        except IOError:
             self.skipTest("credential|key|data store service not started on 8888|8889|8890 port respectively")
             return
         self._test_mid_hermes(credential_store_transport1, key_store_transport1, data_store_transport1,

@@ -25,8 +25,6 @@ py_c_hermes = Extension(
     sources=['pyhermes.c', 'transport.c', 'py_secure_transport.c', 'py_midhermes.c', 'py_transport_wrapper.c',
              'py_transport.c'
              ],
-    include_dirs=['../include'],
-    library_dirs=['../build'],
     libraries=['hermes_mid_hermes', 'hermes_mid_hermes_ll', 'hermes_credential_store', 'hermes_data_store',
                'hermes_key_store', 'hermes_rpc', 'hermes_common', 'themis', 'soter', 'hermes_secure_transport'])
 
@@ -42,14 +40,14 @@ setup(
     classifiers=[
         "Intended Audience :: Developers",
         "Natural Language :: English",
-        #"Operating System :: MacOS :: MacOS X",
+        "Operating System :: MacOS :: MacOS X",
         "Operating System :: POSIX",
         #"Operating System :: POSIX :: BSD",
         "Operating System :: POSIX :: Linux",
         "Programming Language :: Python",
-        #"Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 2",
         #"Programming Language :: Python :: 2.6",
-        #"Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.2",
         "Programming Language :: Python :: 3.3",

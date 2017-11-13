@@ -20,14 +20,29 @@
 
 
 #include "transport.h"
-#include <hermes/common/errors.h>
-
 
 uint32_t transport_send(void *transport, const uint8_t *buf, const size_t buf_length) {
     if (!transport || !buf || !buf_length) {
         return HM_FAIL;
     }
-    PyObject_CallMethod((PyObject *) transport, "send", "y#", (const char *) buf, buf_length);
+    PyObject* buf_object = PyBytes_FromStringAndSize((char*)buf, buf_length);
+    if (!buf_object){
+        return HM_FAIL;
+    }
+    PyObject* method_name = PyUnicode_FromString("send");
+    if(!method_name){
+        Py_DECREF(buf_object);
+        return HM_FAIL;
+    }
+
+    PyObject* object = (PyObject*) transport;
+    Py_INCREF(object);
+
+    PyObject_CallMethodObjArgs(object, method_name, buf_object, NULL);
+
+    Py_DECREF(object);
+    Py_DECREF(method_name);
+    Py_DECREF(buf_object);
     return HM_SUCCESS;
 }
 
@@ -40,7 +55,7 @@ uint32_t transport_recv(void *transport, uint8_t *buf, size_t buf_length) {
         return HM_FAIL;
     }
     if (!(PyBytes_Check(result) || ((size_t) PyBytes_Size(result) != buf_length))) {
-        Py_XDECREF(result);
+        Py_DECREF(result);
         return HM_FAIL;
     }
     memcpy(buf, PyBytes_AsString(result), buf_length);
@@ -64,7 +79,7 @@ uint32_t transport_destroy(hm_rpc_transport_t **transport) {
     if (!transport || !(*transport) || !((*transport)->user_data)) {
         return HM_FAIL;
     }
-    Py_XDECREF((PyObject *) (*transport)->user_data);
+    Py_DECREF((PyObject *) (*transport)->user_data);
     free(*transport);
     *transport = NULL;
     return HM_SUCCESS;
