@@ -27,10 +27,10 @@ dependencies:
     - make
     - sudo make install
     - sudo pip install tox
-    - pyenv global 2.7.12 3.1.5 3.3.6 3.4.4 3.5.3 3.6.2
+    - pyenv global 2.7.12 3.3.6 3.4.4 3.5.3 3.6.2
 
 test:
   override:
     - make test
     # run only TestHermesTransport until add support of running stores
-    - cd pyhermes && tox -e py31,py33,py34,py35,py36,py27 -- python -m unittest test.TestHermesTransport
+    - cd pyhermes && tox -e py33,py34,py35,py36,py27 -- python -m unittest test.TestHermesTransport
