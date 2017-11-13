@@ -20,13 +20,34 @@
 
 dependencies:
   pre:
-    - sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libssl-dev build-essential
+    - sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libssl-dev build-essential python-dev python3-dev python-setuptools python3-setuptools
     - git clone https://github.com/cossacklabs/themis && cd themis && sudo make install
 
   override:
     - make
     - sudo make install
+    - sudo pip install tox
+    - pyenv global 2.7.12 3.3.6 3.4.4 3.5.3 3.6.2
+    - mkdir -p db/credential_store db/key_store db/data_store
+    - cp ./docs/examples/c/service_keys/* db/credential_store/
+    - make examples
+    - ./docs/examples/c/mid_hermes/credential_store_service/cs
+      - background: true
+    - ./docs/examples/c/mid_hermes/key_store_service/ks
+          - background: true
+    - ./docs/examples/c/mid_hermes/data_store_service/ds
+          - background: true
+
 
 test:
   override:
-    - make test 
+    - make test
+    # run only TestHermesTransport until add support of running stores
+    - rm -rf db/key_store/* && \
+      rm -rf db/data_store/* && \
+      cd pyhermes && \
+      tox -e py33,py34,py35,py36,py27 -- python -m unittest test.TestHermesTransport test.TestHermes.test_secure_midhermes
+
+    - rm -rf db/key_store/* && \
+      rm -rf db/data_store/* && \
+      sh docs/examples/go/tests/go_test.sh
