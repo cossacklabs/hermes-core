@@ -12,6 +12,8 @@ dependencies:
     - mkdir -p db/credential_store db/key_store db/data_store
     - cp ./docs/examples/c/service_keys/* db/credential_store/
     - cp ./docs/examples/test_keys/* db/credential_store/
+    - go get -u ./docs/examples/go
+    - go build ./docs/examples/go/hermes_client.go
 
 
 test:
