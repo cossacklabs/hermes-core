@@ -32,11 +32,11 @@ dependencies:
     - cp ./docs/examples/c/service_keys/* db/credential_store/
     - make examples
     - ./docs/examples/c/mid_hermes/credential_store_service/cs
-      - background: true
+      background: true
     - ./docs/examples/c/mid_hermes/key_store_service/ks
-          - background: true
+      background: true
     - ./docs/examples/c/mid_hermes/data_store_service/ds
-          - background: true
+      background: true
 
 
 test:
