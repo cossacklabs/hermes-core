@@ -20,13 +20,17 @@
 
 dependencies:
   pre:
-    - sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libssl-dev build-essential
+    - sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libssl-dev build-essential python-dev python3-dev python-setuptools python3-setuptools
     - git clone https://github.com/cossacklabs/themis && cd themis && sudo make install
 
   override:
     - make
     - sudo make install
+    - sudo pip install tox
+    - pyenv global 2.7.12 3.3.6 3.4.4 3.5.3 3.6.2
 
 test:
   override:
-    - make test 
+    - make test
+    # run only TestHermesTransport until add support of running stores
+    - cd pyhermes && tox -e py33,py34,py35,py36,py27 -- python -m unittest test.TestHermesTransport
