@@ -18,6 +18,17 @@
 #
 #
 
+machine:
+  post:
+    - make examples
+    - ./docs/examples/c/mid_hermes/credential_store_service/cs:
+      background: true
+    - ./docs/examples/c/mid_hermes/key_store_service/ks:
+      background: true
+    - ./docs/examples/c/mid_hermes/data_store_service/ds:
+      background: true
+
+
 dependencies:
   pre:
     - sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libssl-dev build-essential python-dev python3-dev python-setuptools python3-setuptools
@@ -30,13 +41,6 @@ dependencies:
     - pyenv global 2.7.12 3.3.6 3.4.4 3.5.3 3.6.2
     - mkdir -p db/credential_store db/key_store db/data_store
     - cp ./docs/examples/c/service_keys/* db/credential_store/
-    - make examples
-    - ./docs/examples/c/mid_hermes/credential_store_service/cs:
-      background: true
-    - ./docs/examples/c/mid_hermes/key_store_service/ks:
-      background: true
-    - ./docs/examples/c/mid_hermes/data_store_service/ds:
-      background: true
 
 
 test:
