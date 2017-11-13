@@ -18,17 +18,6 @@
 #
 #
 
-machine:
-  post:
-    - make examples
-    - ./docs/examples/c/mid_hermes/credential_store_service/cs:
-      background: true
-    - ./docs/examples/c/mid_hermes/key_store_service/ks:
-      background: true
-    - ./docs/examples/c/mid_hermes/data_store_service/ds:
-      background: true
-
-
 dependencies:
   pre:
     - sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libssl-dev build-essential python-dev python3-dev python-setuptools python3-setuptools
@@ -49,9 +38,17 @@ test:
     # run only TestHermesTransport until add support of running stores
     - rm -rf db/key_store/* && \
       rm -rf db/data_store/* && \
+      ./docs/examples/c/mid_hermes/credential_store_service/cs &  export CS_PID=$!; \
+      ./docs/examples/c/mid_hermes/key_store_service/ks & export KS_PID=$! ; \
+      ./docs/examples/c/mid_hermes/data_store_service/ds & export DS_PID=$!; \ 
       cd pyhermes && \
-      tox -e py33,py34,py35,py36,py27 -- python -m unittest test.TestHermesTransport test.TestHermes.test_secure_midhermes
+      tox -e py33,py34,py35,py36,py27 -- python -m unittest test.TestHermesTransport test.TestHermes.test_secure_midhermes | \
+      kill -9 $CS_PID $KS_PID $DS_PID
 
     - rm -rf db/key_store/* && \
       rm -rf db/data_store/* && \
-      sh docs/examples/go/tests/go_test.sh
+      ./docs/examples/c/mid_hermes/credential_store_service/cs &  export CS_PID=$!; \
+      ./docs/examples/c/mid_hermes/key_store_service/ks & export KS_PID=$! ; \
+      ./docs/examples/c/mid_hermes/data_store_service/ds & export DS_PID=$!; \
+      sh docs/examples/go/tests/go_test.sh | \
+      kill -9 $CS_PID $KS_PID $DS_PID
