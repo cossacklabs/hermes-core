@@ -51,14 +51,14 @@ echo -n $DATASTORE_PUBLIC | base64 --decode > $DB_DIR/`echo -n "data_store_serve
 # add block
 echo "add block"
 $BIN/hermes_client -command=add_block -id=$USER_ID -private_key=$PRIVATE_KEY -config=$CONFIG_PATH -doc $TEST_FILE  -meta="some meta data" 1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
 # read block
 echo "read block"
 $BIN/hermes_client -command=read_block -id=$USER_ID -private_key=$PRIVATE_KEY -config=$CONFIG_PATH -doc $TEST_FILE  1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
@@ -66,7 +66,7 @@ fi
 echo "update block"
 echo "some new content" > $TEST_FILE
 $BIN/hermes_client -command=update_block -id=$USER_ID -private_key=$PRIVATE_KEY -config=$CONFIG_PATH -doc $TEST_FILE  -meta="new metadata" 1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
@@ -81,14 +81,14 @@ fi
 # grant access
 echo "grant read access"
 $BIN/hermes_client -command=grant_read_access -id=$USER_ID -private_key=$PRIVATE_KEY -config=$CONFIG_PATH -doc $TEST_FILE -for_user=$USER_ID2 1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
 # read by user 2
 echo "read by user 2"
 $BIN/hermes_client -command=read_block -id=$USER_ID2 -private_key=$PRIVATE_KEY2 -config=$CONFIG_PATH -doc $TEST_FILE  1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
@@ -104,7 +104,7 @@ fi
 echo "grant update"
 # grant update to user 2
 $BIN/hermes_client -command=grant_update_access -id=$USER_ID -private_key=$PRIVATE_KEY -config=$CONFIG_PATH -doc $TEST_FILE -for_user=$USER_ID2 1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
@@ -112,7 +112,7 @@ fi
 echo "update block by user 2"
 echo "some new content by user2" > $TEST_FILE
 $BIN/hermes_client -command=update_block -id=$USER_ID2 -private_key=$PRIVATE_KEY2 -config=$CONFIG_PATH -doc $TEST_FILE  -meta="new metadata" 1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
@@ -120,7 +120,7 @@ fi
 # revoke update from user 2
 echo "revoke update"
 $BIN/hermes_client -command=revoke_update_access -id=$USER_ID -private_key=$PRIVATE_KEY -config=$CONFIG_PATH -doc $TEST_FILE -for_user=$USER_ID2 1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
@@ -135,7 +135,7 @@ fi
 # revoke read from user 2
 echo "revoke read"
 $BIN/hermes_client -command=revoke_read_access -id=$USER_ID -private_key=$PRIVATE_KEY -config=$CONFIG_PATH -doc $TEST_FILE -for_user=$USER_ID2 1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
@@ -149,6 +149,6 @@ fi
 # delete block
 echo "delete block"
 $BIN/hermes_client -command=delete_block -id=$USER_ID -private_key=$PRIVATE_KEY -config=$CONFIG_PATH -doc $TEST_FILE  1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi

@@ -50,14 +50,14 @@ echo -n $DATASTORE_PUBLIC | base64 --decode > $DB_DIR/`echo -n "data_store_serve
 # add block
 echo "add block"
 $BIN/client add_block $USER_ID $PRIVATE_KEY $TEST_FILE "metadata" 1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
 # read block
 echo "read block"
 $BIN/client read_block $USER_ID $PRIVATE_KEY $TEST_FILE 1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
@@ -65,7 +65,7 @@ fi
 echo "update block"
 echo "some new content" > $TEST_FILE
 $BIN/client update_block $USER_ID $PRIVATE_KEY $TEST_FILE "new metadata" 1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
@@ -80,14 +80,14 @@ fi
 # grant access
 echo "grant read access"
 $BIN/client grant_read $USER_ID $PRIVATE_KEY $TEST_FILE $USER_ID2 1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
 # read by user 2
 echo "read by user 2"
 $BIN/client read_block $USER_ID2 $PRIVATE_KEY2 $TEST_FILE 1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
@@ -103,7 +103,7 @@ fi
 echo "grant update"
 # grant update to user 2
 $BIN/client grant_update $USER_ID $PRIVATE_KEY $TEST_FILE $USER_ID2 1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
@@ -111,7 +111,7 @@ fi
 echo "update block by user 2"
 echo "some new content by user2" > $TEST_FILE
 $BIN/client update_block $USER_ID2 $PRIVATE_KEY2 $TEST_FILE "new metadata" 1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
@@ -119,7 +119,7 @@ fi
 # revoke update from user 2
 echo "revoke update"
 $BIN/client revoke_update $USER_ID $PRIVATE_KEY $TEST_FILE $USER_ID2 1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
@@ -134,7 +134,7 @@ fi
 # revoke read from user 2
 echo "revoke read"
 $BIN/client revoke_read $USER_ID $PRIVATE_KEY $TEST_FILE $USER_ID2 1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
@@ -148,6 +148,6 @@ fi
 # delete block
 echo "delete block"
 $BIN/client delete_block $USER_ID $PRIVATE_KEY $TEST_FILE 1>/dev/null
-if [ $? -eq $FAIL ]; then
+if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
