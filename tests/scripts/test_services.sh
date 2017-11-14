@@ -13,13 +13,13 @@ rm -rf db/key_store/*;
 rm -rf db/data_store/*;
 
 # wait when 8888 port (credential store) will be free
-while ! nc localhost -q 0 8888 </dev/null; do sleep 1; done
+while nc localhost -q 0 8888 < /dev/null; do sleep 1; done
 
 # wait when 8888 port (key store) will be free
-while ! nc localhost -q 0 8889 </dev/null; do sleep 1; done
+while nc localhost -q 0 8889 < /dev/null; do sleep 1; done
 
 # wait when 8888 port (data store) will be free
-while ! nc localhost -q 0 8890 </dev/null; do sleep 1; done
+while nc localhost -q 0 8890 < /dev/null; do sleep 1; done
 
 echo "start services"
 ./docs/examples/c/mid_hermes/credential_store_service/cs &
