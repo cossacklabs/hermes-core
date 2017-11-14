@@ -22,10 +22,15 @@
 TEST_FILE=/tmp/testfile
 echo "some content" > $TEST_FILE
 USER_ID=user1
-PRIVATE_KEY1=/path/to/private/key1
+PRIVATE_KEY1=/tmp/user1.priv
+PRIVATE_KEY_BASE64=UkVDMgAAAC0Tj5tGAPfpgfYMBACxX6onvlWvcc2Gb9ZylBlJdjebTpV3OCIx
+echo -n $PRIVATE_KEY_BASE64 | base64 -d > $PRIVATE_KEY1
 
 USER_ID2=user2
-PRIVATE_KEY2=/path/to/private/key2
+PRIVATE_KEY2=/tmp/user2.priv
+PRIVATE_KEY2_BASE64=UkVDMgAAAC00lzw7ABmvKHvjOqWW8i+dxwHTU8RzuaATkZNBcLmCm8TBxRn2
+echo -n $PRIVATE_KEY2_BASE64 | base64 -d > $PRIVATE_KEY2
+
 CONFIG=docs/examples/python/config.json
 BIN=docs/examples/python/hermes_client.py
 
