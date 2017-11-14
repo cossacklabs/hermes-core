@@ -12,19 +12,24 @@ mkdir -p db/key_store db/data_store db/credential_store
 rm -rf db/key_store/*;
 rm -rf db/data_store/*;
 
+echo "start services"
 ./docs/examples/c/mid_hermes/credential_store_service/cs &
 CS_PID=$!;
+echo "credential store service pid=$CS_PID"
 
 ./docs/examples/c/mid_hermes/key_store_service/ks &
 KS_PID=$!;
+echo "key store service pid=$KS_PID"
 
 ./docs/examples/c/mid_hermes/data_store_service/ds &
 DS_PID=$!;
+echo "data store service pid=$DS_PID"
 
 # run script from arg1
 eval $@;
 RESULT=$?;
 
+echo "kill services"
 kill -9 $CS_PID $KS_PID $DS_PID;
 
 exit $RESULT

@@ -22,7 +22,7 @@ dependencies:
     # copy current code from commit to our gopath and fetch dependencies
     - |
       mkdir -p $TEMP_GOPATH/src/github.com/cossacklabs &&
-      ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} $TEMP_GOPATH/src/github.com/cossacklabs/${CIRCLE_PROJECT_REPONAME}  &&
+      ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} $TEMP_GOPATH/src/github.com/cossacklabs/${CIRCLE_PROJECT_REPONAME}
     # fetch go example's dependencies
     - go get -t -d ./docs/examples/go/... &&
     - go build docs/examples/go/hermes_client.go
@@ -34,7 +34,7 @@ test:
     - make test
     # test pyhermes
     - ./tests/scripts/test_services.sh "cd pyhermes && tox -e py33,py34,py35,py36,py27 -- python -m unittest test.TestHermesTransport test.TestHermes.test_secure_midhermes";
-    
+
     # test golang tutorial
     - ./tests/scripts/test_services.sh docs/examples/go/tests/go_test.sh;
 
