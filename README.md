@@ -106,11 +106,16 @@ To register a user with ID "USER", type this into the command line:
 ```console
 cd docs/examples/c/mid_hermes_low_level
 mkdir -p ./db/credential_store
-../key_pair_gen USER.priv ./db/credential_store/`echo USER | base64`
-```  
-* Add the block `file1.block` with meta "first block in HERMES" to Hermes-core as a USER, using the following command:
+../key_gen/key_pair_gen USER.priv ./db/credential_store/$(echo -ne USER | base64)
+```
+* Create first file file.1block:
 ```console
-./hermes_client_ll add_block USER `cat USER.priv | base64` file1.block "first block in Hermes"
+echo "smth" > file1.block
+```
+* Add the block `file1.block` with meta "first block in HERMES" to Hermes-core as a USER, using the following command:
+
+```console
+./hermes_client_ll add_block USER $(cat USER.priv | base64) file1.block "first block in Hermes"
 ```
 * Now you can see some new files in the Hermes-core storages:
 ```console
@@ -128,8 +133,8 @@ mkdir -p ./db/credential_store
 
 * Find the list of all the other commands supported by the example using the following command:
 ```console
-docs/examples/c/hermes_client_low_level --help
-usage: client <command> <user id> <base64 encoded user private key>  <name of file for proceed> <meta> <for user>.
+docs/examples/c/mid_hermes_low_level/hermes_client_ll --help
+usage: hermes_client_ll <command> <user id> <base64 encoded user private key>  <name of file for proceed> <meta> <for user>.
            <command>                         - executes the command to be performed by the client, see below;
            <user id>                         - user identifier (user needs to be registered in Credential store);
            <base64 encoded user private key> - base64 encoded private key of the user;
@@ -163,7 +168,7 @@ To build Hermes-core, open the terminal and type in the following command:
 ```console
 $ git clone https://github.com/cossacklabs/hermes-core
 $ cd hermes-core
-$ make install
+$ make && sudo make install
 ``` 
 Hermes-core is ready to use.
 
