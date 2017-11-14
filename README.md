@@ -106,7 +106,7 @@ To register a user with ID "USER", type this into the command line:
 ```console
 cd docs/examples/c/mid_hermes_low_level
 mkdir -p ./db/credential_store
-../key_gen/key_pair_gen USER.priv ./db/credential_store/$(echo -ne USER | base64)
+../key_gen/key_pair_gen USER.priv ./db/credential_store/$(echo -n USER | base64)
 ```
 * Create first file file.1block:
 ```console
