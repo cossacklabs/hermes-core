@@ -1,3 +1,9 @@
+machine:
+  environment:
+    # make our gopath first in gopath list
+    TEMP_GOPATH: ~/temp_gopath
+    GOPATH: $TEMP_GOPATH:$GOPAT
+
 dependencies:
   pre:
     - sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libssl-dev build-essential python-dev python3-dev python-setuptools python3-setuptools
@@ -12,8 +18,11 @@ dependencies:
     - mkdir -p db/credential_store db/key_store db/data_store
     - cp ./docs/examples/c/service_keys/* db/credential_store/
     - cp ./docs/examples/test_keys/* db/credential_store/
-    - go get -u ./docs/examples/go
-    - go build ./docs/examples/go/hermes_client.go
+    - |
+      mkdir $TEMP_GOPATH/src/github.com/cossacklabs &&
+      cp -r ../hermes-core $TEMP_GOPATH/src/github.com/cossacklabs/ &&
+      github.com/cossacklabs/hermes-core/docs/examples/go/... && 
+      go build docs/examples/go/hermes_client.go
 
 
 test:
