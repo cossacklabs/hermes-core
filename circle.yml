@@ -19,7 +19,7 @@ dependencies:
     - cp ./docs/examples/c/service_keys/* db/credential_store/
     - cp ./docs/examples/test_keys/* db/credential_store/
     - |
-      mkdir $TEMP_GOPATH/src/github.com/cossacklabs &&
+      mkdir -p $TEMP_GOPATH/src/github.com/cossacklabs &&
       cp -r ../hermes-core $TEMP_GOPATH/src/github.com/cossacklabs/ &&
       github.com/cossacklabs/hermes-core/docs/examples/go/... && 
       go build docs/examples/go/hermes_client.go
