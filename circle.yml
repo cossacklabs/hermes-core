@@ -20,8 +20,8 @@ dependencies:
     - cp ./docs/examples/test_keys/* db/credential_store/
     - |
       mkdir -p $TEMP_GOPATH/src/github.com/cossacklabs &&
-      ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} $TEMP_GOPATH/src/github.com/cosascklabs/${CIRCLE_PROJECT_REPONAME}  &&
-      go get github.com/cossacklabs/hermes-core/docs/examples/go/... &&
+      ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} $TEMP_GOPATH/src/github.com/cossacklabs/${CIRCLE_PROJECT_REPONAME}  &&
+      go get -t -d ./docs/examples/go/... &&
       go build docs/examples/go/hermes_client.go
 
 
