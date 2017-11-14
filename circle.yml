@@ -1,22 +1,9 @@
-#
-# Copyright (c) 2017 Cossack Labs Limited
-#
-# This file is a part of Hermes-core.
-#
-# Hermes-core is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Hermes-core is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Affero General Public License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with Hermes-core.  If not, see <http://www.gnu.org/licenses/>.
-#
-#
+machine:
+  environment:
+    # circleci has several folders in gopath so place our gopath first in gopath list to simplify copying code into
+    # gopath directories below
+    TEMP_GOPATH: ${HOME}/temp_gopath
+    GOPATH: $TEMP_GOPATH:$GOPATH
 
 dependencies:
   pre:
@@ -26,11 +13,33 @@ dependencies:
   override:
     - make
     - sudo make install
+    - make examples
     - sudo pip install tox
     - pyenv global 2.7.12 3.3.6 3.4.4 3.5.3 3.6.2
+    - mkdir -p db/credential_store db/key_store db/data_store
+    - cp ./docs/examples/c/service_keys/* db/credential_store/
+    - cp ./docs/examples/test_keys/* db/credential_store/
+    # copy current code from commit to our gopath
+    - mkdir -p $TEMP_GOPATH/src/github.com/cossacklabs
+    # link current code to gopath to avoid fetching via go get
+    - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} $TEMP_GOPATH/src/github.com/cossacklabs/${CIRCLE_PROJECT_REPONAME}
+    # fetch go example's dependencies
+    - go get -t -d ./docs/examples/go/...
+    - go build docs/examples/go/hermes_client.go
+    - cd pyhermes && python setup.py install
+
 
 test:
   override:
     - make test
-    # run only TestHermesTransport until add support of running stores
-    - cd pyhermes && tox -e py33,py34,py35,py36,py27 -- python -m unittest test.TestHermesTransport
+    # test pyhermes
+    - ./tests/scripts/test_services.sh "cd pyhermes && tox -e py33,py34,py35,py36,py27 -- python -m unittest test.TestHermesTransport test.TestHermes.test_secure_midhermes";
+
+    # test golang tutorial
+    - ./tests/scripts/test_services.sh docs/examples/go/tests/go_test.sh;
+
+    # test python tutorial
+    - ./tests/scripts/test_services.sh docs/examples/python/tests/test.sh;
+
+    # test c tutorial
+    - ./tests/scripts/test_services.sh docs/examples/c/tests/test.sh;
