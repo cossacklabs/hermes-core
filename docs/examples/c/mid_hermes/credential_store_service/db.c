@@ -36,7 +36,7 @@ typedef struct db_type{
 
 uint32_t db_get_public_key(void* cs, const uint8_t* user_id, const size_t user_id_length, uint8_t** pub_key, size_t* pub_key_length){
   char fpath[10*1024];
-  fprintf(stderr, ".. %s %li ..", user_id, user_id_length);
+  fprintf(stdout, "get public key for user_id=<%.*s>\n", (int)user_id_length, user_id);
   db_t* db = (db_t*)cs;
   BUILD_TYPED_PATH(fpath, C(db->path), E(user_id, user_id_length));
   return read_whole_file(fpath, pub_key, pub_key_length);  

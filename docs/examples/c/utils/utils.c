@@ -77,6 +77,7 @@ int remove_directory(const char *path)
     closedir(d);
   }
   if (!r){
+    fprintf(stdout, "remove directory <%s>\n", path);
     r = rmdir(path);
   }
   return 0;
@@ -88,6 +89,7 @@ int create_directory(const char *path){
     strncat(subpath, path, delim - path);
     create_directory(subpath);    
   }
+  fprintf(stdout, "create directory <%s>\n", path);
   mkdir(path,0777);
   return 0;
 }
@@ -96,6 +98,7 @@ int create_directory(const char *path){
 uint32_t read_whole_file(const char* file_name, uint8_t** buf, size_t* buf_length){
   FILE* f=fopen(file_name, "rb");
   if(!f){
+    fprintf(stderr, "can't open file <%s> for read\n", file_name);
     return 1;
   }
   size_t read_to_length=0;
@@ -112,6 +115,7 @@ uint32_t read_whole_file(const char* file_name, uint8_t** buf, size_t* buf_lengt
 uint32_t write_whole_file(const char* filename, const uint8_t* buf, const size_t buf_length){
   FILE* f=fopen(filename, "wb");
   if(!f){
+    fprintf(stderr, "can't open file <%s> for write\n", filename);
     return 1;
   }
   size_t writed_bytes=fwrite(buf, 1, buf_length, f);
@@ -164,6 +168,7 @@ bool check_file_exist(const char* file_name){
   if( access( file_name, F_OK ) != -1){
     return true;
   }
+  fprintf(stderr, "file <%s> not exists\n", file_name);
   return false;
 }
 

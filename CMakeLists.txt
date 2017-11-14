@@ -3,7 +3,7 @@ project(hermes_core)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(hermes_client_example docs/examples/c/mid_hermes/client/hermes_client.c docs/examples/c/mid_hermes/common/transport.c docs/examples/c/utils/utils.c docs/examples/c/utils/base64.c src/secure_transport/utils.c src/secure_transport/utils.h docs/examples/c/mid_hermes/common/credential_store_client.c docs/examples/c/mid_hermes/common/session_callback.c docs/examples/c/mid_hermes/common/session_callback.h)
+add_executable(hermes_client_example docs/examples/c/mid_hermes/client/hermes_client.c docs/examples/c/mid_hermes/common/transport.c docs/examples/c/utils/utils.c docs/examples/c/utils/base64.c src/secure_transport/utils.c src/secure_transport/utils.h docs/examples/c/mid_hermes/common/credential_store_client.c src/secure_transport/session_callback.c include/hermes/secure_transport/session_callback.h)
 TARGET_LINK_LIBRARIES(hermes_client_example hermes_mid_hermes hermes_mid_hermes_ll hermes_credential_store hermes_data_store hermes_key_store hermes_rpc pthread hermes_common themis soter hermes_secure_transport)
 
 
