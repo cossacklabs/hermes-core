@@ -43,5 +43,4 @@ test:
 
     # test c tutorial
     # test failure
-    - rm ./docs/examples/c/mid_hermes/client/client
-    - ./tests/scripts/test_services.sh docs/examples/c/tests/test.sh;
+    - rm ./docs/examples/c/mid_hermes/client/client && ./tests/scripts/test_services.sh docs/examples/c/tests/test.sh;
