@@ -7,7 +7,7 @@ machine:
 
 dependencies:
   pre:
-    - sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libssl-dev build-essential python-dev python3-dev python-setuptools python3-setuptools
+    - sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libssl-dev build-essential python-dev python3-dev python-setuptools python3-setuptools netcat
     - git clone https://github.com/cossacklabs/themis && cd themis && sudo make install
 
   override:
