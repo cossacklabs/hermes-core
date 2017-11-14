@@ -4,6 +4,7 @@ all:
 	    ../common/transport.c \
 	    ../../utils/utils.c \
 	    ../../utils/base64.c \
+	    -std=c99 \
 	    -lhermes_mid_hermes \
 	    -lhermes_mid_hermes_ll \
 	    -lhermes_credential_store \
