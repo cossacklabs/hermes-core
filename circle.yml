@@ -19,10 +19,10 @@ dependencies:
     - mkdir -p db/credential_store db/key_store db/data_store
     - cp ./docs/examples/c/service_keys/* db/credential_store/
     - cp ./docs/examples/test_keys/* db/credential_store/
-    # copy current code from commit to our gopath and fetch dependencies
-    - |
-      mkdir -p $TEMP_GOPATH/src/github.com/cossacklabs &&
-      ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} $TEMP_GOPATH/src/github.com/cossacklabs/${CIRCLE_PROJECT_REPONAME}
+    # copy current code from commit to our gopath
+    - mkdir -p $TEMP_GOPATH/src/github.com/cossacklabs
+    # link current code to gopath to avoid fetching via go get
+    - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} $TEMP_GOPATH/src/github.com/cossacklabs/${CIRCLE_PROJECT_REPONAME}
     # fetch go example's dependencies
     - go get -t -d ./docs/examples/go/...
     - go build docs/examples/go/hermes_client.go
@@ -42,5 +42,4 @@ test:
     - ./tests/scripts/test_services.sh docs/examples/python/tests/test.sh;
 
     # test c tutorial
-    # test failure
-    - rm ./docs/examples/c/mid_hermes/client/client && ./tests/scripts/test_services.sh docs/examples/c/tests/test.sh;
+    - ./tests/scripts/test_services.sh docs/examples/c/tests/test.sh;
