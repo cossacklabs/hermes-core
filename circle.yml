@@ -2,7 +2,7 @@ machine:
   environment:
     # make our gopath first in gopath list
     TEMP_GOPATH: ~/temp_gopath
-    GOPATH: $TEMP_GOPATH:$GOPAT
+    GOPATH: $TEMP_GOPATH:$GOPATH
 
 dependencies:
   pre:
@@ -20,8 +20,8 @@ dependencies:
     - cp ./docs/examples/test_keys/* db/credential_store/
     - |
       mkdir -p $TEMP_GOPATH/src/github.com/cossacklabs &&
-      cp -r ../hermes-core $TEMP_GOPATH/src/github.com/cossacklabs/ &&
-      github.com/cossacklabs/hermes-core/docs/examples/go/... && 
+      cp -r ../hermes-core $TEMP_GOPATH/src/github.com/cossacklabs/ || true &&
+      go get github.com/cossacklabs/hermes-core/docs/examples/go/... &&
       go build docs/examples/go/hermes_client.go
 
 
