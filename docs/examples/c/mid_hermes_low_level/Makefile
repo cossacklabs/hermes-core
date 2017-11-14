@@ -1,4 +1,3 @@
-CC = clang
 SRC_PATH = .
 OBJ_PATH = ./obj
 
