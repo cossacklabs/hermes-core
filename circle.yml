@@ -1,6 +1,7 @@
 machine:
   environment:
-    # make our gopath first in gopath list
+    # circleci has several folders in gopath so place our gopath first in gopath list to simplify copying code into
+    # gopath directories below
     TEMP_GOPATH: ${HOME}/temp_gopath
     GOPATH: $TEMP_GOPATH:$GOPATH
 
@@ -18,61 +19,27 @@ dependencies:
     - mkdir -p db/credential_store db/key_store db/data_store
     - cp ./docs/examples/c/service_keys/* db/credential_store/
     - cp ./docs/examples/test_keys/* db/credential_store/
+    # copy current code from commit to our gopath and fetch dependencies
     - |
       mkdir -p $TEMP_GOPATH/src/github.com/cossacklabs &&
       ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} $TEMP_GOPATH/src/github.com/cossacklabs/${CIRCLE_PROJECT_REPONAME}  &&
-      go get -t -d ./docs/examples/go/... &&
-      go build docs/examples/go/hermes_client.go
+    # fetch go example's dependencies
+    - go get -t -d ./docs/examples/go/... &&
+    - go build docs/examples/go/hermes_client.go
     - cd pyhermes && python setup.py install
 
 
 test:
   override:
-    #- make test
-    # run only TestHermesTransport until add support of running stores
-    - |
-      rm -rf db/key_store/* ;
-      rm -rf db/data_store/* ;
-      ./docs/examples/c/mid_hermes/credential_store_service/cs &  export CS_PID=$!;
-      ./docs/examples/c/mid_hermes/key_store_service/ks & export KS_PID=$! ;
-      ./docs/examples/c/mid_hermes/data_store_service/ds & export DS_PID=$!;
-      cd pyhermes ;
-      tox -e py33,py34,py35,py36,py27 -- python -m unittest test.TestHermesTransport test.TestHermes.test_secure_midhermes || \
-      kill -9 $CS_PID $KS_PID $DS_PID
-
+    - make test
+    # test pyhermes
+    - ./tests/scripts/test_services.sh "cd pyhermes && tox -e py33,py34,py35,py36,py27 -- python -m unittest test.TestHermesTransport test.TestHermes.test_secure_midhermes";
+    
     # test golang tutorial
-    - |
-      rm -rf db/key_store/*;
-      rm -rf db/data_store/*;
-      ./docs/examples/c/mid_hermes/credential_store_service/cs &  export CS_PID=$!; 
-      ./docs/examples/c/mid_hermes/key_store_service/ks & export KS_PID=$! ; 
-      ./docs/examples/c/mid_hermes/data_store_service/ds & export DS_PID=$!; 
-      sh docs/examples/go/tests/go_test.sh; 
-      export RESULT=$?;
-      kill -9 $CS_PID $KS_PID $DS_PID; 
-      exit $RESULT
+    - ./tests/scripts/test_services.sh docs/examples/go/tests/go_test.sh;
 
     # test python tutorial
-    - |
-      rm -rf db/key_store/*;
-      rm -rf db/data_store/*;
-      ./docs/examples/c/mid_hermes/credential_store_service/cs &  export CS_PID=$!;
-      ./docs/examples/c/mid_hermes/key_store_service/ks & export KS_PID=$! ;
-      ./docs/examples/c/mid_hermes/data_store_service/ds & export DS_PID=$!;
-      sh docs/examples/python/tests/test.sh; 
-      export RESULT=$?;
-      kill -9 $CS_PID $KS_PID $DS_PID;
-      exit $RESULT
+    - ./tests/scripts/test_services.sh docs/examples/python/tests/test.sh;
 
     # test c tutorial
-    - |
-      rm -rf db/key_store/*;
-      rm -rf db/data_store/*;
-      ./docs/examples/c/mid_hermes/credential_store_service/cs &  export CS_PID=$!;
-      ./docs/examples/c/mid_hermes/key_store_service/ks & export KS_PID=$! ;
-      ./docs/examples/c/mid_hermes/data_store_service/ds & export DS_PID=$!;
-      rm docs/examples/c/mid_hermes/client/client;
-      sh docs/examples/c/tests/test.sh;
-      export RESULT=$?;
-      kill -9 $CS_PID $KS_PID $DS_PID;
-      exit $RESULT
+    - ./tests/scripts/test_services.sh docs/examples/c/tests/test.sh;
