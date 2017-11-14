@@ -35,7 +35,7 @@ PRIVATE_KEY2=UkVDMgAAAC00lzw7ABmvKHvjOqWW8i+dxwHTU8RzuaATkZNBcLmCm8TBxRn2
 PUBLIC_KEY2=VUVDMgAAAC0lAFeZAqw+nKzco1l2qtXELqVr7fmpsMf4hSrOa/TkAu5OQ6Cy
 
 # path to dir where are compiled client binary
-BIN=cmake-build-debug
+BIN=./docs/examples/c/mid_hermes/client
 SUCCESS=0
 FAIL=1
 DB_DIR=db/credential_store
