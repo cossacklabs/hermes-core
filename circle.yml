@@ -24,7 +24,7 @@ dependencies:
       mkdir -p $TEMP_GOPATH/src/github.com/cossacklabs &&
       ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} $TEMP_GOPATH/src/github.com/cossacklabs/${CIRCLE_PROJECT_REPONAME}
     # fetch go example's dependencies
-    - go get -t -d ./docs/examples/go/... &&
+    - go get -t -d ./docs/examples/go/... 
     - go build docs/examples/go/hermes_client.go
     - cd pyhermes && python setup.py install
 
