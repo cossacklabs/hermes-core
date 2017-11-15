@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 # testing with running services:
 # 1. delete all files in key_store/data_store from previous tests
