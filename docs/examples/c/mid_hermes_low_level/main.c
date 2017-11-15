@@ -77,22 +77,19 @@ int init() {
 }
 
 int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        fprintf(stderr, "error: params error\n\n%s", HELP);
+        return FAIL;
+    }
+    if (argc == 2 && strcmp(argv[1], "--help") == 0) {
+        fprintf(stdout, HELP);
+        return SUCCESS;
+    }
     if (0 != init()) {
         fprintf(stderr, "error: initialisation\n");
         finalize();
         return FAIL;
     }
-    if (argc < 2) {
-        fprintf(stderr, "error: params error\n\n%s", HELP);
-        finalize();
-        return FAIL;
-    }
-    if (argc == 2 && strcmp(argv[1], "--help") == 0) {
-        fprintf(stdout, HELP);
-        finalize();
-        return SUCCESS;
-    }
-
     if (strcmp(argv[1], "read_block") == 0) {
         if (argc != 5 || 0 != get_block(argv[2], argv[3], argv[4])) {
             fprintf(stderr, "error: block getting error\n");
