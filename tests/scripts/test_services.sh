@@ -39,6 +39,16 @@ eval $@;
 RESULT=$?;
 
 echo "kill services"
-kill -9 $CS_PID $KS_PID $DS_PID;
+kill -9 $CS_PID
+kill -9 $KS_PID
+kill -9 $DS_PID;
+
+# wait killing processes
+while kill -0 "$CS_PID"; do sleep 0.5
+done;
+while kill -0 "$KS_PID"; do sleep 0.5
+done;
+while kill -0 "$DS_PID"; do sleep 0.5
+done;
 
 exit $RESULT
