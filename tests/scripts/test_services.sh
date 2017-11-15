@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 # testing with running services:
 # 1. delete all files in key_store/data_store from previous tests
@@ -38,12 +38,15 @@ echo "data store service pid=$DS_PID"
 eval $@;
 RESULT=$?;
 
-echo "kill services"
-kill -9 $CS_PID
-kill -9 $KS_PID
-kill -9 $DS_PID;
+echo "kill credential store $CS_PID";
+kill -s SIGINT "$CS_PID";
+echo "kill key store $KS_PID";
+kill -s SIGINT "$KS_PID";
+echo "kill data store $DS_PID";
+kill -s SIGINT "$DS_PID";
 
 # wait killing processes
+echo "wait kill finishing"
 while kill -0 "$CS_PID"; do sleep 0.5
 done;
 while kill -0 "$KS_PID"; do sleep 0.5

@@ -92,7 +92,16 @@ int main(int argc, char** argv){
   server.sin_family = AF_INET;
   server.sin_addr.s_addr = INADDR_ANY;
   server.sin_port = htons( SERVER_PORT );
-
+#ifdef REUSE_SOCKET
+  int reuse=1;
+  if (setsockopt(socket_desc, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuse, sizeof(reuse)) < 0){
+        perror("setsockopt(SO_REUSEADDR) failed");
+  }
+  if (setsockopt(socket_desc, SOL_SOCKET, SO_REUSEPORT, (const char*)&reuse, sizeof(reuse)) < 0) {
+        perror("setsockopt(SO_REUSEPORT) failed");
+        return FAIL;
+  }
+#endif
   if(bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0){
       perror("bind failed. Error\n");
       return FAIL;

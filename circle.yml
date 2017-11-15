@@ -13,7 +13,7 @@ dependencies:
   override:
     - make
     - sudo make install
-    - make examples
+    - make CFLAGS=-DREUSE_SOCKET examples
     - sudo pip install tox
     - pyenv global 2.7.12 3.3.6 3.4.4 3.5.3 3.6.2
     - mkdir -p db/credential_store db/key_store db/data_store

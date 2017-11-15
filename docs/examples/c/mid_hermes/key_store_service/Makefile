@@ -14,6 +14,7 @@ all:
 	-lhermes_secure_transport \
 	-lthemis \
     -lsoter \
+    $(CFLAGS) \
 	-o ks
 
 clean:
