@@ -13,6 +13,7 @@ all:
 	-lhermes_secure_transport \
 	-lthemis \
     -lsoter \
+    $(CFLAGS) \
 	-o cs
 
 clean:
