@@ -73,7 +73,7 @@ uint32_t hm_hash_table_entry_destroy(hm_hash_table_entry_t *entry) {
 int hm_hash_(const uint8_t *key, const size_t key_length) {
     //djb2 function.
     unsigned long hash = 5381;
-    int i = 0;
+    size_t i = 0;
     for (; i < key_length; ++i) {
         hash = ((hash << 5) + hash) + key[i];
     }
@@ -84,7 +84,7 @@ struct hm_hash_table_type {
     hm_hash_table_entry_t *t[HM_HASH_TABLE_CAP];
 };
 
-hm_hash_table_t *hm_hash_table_create() {
+hm_hash_table_t *hm_hash_table_create(void) {
     hm_hash_table_t *table = calloc(sizeof(hm_hash_table_t), 1);
     assert(table);
     return table;

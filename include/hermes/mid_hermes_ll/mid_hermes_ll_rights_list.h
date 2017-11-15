@@ -47,7 +47,7 @@ typedef struct mid_hermes_ll_rights_list_type {
     size_t len;
 } mid_hermes_ll_rights_list_t;
 
-mid_hermes_ll_rights_list_t *mid_hermes_ll_rights_list_create();
+mid_hermes_ll_rights_list_t *mid_hermes_ll_rights_list_create(void);
 
 hermes_status_t mid_hermes_ll_rights_list_rpush(
         mid_hermes_ll_rights_list_t *rights_list, mid_hermes_ll_rights_list_node_t *rights_node);

@@ -34,7 +34,7 @@ typedef uint32_t (*send_rouitine_t)(void* user_data, const uint8_t* buffer_to_se
 // if really readed less than buffer_to_receive_length bytes need return error!!!
 typedef uint32_t (*recv_rouitine_t)(void* user_data, uint8_t* buffer_to_receive, const size_t buffer_to_receive_length);
 
-hm_param_pack_t* hm_param_pack_create();
+hm_param_pack_t* hm_param_pack_create(void);
 
 hm_param_pack_t* hm_param_pack_create_(void* unused, ...);
 uint32_t hm_param_pack_extract_(hm_param_pack_t* pack, ...);

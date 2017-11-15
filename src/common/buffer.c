@@ -29,7 +29,7 @@
 #include <hermes/common/errors.h>
 
 
-#define BUFFER_BLOCK_CAPACITY_DEFAULT 1024*10
+#define BUFFER_BLOCK_CAPACITY_DEFAULT (1024*10)
 
 struct buffer_t_ {
     size_t capacity_;
@@ -60,7 +60,7 @@ int buffer_realloc_(buffer_t *buffer, const size_t size) {
     return BUFFER_SUCCESS;
 }
 
-buffer_t *buffer_create() {
+buffer_t *buffer_create(void) {
     buffer_t *buffer = malloc(sizeof *buffer);
     assert(buffer);
     buffer->capacity_ = 1;

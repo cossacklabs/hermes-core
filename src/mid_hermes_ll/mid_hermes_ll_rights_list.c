@@ -48,7 +48,7 @@ hermes_status_t mid_hermes_ll_rights_list_node_destroy(mid_hermes_ll_rights_list
     return HM_SUCCESS;
 }
 
-mid_hermes_ll_rights_list_t *mid_hermes_ll_rights_list_create() {
+mid_hermes_ll_rights_list_t *mid_hermes_ll_rights_list_create(void) {
     mid_hermes_ll_rights_list_t *list = calloc(1, sizeof(mid_hermes_ll_rights_list_t));
     assert(list);
     return list;
