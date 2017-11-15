@@ -31,14 +31,14 @@
 #define BUFFER_SUCCESS HM_SUCCESS
 #define BUFFER_INVALID_PARAM HM_INVALID_PARAMETER
 #define BUFFER_BAD_ALLOC HM_BAD_ALLOC
-#define BUFFER_AT_END -4
-#define BUFFER_INCORRECT_BLOCK_TYPE -5
-#define BUFFER_CORRUPTED -6
-#define BUFFER_WRITE_READ_ONLY -7
+#define BUFFER_AT_END (-4)
+#define BUFFER_INCORRECT_BLOCK_TYPE (-5)
+#define BUFFER_CORRUPTED (-6)
+#define BUFFER_WRITE_READ_ONLY (-7)
 
 typedef struct buffer_t_ buffer_t;
 
-buffer_t *buffer_create();
+buffer_t *buffer_create(void);
 
 buffer_t *buffer_create_with_(void *unused, ...);
 

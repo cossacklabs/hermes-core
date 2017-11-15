@@ -26,7 +26,7 @@
 #include <assert.h>
 #include <string.h>
 
-hm_buffers_list_t *hm_buffers_list_create() {
+hm_buffers_list_t *hm_buffers_list_create(void) {
     hm_buffers_list_t *list = calloc(1, sizeof(hm_buffers_list_t));
     assert(list);
     return list;
@@ -148,14 +148,14 @@ hermes_status_t hm_buffers_list_destroy(hm_buffers_list_t **buffers_list) {
     return HM_SUCCESS;
 }
 
-const uint8_t *hm_buffers_list_iterator_get_data(hm_buffers_list_iterator_t *iterator) {
+uint8_t *hm_buffers_list_iterator_get_data(hm_buffers_list_iterator_t *iterator) {
     if (!iterator || !(iterator->curr)) {
         return NULL;
     }
     return iterator->curr->data;
 }
 
-const size_t hm_buffers_list_iterator_get_size(hm_buffers_list_iterator_t *iterator) {
+size_t hm_buffers_list_iterator_get_size(hm_buffers_list_iterator_t *iterator) {
     if (!iterator || !(iterator->curr)) {
         return 0;
     }

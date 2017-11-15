@@ -79,7 +79,7 @@ int get_public_key_for_id_wrapper(const void *id, size_t id_length, void *key_bu
         return THEMIS_SUCCESS;
     }
     return THEMIS_FAIL;
-};
+}
 
 // hermes_transport_send encrypt buffer with secure session and send data with <send_data> function
 // implement hermes transport interface
@@ -104,7 +104,7 @@ uint32_t hermes_transport_send(void *transport_, const uint8_t *buffer, const si
     };
     free(wrapped_buffer);
     return HM_SUCCESS;
-};
+}
 
 // hermes_transport_receive read data from transport with <read_data_size> and <read_data> functions,
 // unwrap with secure_session and return when read size == buffer_length
@@ -150,7 +150,7 @@ uint32_t hermes_transport_receive(void *transport_, uint8_t *buffer, size_t buff
         total_read += unwrapped_size;
     }while(total_read < buffer_length);
     return HM_SUCCESS;
-};
+}
 
 // init_secure_session establish secure session using transport
 hermes_status_t init_secure_session(hm_rpc_transport_t* transport, secure_session_t* session, bool is_server){

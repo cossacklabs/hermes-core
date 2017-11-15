@@ -28,7 +28,7 @@
 
 typedef struct hm_hash_table_type hm_hash_table_t;
 
-hm_hash_table_t* hm_hash_table_create();
+hm_hash_table_t* hm_hash_table_create(void);
 uint32_t hm_hash_table_destroy(hm_hash_table_t** table);
 
 uint32_t hm_hash_table_set(hm_hash_table_t* table, const uint8_t* key, const size_t key_length, const uint8_t* val, const size_t val_length);

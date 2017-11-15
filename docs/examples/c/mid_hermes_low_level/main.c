@@ -153,5 +153,5 @@ int main(int argc, char *argv[]) {
         return FAIL;
     }
     finalize();
-    return FAIL;
+    return SUCCESS;
 }

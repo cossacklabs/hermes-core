@@ -40,7 +40,7 @@ typedef struct hm_buffers_list_type {
     hm_buffers_list_node_t *first;
 } hm_buffers_list_t;
 
-hm_buffers_list_t *hm_buffers_list_create();
+hm_buffers_list_t *hm_buffers_list_create(void);
 
 hm_buffers_list_t *hm_buffers_list_extract(const uint8_t *data, const size_t length);
 
@@ -57,9 +57,9 @@ typedef struct hm_buffers_list_iterator_type hm_buffers_list_iterator_t;
 struct hm_buffers_list_iterator_type {
     hm_buffers_list_node_t *curr;
 
-    const uint8_t *(*data)(hm_buffers_list_iterator_t *iterator);
+    uint8_t *(*data)(hm_buffers_list_iterator_t *iterator);
 
-    const size_t (*size)(hm_buffers_list_iterator_t *iterator);
+    size_t (*size)(hm_buffers_list_iterator_t *iterator);
 
     bool (*next)(hm_buffers_list_iterator_t *iterator);
 };

@@ -51,7 +51,7 @@ struct hm_param_pack_type{
   hm_param_pack_node_t nodes[HM_PARAM_PACK_MAX_PARAMS];
 };
 
-hm_param_pack_t* hm_param_pack_create(){
+hm_param_pack_t* hm_param_pack_create(void){
   hm_param_pack_t* res = calloc(1, sizeof(hm_param_pack_t));
   assert(res);
   return res;
