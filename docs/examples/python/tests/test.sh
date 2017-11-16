@@ -58,6 +58,34 @@ if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
 
+# rotate block
+echo "rotate block"
+md5sum db/data_store/`echo -n ${TEST_FILE}|base64`/data > ${TEST_FILE}.1.md5
+python $BIN --id $USER_ID --private_key $PRIVATE_KEY1 --doc $TEST_FILE --config=$CONFIG --rotate
+if [ ! $? -eq $SUCCESS ]; then
+    exit 1
+fi
+
+md5sum db/data_store/`echo -n ${TEST_FILE}|base64`/data > ${TEST_FILE}.2.md5
+
+diff ${TEST_FILE}.1.md5 ${TEST_FILE}.2.md5 > /dev/null
+diff_result=$?
+rm ${TEST_FILE}.1.md5 ${TEST_FILE}.2.md5
+
+# check that md5 of data before rotate != md5 of data after rotate
+# result == 1 if not equal
+if [ ! $diff_result -eq 1 ]; then
+    echo "md5 hash sum not different"
+    exit 1
+fi
+
+# read block
+echo "read block"
+python $BIN --id $USER_ID --private_key $PRIVATE_KEY1 --doc $TEST_FILE --config=$CONFIG --read
+if [ ! $? -eq $SUCCESS ]; then
+    exit 1
+fi
+
 # read by user 2
 echo "read by user 2"
 python $BIN --id $USER_ID2 --private_key $PRIVATE_KEY2 --doc $TEST_FILE --config=$CONFIG --read

@@ -308,12 +308,25 @@ int rotate_block(const char* user_id, const char* user_sk, const char* block_fil
   if(!(bl->load(bl, block_id, ds, ks, cs))){
     mid_hermes_ll_block_destroy(&bl);
     mid_hermes_ll_buffer_destroy(&block_id);
+    fprintf(stderr, "can't load block\n");
     return 1;
   }
   mid_hermes_ll_rights_list_t* rl=bl->access_rights(bl, ks, cs);
-  if(!rl || !(bl->rotate(bl, rl)) || !(bl->save(bl, rl, ds, ks))){
+    if(!rl){
+        mid_hermes_ll_block_destroy(&bl);
+        fprintf(stderr, "can't load rights\n");
+        return 1;
+    }
+    if(!(bl->rotate(bl, rl))){
+        mid_hermes_ll_rights_list_destroy(&rl);
+        mid_hermes_ll_block_destroy(&bl);
+        fprintf(stderr, "can't rotate\n");
+        return 1;
+    }
+  if(!(bl->save(bl, rl, ds, ks))){
     mid_hermes_ll_rights_list_destroy(&rl);
     mid_hermes_ll_block_destroy(&bl);
+    fprintf(stderr, "can't save rotated block\n");
     return 1;
   }
   mid_hermes_ll_block_destroy(&bl);

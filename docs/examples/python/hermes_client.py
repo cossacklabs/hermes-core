@@ -71,8 +71,7 @@ parser.add_argument('--update', '-u', action='store_true', default=False,
 parser.add_argument('--delete', '-d', action='store_true', default=False,
                     dest='delete')
 
-parser.add_argument('--rotate', '-rt', action='store_true', default=False,
-                 dest='rotate')
+parser.add_argument('--rotate', '-rt', action='store_true', default=False, dest='rotate')
 
 parser.add_argument('--grant_read', '-gr', action='store_true', default=False,
                     dest='grant_read')
