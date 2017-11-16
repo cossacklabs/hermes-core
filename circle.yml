@@ -43,3 +43,6 @@ test:
 
     # test c tutorial
     - ./tests/scripts/test_services.sh docs/examples/c/tests/test.sh;
+
+    # test c midhermes low level
+    - ./docs/examples/c/tests/test_mid_hermes_ll.sh;

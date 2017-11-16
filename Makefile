@@ -248,10 +248,16 @@ install: install_headers install_static_libs install_shared_libs
 # alias for now, will install hermes-libs later
 install_all: install
 
-ll_example: CMD = make docs/examples/c/mid_hermes_low_level/Makefile
+mid_hermes_ll_example: CMD = cd docs/examples/c/mid_hermes_low_level && make
 
-ll_example: static_core
+mid_hermes_ll_example: static_core
 	@echo -n "make midHermes lowLevel example"
+	@$(BUILD_CMD_)
+
+mid_hermes_ll_example_clean: CMD = cd docs/examples/c/mid_hermes_low_level && make clean
+
+mid_hermes_ll_example_clean:
+	@echo -n "make midHermes lowLevel example clean"
 	@$(BUILD_CMD_)
 
 mid_hermes_example_client: CMD = cd docs/examples/c/mid_hermes/client && make
@@ -315,9 +321,9 @@ ckeygen_clean:
 	@echo -n "make C keygen clean"
 	@$(BUILD_CMD_)
 
-examples: static_core ckeygen ll_example mid_hermes_example_client mid_hermes_example_credential_store mid_hermes_example_key_store mid_hermes_example_data_store
+examples: static_core ckeygen mid_hermes_ll_example mid_hermes_example_client mid_hermes_example_credential_store mid_hermes_example_key_store mid_hermes_example_data_store
 
-examples_clean: ckeygen_clean mid_hermes_example_client_clean mid_hermes_example_credential_store_clean mid_hermes_example_key_store_clean mid_hermes_example_data_store_clean
+examples_clean: ckeygen_clean mid_hermes_ll_example_clean mid_hermes_example_client_clean mid_hermes_example_credential_store_clean mid_hermes_example_key_store_clean mid_hermes_example_data_store_clean
 
 examples_clean:
 	@$(BUILD_CMD_)
