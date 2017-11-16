@@ -42,7 +42,7 @@ uint32_t db_get_public_key(void* cs, const uint8_t* user_id, const size_t user_i
   return read_whole_file(fpath, pub_key, pub_key_length);  
 }
 
-hm_cs_db_t* db_create(){
+hm_cs_db_t* db_create(void){
   hm_cs_db_t* cs=calloc(1, sizeof(hm_cs_db_t));
   assert(cs);
   cs->user_data=calloc(1, sizeof(db_t));

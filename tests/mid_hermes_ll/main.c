@@ -22,11 +22,13 @@
 #include <common/common.h>
 #include "block_tests.h"
 
-void mid_hermes_ll_tests(){
-    testsuite_fail_if(mid_hermes_ll_block_tests(), "mid hermes ll block");
+void mid_hermes_ll_tests(void){
+    testsuite_fail_if(mid_hermes_ll_block_tests() == TEST_FAIL, "mid hermes ll block");
 }
 
 int main(int argc, char *argv[]){
+    UNUSED(argc);
+    UNUSED(argv);
     fprintf(stderr, "here");
     testsuite_start_testing();
     testsuite_enter_suite("mid hermes ll test");

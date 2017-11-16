@@ -31,6 +31,8 @@
 extern "C"{
 #endif
 
+#define UNUSED(expr) (void)(expr)
+
 typedef int test_utils_status_t;
 
 test_utils_status_t string_to_bytes(const char *str, uint8_t *bytes, size_t size);

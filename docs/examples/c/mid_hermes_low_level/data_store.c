@@ -37,7 +37,7 @@ struct hermes_data_store_type{
   char path[1024];
 };
 
-hermes_data_store_t* hermes_data_store_create(){
+hermes_data_store_t* hermes_data_store_create(void){
   hermes_data_store_t* ds=calloc(1, sizeof(hermes_data_store_t));
   assert(ds);
   memcpy(ds->path, DATA_STORE_PATH, strlen(DATA_STORE_PATH)+1);

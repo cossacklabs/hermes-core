@@ -25,7 +25,7 @@
 
 #include <hermes/credential_store/db.h>
 
-hm_cs_db_t* db_create();
+hm_cs_db_t* db_create(void);
 uint32_t db_destroy(hm_cs_db_t** db);
 
 #endif //DB_H

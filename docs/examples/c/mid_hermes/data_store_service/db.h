@@ -25,7 +25,7 @@
 
 #include <hermes/data_store/db.h>
 
-hm_ds_db_t* db_create();
+hm_ds_db_t* db_create(void);
 uint32_t db_destroy(hm_ds_db_t** db);
 
 #endif //DB_H

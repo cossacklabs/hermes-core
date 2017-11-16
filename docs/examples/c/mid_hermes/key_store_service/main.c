@@ -44,6 +44,7 @@
 int socket_desc=0;
 
 void exit_handler(int s){
+  UNUSED(s);
   fprintf(stderr, "\rexited...\n");
   close(socket_desc);
   exit(1); 
@@ -57,9 +58,9 @@ void* key_store(void* arg){
     return (void*)FAIL;
   }
   hm_rpc_transport_t* credential_store_transport = create_secure_transport(
-          key_store_id, strlen(key_store_id), key_store_private_key, sizeof(key_store_private_key),
+          key_store_id, strlen((char*)key_store_id), key_store_private_key, sizeof(key_store_private_key),
           credential_store_pk, sizeof(credential_store_pk),
-          credential_store_id, strlen(credential_store_id), raw_credential_store_transport, false);
+          credential_store_id, strlen((char*)credential_store_id), raw_credential_store_transport, false);
   if(!credential_store_transport){
     perror("can't initialize secure transport to credential store\n");
     transport_destroy(&raw_credential_store_transport);
@@ -67,7 +68,7 @@ void* key_store(void* arg){
   }
 
   // create secure transport with new client
-  hm_rpc_transport_t* client_transport=transport_create((int64_t)arg);
+  hm_rpc_transport_t* client_transport=transport_create((int)(intptr_t)arg);
   if(!client_transport){
     perror("client transport creation error ...\n");
     return (void*)FAIL;
@@ -76,7 +77,7 @@ void* key_store(void* arg){
   secure_session_user_callbacks_t* session_callback = get_session_callback_with_remote_credential_store(
           credential_store_transport);
   hm_rpc_transport_t* secure_client_transport = create_secure_transport_with_callback(
-          key_store_id, strlen(key_store_id),key_store_private_key, sizeof(key_store_private_key),
+          key_store_id, strlen((char*)key_store_id),key_store_private_key, sizeof(key_store_private_key),
           session_callback, client_transport, true);
   if(!secure_client_transport){
       perror("can't establish secure transport with client\n");
@@ -104,6 +105,8 @@ void* key_store(void* arg){
 }
 
 int main(int argc, char** argv){
+  UNUSED(argc);
+  UNUSED(argv);
   struct sockaddr_in server , client;
   socket_desc = socket(AF_INET , SOCK_STREAM , 0);
   if (socket_desc == -1){

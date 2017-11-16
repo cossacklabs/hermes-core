@@ -46,6 +46,7 @@
 #define MAX_COMMAND_LENGTH 256
 
 void* server(void* param){
+  UNUSED(param);
   hm_rpc_transport_t* transport = hm_test_transport_create(SC_PIPE_NAME, CS_PIPE_NAME, true);
   if(!transport){
     testsuite_fail_if(true, "server transport initializing");
@@ -75,6 +76,7 @@ void* server(void* param){
 }
 
 void* client(void* param){
+  UNUSED(param);
   hm_rpc_transport_t* transport = hm_test_transport_create(CS_PIPE_NAME, SC_PIPE_NAME, false);
   if(!transport){
     testsuite_fail_if(true, "client transport initializing");
@@ -102,7 +104,6 @@ void* client(void* param){
   }
   i=1;
   while(i<=MAX_USERS){
-    char user_id[USER_ID_LENGTH];
     char command[MAX_COMMAND_LENGTH];
     sprintf(command, "find . -maxdepth 1 -name \"*.priv\" | sed '%iq;d' | awk '{print substr($0, 3, 2*%i)}'", i, USER_ID_LENGTH);
     FILE* f=popen(command, "r");
@@ -136,7 +137,7 @@ void* client(void* param){
   return (void*)TEST_SUCCESS;
 }
 
-int credential_store_general_flow(){
+int credential_store_general_flow(void){
   mkfifo(SC_PIPE_NAME, 0666);
   mkfifo(CS_PIPE_NAME, 0666);
   pthread_t client_thread;
@@ -156,11 +157,13 @@ int credential_store_general_flow(){
   return res;
 }
 
-void credential_store_tests(){
-  testsuite_fail_if(credential_store_general_flow(), "credential store general flow");
+void credential_store_tests(void){
+  testsuite_fail_if(credential_store_general_flow() != TEST_SUCCESS, "credential store general flow");
 }
 
 int main(int argc, char *argv[]){
+  UNUSED(argc);
+  UNUSED(argv);
   system("rm *.priv");
   testsuite_start_testing();
   testsuite_enter_suite("credential_store test");

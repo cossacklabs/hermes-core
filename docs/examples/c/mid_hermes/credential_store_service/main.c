@@ -44,13 +44,14 @@
 int socket_desc=0;
 
 void exit_handler(int s){
+  UNUSED(s);
   fprintf(stderr, "\rexited...\n");
   close(socket_desc);
   exit(1); 
 }
 
 void* credential_store(void* arg){
-  hm_rpc_transport_t* client_transport=transport_create((int)arg);
+  hm_rpc_transport_t* client_transport=transport_create((int)(intptr_t)arg);
   if(!client_transport){
     perror("client transport creation error ...\n");
     return (void*)FAIL;
@@ -64,7 +65,7 @@ void* credential_store(void* arg){
   secure_session_user_callbacks_t* session_callback = get_session_callback_with_local_credential_store(db);
 
   hm_rpc_transport_t* secure_transport = create_secure_transport_with_callback(
-          credential_store_id, strlen(credential_store_id),
+          credential_store_id, strlen((char*)credential_store_id),
           credential_store_private_key, sizeof(credential_store_private_key),
           session_callback, client_transport, true);
 
@@ -83,6 +84,8 @@ void* credential_store(void* arg){
 }
 
 int main(int argc, char** argv){
+  UNUSED(argc);
+  UNUSED(argv);
   struct sockaddr_in server , client;
   socket_desc = socket(AF_INET , SOCK_STREAM , 0);
   if (socket_desc == -1){

@@ -26,15 +26,6 @@
 
 #define TEMP_BUFFER_SIZE (2048)
 
-typedef struct secure_transport_type {
-    // transport that will be wrapped
-    hm_rpc_transport_t* user_transport;
-    // secure session for this connection
-    secure_session_t* session;
-    secure_session_user_callbacks_t* session_callback;
-
-} secure_transport_t;
-
 /* \brief used as user_data in secure_session_user_callbacks_t implementation
  *
  */
