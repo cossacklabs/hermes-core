@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
         return FAIL;
     }
     if (argc == 2 && strcmp(argv[1], "--help") == 0) {
-        fprintf(stdout, HELP);
+        fprintf(stdout, "%s", HELP);
         return SUCCESS;
     }
     if (0 != init()) {

@@ -97,7 +97,7 @@ void destroy_transports_container(transports_container_t* container){
 
 int main(int argc, char **argv) {
     if (argc == 2 && strcmp(argv[1], "--help") == 0){
-        fprintf(stdout, HELP);
+        fprintf(stdout, "%s", HELP);
         return SUCCESS;
     }
     if (argc < 5) {

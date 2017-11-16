@@ -4,7 +4,7 @@ machine:
     # gopath directories below
     TEMP_GOPATH: ${HOME}/temp_gopath
     GOPATH: $TEMP_GOPATH:$GOPATH
-    STRICT_CFLAGS: "-Wall -Wextra -Wstrict-aliasing -fstrict-aliasing -pedantic -fno-common -Wno-unused-result -fno-common -fwrapv -Wstrict-prototypes"
+    STRICT_CFLAGS: "-Wall -Wextra -Wstrict-aliasing -fstrict-aliasing -pedantic -fno-common -Wno-unused-result -fno-common -fwrapv -Wstrict-prototypes -std=c99"
 
 dependencies:
   pre:
