@@ -38,6 +38,8 @@
 #define TEST_SUCCESS 0
 #define TEST_FAIL 1
 
+#define UNUSED(expr) (void)(expr)
+
 #include <stdint.h>
 #include <stdlib.h>
 

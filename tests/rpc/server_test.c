@@ -64,6 +64,7 @@ uint32_t func1_proxy(hm_rpc_client_sync_t* c, uint32_t a, uint32_t b, uint32_t* 
 }
 
 uint32_t func1_stub(hm_param_pack_t* in, hm_param_pack_t** out, void* user_data){
+  UNUSED(user_data);
   uint32_t a,b, res;
   if(HM_SUCCESS!=HM_PARAM_EXTRACT(in, HM_PARAM_INT32(&a), HM_PARAM_INT32(&b))){
     return HM_FAIL;
@@ -78,6 +79,7 @@ uint32_t func1_stub(hm_param_pack_t* in, hm_param_pack_t** out, void* user_data)
 
 
 void* client(void *param){
+  UNUSED(param);
   hm_rpc_transport_t* transport = hm_test_transport_create(CS_PIPE_NAME, SC_PIPE_NAME, false);
   if(!transport){
     testsuite_fail_if(true, "client transport initializing");
@@ -104,7 +106,8 @@ void* client(void *param){
   return (void*)TEST_SUCCESS;
 }
 
-void* server(void *param){  
+void* server(void *param){
+  UNUSED(param);
   hm_rpc_transport_t* transport = hm_test_transport_create(SC_PIPE_NAME, CS_PIPE_NAME, true);
   if(!transport){
     testsuite_fail_if(true, "server transport initializing");
@@ -134,7 +137,7 @@ void* server(void *param){
 }
 
 
-static int server_general_flow(){
+static int server_general_flow(void){
   mkfifo(SC_PIPE_NAME, 0666);
   mkfifo(CS_PIPE_NAME, 0666);
   pthread_t client_thread;
@@ -158,7 +161,7 @@ static int server_general_flow(){
   return TEST_SUCCESS;
 }
 
-void client_server_tests(){
-  testsuite_fail_if(0!=server_general_flow(), "client-server general flow");
+void client_server_tests(void){
+  testsuite_fail_if(TEST_SUCCESS != server_general_flow(), "client-server general flow");
 }
 

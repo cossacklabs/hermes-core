@@ -20,6 +20,6 @@
 #ifndef HERMES_CORE_BLOCK_TESTS_H
 #define HERMES_CORE_BLOCK_TESTS_H
 
-int mid_hermes_ll_block_tests();
+int mid_hermes_ll_block_tests(void);
 
 #endif //HERMES_CORE_BLOCK_TESTS_H

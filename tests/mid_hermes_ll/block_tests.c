@@ -25,12 +25,12 @@
 #include <common/common.h>
 #include "block_tests.h"
 
-int mid_hermes_ll_block_buffer_equality_tests ();
-int mid_hermes_ll_block_user_equality_tests ();
-int mid_hermes_ll_block_cst_time_memcmp_tests ();
+int mid_hermes_ll_block_buffer_equality_tests (void);
+int mid_hermes_ll_block_user_equality_tests (void);
+int mid_hermes_ll_block_cst_time_memcmp_tests (void);
 
 
-int mid_hermes_ll_block_tests(){
+int mid_hermes_ll_block_tests(void){
     // generate test keypair
     uint8_t* private_key=NULL;
     size_t private_key_length=0;
@@ -38,7 +38,7 @@ int mid_hermes_ll_block_tests(){
     size_t public_key_length=0;
     if(themis_gen_ec_key_pair(private_key, &private_key_length, public_key, &public_key_length)!=THEMIS_BUFFER_TOO_SMALL){
         testsuite_fail_if(true, "get length for private or public keys");
-        TEST_FAIL;
+        return TEST_FAIL;
     }
     private_key = malloc(private_key_length);
     public_key = malloc(public_key_length);
@@ -132,12 +132,12 @@ int mid_hermes_ll_block_tests(){
     return TEST_SUCCESS;
 }
 
-int mid_hermes_ll_block_buffer_equality_tests () {
+int mid_hermes_ll_block_buffer_equality_tests (void) {
     uint8_t *userId1 = (uint8_t*)"user id1";
     mid_hermes_ll_buffer_t* userBuffer1 = mid_hermes_ll_buffer_create(userId1, 8);
 
     uint8_t *userId1Twin = (uint8_t*)"user id1";
-    mid_hermes_ll_buffer_t* userBuffer1Twin = mid_hermes_ll_buffer_create(userId1, 8);
+    mid_hermes_ll_buffer_t* userBuffer1Twin = mid_hermes_ll_buffer_create(userId1Twin, 8);
 
     uint8_t *userId2 = (uint8_t*)"user id2";
     mid_hermes_ll_buffer_t* userBuffer2 = mid_hermes_ll_buffer_create(userId2, 8);
@@ -169,9 +169,9 @@ int mid_hermes_ll_block_buffer_equality_tests () {
     return TEST_SUCCESS; 
 }
 
-int mid_hermes_ll_block_user_equality_tests () {
+int mid_hermes_ll_block_user_equality_tests (void) {
 
-    int KEY_LENGTH = 256;
+    size_t KEY_LENGTH = 256;
 
     size_t private_key_length1=KEY_LENGTH;
     size_t public_key_length1=KEY_LENGTH;
@@ -215,7 +215,7 @@ int mid_hermes_ll_block_user_equality_tests () {
     return TEST_SUCCESS; 
 }
 
-int mid_hermes_ll_block_cst_time_memcmp_tests () {
+int mid_hermes_ll_block_cst_time_memcmp_tests (void) {
 
     uint8_t data1[3] = {0xAB, 0xAC, 0x12};
     uint8_t data2[3] = {0xAB, 0xAC, 0x12};
