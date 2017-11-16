@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
         fprintf(stderr, "error: params error\n\n%s\n", HELP);
         return FAIL;
     }
-    transports_container_t container = {0};
+    transports_container_t container = {NULL, NULL, NULL, NULL, NULL, NULL};
 
     mid_hermes_t *mh = NULL;
     uint8_t sk[1024];

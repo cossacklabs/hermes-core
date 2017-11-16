@@ -2,8 +2,11 @@ cmake_minimum_required(VERSION 3.6)
 project(hermes_core)
 
 set(CMAKE_CXX_STANDARD 11)
-
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wstrict-aliasing -fstrict-aliasing -pedantic -fno-common -Wno-unused-result -fno-common -fwrapv -Wstrict-prototypes")
+
+# use clang as compiler explicitly
+#set(CMAKE_C_COMPILER clang)
+#set(CMAKE_CXX_COMPILER clang)
 
 add_executable(hermes_client_example docs/examples/c/mid_hermes/client/hermes_client.c docs/examples/c/mid_hermes/common/transport.c docs/examples/c/utils/utils.c docs/examples/c/utils/base64.c src/secure_transport/utils.c src/secure_transport/utils.h docs/examples/c/mid_hermes/common/credential_store_client.c src/secure_transport/session_callback.c include/hermes/secure_transport/session_callback.h)
 TARGET_LINK_LIBRARIES(hermes_client_example hermes_mid_hermes hermes_mid_hermes_ll hermes_credential_store hermes_data_store hermes_key_store hermes_rpc pthread hermes_common themis soter hermes_secure_transport)
