@@ -49,7 +49,7 @@ const char* const HELP = "usage: hermes_client_ll <command> <user id> <base64 en
         "           read_block -  read <name of file to be processed> block with <meta> from Hermes system\n"
         "           update_block -  update <name of file to be processed> block with <meta> in Hermes system\n"
         "           delete_block -  delete <name of file to be processed> block from Hermes system\n"
-        "           rotate -   rotate <name of file to be processed> block from Hermes system\n"
+        //"           rotate -   rotate <name of file to be processed> block from Hermes system\n"
         "           grant_read - grant read access for <for user> to <name of file to be processed> block in Hermes system\n"
         "           grant_update - grant update access for <for user> to <name of file to be processed> block in Hermes system\n"
         "           revoke_read - deny read access for <for user> to <name of file to be processed> block in Hermes system\n"
@@ -138,12 +138,12 @@ int main(int argc, char *argv[]) {
             finalize();
             return FAIL;
         }
-    } else if (strcmp(argv[1], "rotate") == 0) {
-        if (argc != 5 || 0 != rotate_block(argv[2], argv[3], argv[4])) {
-            fprintf(stderr, "error: block rotate error\n");
-            finalize();
-            return FAIL;
-        }
+//     } else if (strcmp(argv[1], "rotate") == 0) {
+//         if (argc != 5 || 0 != rotate_block(argv[2], argv[3], argv[4])) {
+//             fprintf(stderr, "error: block rotate error\n");
+//             finalize();
+//             return FAIL;
+//         }
     } else {
         fprintf(stderr, "error: undefined command %s\n\n%s", argv[1], HELP);
         finalize();
