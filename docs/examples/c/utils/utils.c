@@ -118,7 +118,7 @@ uint32_t write_whole_file(const char* filename, const uint8_t* buf, const size_t
     fprintf(stderr, "can't open file <%s> for write\n", filename);
     return 1;
   }
-  size_t writed_bytes=fwrite(buf, 1, buf_length, f);
+  fwrite(buf, 1, buf_length, f);
   fclose(f);
   return 0;
 }

@@ -33,7 +33,7 @@ struct hermes_credential_store_type{
   char path[1024];
 };
 
-hermes_credential_store_t* hermes_credential_store_create(){
+hermes_credential_store_t* hermes_credential_store_create(void){
   hermes_credential_store_t* cs=calloc(1, sizeof(hermes_credential_store_t));
   assert(cs);
   memcpy(cs->path, CREDENTIAL_STORE_PATH, strlen(CREDENTIAL_STORE_PATH)+1);

@@ -34,7 +34,7 @@ struct hermes_key_store_type{
   char path[256];
 };
 
-hermes_key_store_t* hermes_key_store_create(){
+hermes_key_store_t* hermes_key_store_create(void){
   hermes_key_store_t* ks=calloc(1, sizeof(hermes_key_store_t));
   assert(ks);
   memcpy(ks->path, HERMES_KEY_STORE_PATH, strlen(HERMES_KEY_STORE_PATH)+1);

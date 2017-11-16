@@ -36,7 +36,7 @@
 #define SUCCESS 0
 #define FAIL 1
 
-const char const *HELP = "usage: hermes_client_ll <command> <user id> <base64 encoded user private key>  <name of file for proceed> <meta> <for user>.\n"
+const char* const HELP = "usage: hermes_client_ll <command> <user id> <base64 encoded user private key>  <name of file for proceed> <meta> <for user>.\n"
         "           <command>                         - executes the command to be performed by the client, see below;\n"
         "           <user id>                         - user identifier (user needs to be registered in Credential store);\n"
         "           <base64 encoded user private key> - base64 encoded private key of the user;\n"
@@ -59,14 +59,14 @@ hermes_key_store_t *ks = NULL;
 hermes_credential_store_t *cs = NULL;
 hermes_data_store_t *ds = NULL;
 
-int finalize() {
+int finalize(void) {
     hermes_key_store_destroy(&ks);
     hermes_data_store_destroy(&ds);
     hermes_credential_store_destroy(&cs);
     return 0;
 }
 
-int init() {
+int init(void) {
     ks = hermes_key_store_create();
     ds = hermes_data_store_create();
     cs = hermes_credential_store_create();
