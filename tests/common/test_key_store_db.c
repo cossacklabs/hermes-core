@@ -264,6 +264,7 @@ uint32_t  db_get_indexed_rights(
                                 const size_t index,
                                 uint8_t** user_id, size_t* user_id_length,
                                 uint32_t* rights_mask){
+  UNUSED(index);
   if(!db || !block_id || !block_id_length || !user_id || !user_id_length || !rights_mask){
     return HM_INVALID_PARAMETER;
   }

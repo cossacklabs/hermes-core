@@ -27,7 +27,7 @@
 
 #include <stdint.h>
 
-hm_cs_db_t* hm_test_cs_db_create();
+hm_cs_db_t* hm_test_cs_db_create(void);
 uint32_t hm_test_cs_db_destroy(hm_cs_db_t** db);
 
 

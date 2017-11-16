@@ -63,7 +63,7 @@ uint32_t transport_send(void *t, const uint8_t *buf, const size_t buf_length) {
         return HM_FAIL;
     }
     ssize_t written = write(transport->socket, buf, buf_length);
-    if (buf_length !=written) {
+    if (written < 0 || buf_length != (size_t)written) {
         return HM_FAIL;
     }
     return HM_SUCCESS;
@@ -73,14 +73,15 @@ uint32_t transport_recv(void *t, uint8_t *buf, size_t buf_length) {
     if (!t || !buf || !buf_length) {
         return HM_FAIL;
     }
-    ssize_t readed_bytes, total_read = 0;
+    ssize_t readed_bytes = 0;
+    size_t total_read = 0;
     while (total_read < buf_length) {
         readed_bytes = read(((transport_t *) t)->socket, buf + total_read, buf_length - total_read);
         if (readed_bytes < 0) {
             return HM_FAIL;
         }
         total_read += readed_bytes;
-        if(readed_bytes == 0 || readed_bytes < buf_length){
+        if(readed_bytes == 0 || (size_t)readed_bytes < buf_length){
             break;
         }
     }

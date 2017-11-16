@@ -58,6 +58,7 @@
 #define MAX_KEY_LENGTH 256
 
 void* data_store_server(void* param){
+  UNUSED(param);
   hm_rpc_transport_t* transport = hm_test_transport_create(DC_PIPE_NAME, CD_PIPE_NAME, true);
   if(!transport){
     testsuite_fail_if(true, "server transport initializing");
@@ -93,6 +94,7 @@ void* data_store_server(void* param){
 }
 
 void* credential_store_server(void* param){
+  UNUSED(param);
   hm_rpc_transport_t* transport = hm_test_transport_create(SC_PIPE_NAME, CS_PIPE_NAME, true);
   if(!transport){
     testsuite_fail_if(true, "server transport initializing");
@@ -128,6 +130,7 @@ void* credential_store_server(void* param){
 }
 
 void* key_store_server(void* param){
+  UNUSED(param);
   hm_rpc_transport_t* transport = hm_test_transport_create(KC_PIPE_NAME, CK_PIPE_NAME, true);
   if(!transport){
     testsuite_fail_if(true, "server transport initializing");
@@ -192,7 +195,6 @@ typedef struct users_type{
 void gen_users(users_t* u){
   int i=1;
   while(i<=MAX_USERS && i<=MAX_USERS_IN_TESTS){
-    char user_id[USER_ID_LENGTH];
     char command[MAX_COMMAND_LENGTH];
     sprintf(command, "find . -maxdepth 1 -name \"*.priv\" | sed '%iq;d' | awk '{printf substr($0, 3, 2*%i)}'", i, USER_ID_LENGTH);
     FILE* f=popen(command, "r");
@@ -224,6 +226,7 @@ void gen_blocks(blocks_t* b){
 }
 
 void* client(void* param){
+  UNUSED(param);
   hm_rpc_transport_t* credential_store_transport = hm_test_transport_create(CS_PIPE_NAME, SC_PIPE_NAME, false);
   hm_rpc_transport_t* data_store_transport = hm_test_transport_create(CD_PIPE_NAME, DC_PIPE_NAME, false);
   hm_rpc_transport_t* key_store_transport = hm_test_transport_create(CK_PIPE_NAME, KC_PIPE_NAME, false);
@@ -284,7 +287,7 @@ void* client(void* param){
   return (void*)TEST_SUCCESS;
 }
 
-int mid_hermes_general_flow(){
+int mid_hermes_general_flow(void){
   mkfifo(CS_PIPE_NAME, 0666);
   mkfifo(SC_PIPE_NAME, 0666);
   mkfifo(CD_PIPE_NAME, 0666);
@@ -322,11 +325,13 @@ int mid_hermes_general_flow(){
   return res;
 }
 
-void mid_hermes_tests(){
-  testsuite_fail_if(mid_hermes_general_flow(), "mid hermes general flow");
+void mid_hermes_tests(void){
+  testsuite_fail_if((bool)mid_hermes_general_flow(), "mid hermes general flow");
 }
 
 int main(int argc, char *argv[]){
+  UNUSED(argc);
+  UNUSED(argv);
   system("rm *.priv");
   testsuite_start_testing();
   testsuite_enter_suite("mid hermes test");

@@ -4,6 +4,7 @@ machine:
     # gopath directories below
     TEMP_GOPATH: ${HOME}/temp_gopath
     GOPATH: $TEMP_GOPATH:$GOPATH
+    STRICT_CFLAGS: "-Wall -Wextra -Wstrict-aliasing -fstrict-aliasing -pedantic -fno-common -Wno-unused-result -fno-common -fwrapv -Wstrict-prototypes -std=c99"
 
 dependencies:
   pre:
@@ -11,9 +12,9 @@ dependencies:
     - git clone https://github.com/cossacklabs/themis && cd themis && sudo make install
 
   override:
-    - make
+    - CFLAGS="$STRICT_CFLAGS" make
     - sudo make install
-    - make CFLAGS=-DREUSE_SOCKET examples
+    - CFLAGS="-DREUSE_SOCKET $STRICT_CFLAGS" make examples
     - sudo pip install tox
     - pyenv global 2.7.12 3.3.6 3.4.4 3.5.3 3.6.2
     - mkdir -p db/credential_store db/key_store db/data_store

@@ -24,7 +24,14 @@
 #include <hermes/rpc/transport.h>
 #include <themis/secure_session.h>
 
-typedef struct secure_transport_type secure_transport_t;
+typedef struct secure_transport_type {
+    // transport that will be wrapped
+    hm_rpc_transport_t* user_transport;
+    // secure session for this connection
+    secure_session_t* session;
+    secure_session_user_callbacks_t* session_callback;
+
+} secure_transport_t;
 
 uint32_t destroy_secure_transport(secure_transport_t** transport_);
 uint32_t destroy_rpc_secure_transport(hm_rpc_transport_t** transport_);

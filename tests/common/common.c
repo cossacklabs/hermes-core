@@ -24,7 +24,7 @@
 
 #ifndef _GNU_SOURCE
   // empty implementation of tdestroy
-  void tdestroy(void *root, void (*free_node)(void *nodep)) {}
+  void tdestroy(void *root, void (*free_node)(void *nodep)) {UNUSED(root);UNUSED(free_node);}
 #endif //_GNU_SOURCE
 
 
@@ -33,7 +33,7 @@ void bin_array_to_hexdecimal_string(const uint8_t* in, const size_t in_length, c
   assert(in_length);
   assert(out);
   assert(out_length==(2*in_length+1));
-  int j;
+  size_t j;
   out[0]=0;
   for(j=0;j<in_length;++j){
     sprintf(out, "%s%02x", out, in[j]);
@@ -45,7 +45,7 @@ void hexdecimal_string_to_bin_array(const char* in, const size_t in_length, uint
   assert(0==(in_length%2));
   assert(out);
   assert(out_length==(in_length/2));
-  int j;
+  size_t j;
   for(j=0; j<(in_length/2); ++j) {
     unsigned int tmp;
     assert(1==sscanf(in+2*j, "%02x", &tmp));

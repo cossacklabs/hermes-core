@@ -25,7 +25,7 @@
 
 #include <hermes/key_store/db.h>
 
-hm_ks_db_t* db_create();
+hm_ks_db_t* db_create(void);
 uint32_t db_destroy(hm_ks_db_t** db);
 
 #endif //DB_H

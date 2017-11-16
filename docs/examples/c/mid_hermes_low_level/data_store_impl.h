@@ -25,7 +25,7 @@
 
 #include <hermes/mid_hermes_ll/interfaces/data_store.h>
 
-hermes_data_store_t* hermes_data_store_create();
+hermes_data_store_t* hermes_data_store_create(void);
 
 
 #endif //DATA_STORE_IMPL_H

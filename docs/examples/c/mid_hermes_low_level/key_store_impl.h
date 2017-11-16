@@ -25,6 +25,6 @@
 
 #include <hermes/mid_hermes_ll/interfaces/key_store.h>
 
-hermes_key_store_t* hermes_key_store_create();
+hermes_key_store_t* hermes_key_store_create(void);
 
 #endif //KEY_STORE_IMPL_H

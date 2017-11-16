@@ -38,7 +38,7 @@
 #define CS_PIPE_NAME "/tmp/hermes_core_test_cs_pipe" 
 #define SC_PIPE_NAME "/tmp/hermes_core_test_sc_pipe"
 
-static int param_pack_general_flow(){
+static int param_pack_general_flow(void){
   uint8_t *param1=NULL, *param3=NULL;
   size_t param1_length=0, param3_length=0;
   int32_t param2=0;
@@ -153,6 +153,7 @@ static int param_pack_general_flow(){
 }
 
 void* client_func(void *param){
+  UNUSED(param);
   uint8_t *param1=NULL, *param3=NULL;
   size_t param1_length=0, param3_length=0;
   int32_t param2=0;
@@ -202,6 +203,7 @@ void* client_func(void *param){
 }
 
 void* server_func(void *param){
+  UNUSED(param);
   hm_rpc_transport_t* transport = hm_test_transport_create(SC_PIPE_NAME, CS_PIPE_NAME, true);
   if(!transport){
     testsuite_fail_if(true, "server transport initializing");
@@ -226,7 +228,7 @@ void* server_func(void *param){
 }
 
 
-static int param_pack_send_receive_test(){
+static int param_pack_send_receive_test(void){
   mkfifo(SC_PIPE_NAME, 0666);
   mkfifo(CS_PIPE_NAME, 0666);
   pthread_t client_thread;
@@ -251,7 +253,7 @@ static int param_pack_send_receive_test(){
 }
 
 
-void rpc_tests(){
-  testsuite_fail_if(param_pack_general_flow(), "param pack general flow");
-  testsuite_fail_if(param_pack_send_receive_test(), "param pack send/receive general flow");
+void rpc_tests(void){
+  testsuite_fail_if(param_pack_general_flow() == TEST_FAIL, "param pack general flow");
+  testsuite_fail_if((bool)param_pack_send_receive_test() == TEST_FAIL, "param pack send/receive general flow");
 }

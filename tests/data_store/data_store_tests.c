@@ -43,6 +43,7 @@
 #define SC_PIPE_NAME "/tmp/hermes_core_test_sc_pipe"
 
 void* server(void* param){
+  UNUSED(param);
   hm_rpc_transport_t* transport = hm_test_transport_create(SC_PIPE_NAME, CS_PIPE_NAME, true);
   if(!transport){
     testsuite_fail_if(true, "server transport initializing");
@@ -96,6 +97,7 @@ void gen_new_block(block_t* block){
 }
 
 void* client(void* param){
+  UNUSED(param);
   hm_rpc_transport_t* transport = hm_test_transport_create(CS_PIPE_NAME, SC_PIPE_NAME, false);
   if(!transport){
     testsuite_fail_if(true, "client transport initializing");
@@ -121,7 +123,7 @@ void* client(void* param){
   return (void*)TEST_SUCCESS;
 }
 
-int data_store_general_flow(){
+int data_store_general_flow(void){
   mkfifo(CS_PIPE_NAME, 0666);
   mkfifo(SC_PIPE_NAME, 0666);
   pthread_t client_thread;
@@ -141,11 +143,13 @@ int data_store_general_flow(){
   return res;
 }
 
-void data_store_tests(){
-  testsuite_fail_if(data_store_general_flow(), "data store general flow");
+void data_store_tests(void){
+  testsuite_fail_if(data_store_general_flow() != TEST_SUCCESS, "data store general flow");
 }
 
 int main(int argc, char *argv[]){
+  UNUSED(argc);
+  UNUSED(argv);
   testsuite_start_testing();
   testsuite_enter_suite("data_store test");
 
