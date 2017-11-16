@@ -12,7 +12,7 @@ dependencies:
     - git clone https://github.com/cossacklabs/themis && cd themis && sudo make install
 
   override:
-    - make CFLAGS=$STRICT_CFLAGS
+    - make CFLAGS="$STRICT_CFLAGS"
     - sudo make install
     - make CFLAGS="-DREUSE_SOCKET $STRICT_CFLAGS" examples
     - sudo pip install tox
