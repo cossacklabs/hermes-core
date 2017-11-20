@@ -28,13 +28,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-
-#include <hermes/common/errors.h>
-
-#include <stdint.h>
-#include <stdlib.h>
-
-
 typedef struct hermes_credential_store_type hermes_credential_store_t;
 
 hermes_status_t hermes_credential_store_get_public_key(
