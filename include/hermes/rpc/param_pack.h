@@ -60,7 +60,7 @@ hm_param_pack_t* hm_param_pack_receive(hm_rpc_transport_t* transport);
 
 #define HM_PARAM_TYPE_BUFFERS_LIST 0x26048030
 
-/* end of constatnt definitions*/
+/* end of constant definitions*/
 
 #define HM_PARAM_INT32(p) (uint32_t)HM_PARAM_PACK_MAGIC, (uint32_t)HM_PARAM_TYPE_INT32, p
 #define HM_PARAM_BUFFER(p, p_len) (uint32_t)HM_PARAM_PACK_MAGIC, (uint32_t)HM_PARAM_TYPE_BUFFER, p, p_len
