@@ -1,9 +1,5 @@
 <h1 align="center">
-  <br>
-  HERMES-CORE
-  <br>
-  0.5 PoC
-  <br>
+  HERMES-CORE 0.5 PoC
 </h1>
 
 <p align="center">
