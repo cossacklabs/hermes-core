@@ -6,7 +6,6 @@
   <br>
 </h1>
 
----
 <p align="center">
   <a href="https://github.com/cossacklabs/hermes-core/releases/latest"><img src="https://img.shields.io/github/release/cossacklabs/hermes-core.svg" alt="GitHub release"></a>
   <a href="https://circleci.com/gh/cossacklabs/hermes-core"><img src="https://circleci.com/gh/cossacklabs/hermes-core/tree/master.svg?style=shield&circle-token=75820c008f79dd9751880eff37673be5ca34aa13" alt="Circle CI"></a>
@@ -58,9 +57,9 @@ We also advise you to check out the ever-evolving [Implementing Hermes-based Sec
 
 Hermes-core is available on C, however, clients are implemented on C, Python and Go: 
 
-| Platform | Documentation | Examples |
+| Platform | Tutorial | Code example |
 | :----- | :----- | :------ |
-| C core / C client | [Local CLI example](https://github.com/cossacklabs/hermes-core/wiki/Local-CLI-example) | [docs/examples/c/mid_hermes_low_level](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/c/mid_hermes_low_level) |
+| C core / C client | [Local CLI tutorial](https://github.com/cossacklabs/hermes-core/wiki/Local-CLI-example) | [docs/examples/c/mid_hermes_low_level](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/c/mid_hermes_low_level) |
 | C core / C client | [C tutorial](https://github.com/cossacklabs/hermes-core/wiki/C-tutorial) | [docs/examples/c](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/c) |
 | C core / Python client | [Python tutorial](https://github.com/cossacklabs/hermes-core/wiki/Python-tutorial) | [docs/examples/python](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/python) |
 | C core / Go client | [Go tutorial](https://github.com/cossacklabs/hermes-core/wiki/Go-tutorial) | [docs/examples/go](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/go) |
@@ -75,7 +74,9 @@ There is a separate, commercial licensed Hermes version for industrial use (its 
 
 # Contributing to us
 
-If you're looking for something to contribute to and gain eternal respect, just pick the things in the [list of issues](https://github.com/cossacklabs/themis/issues) and let us know via [email](dev@cossacklabs.com) / through [Gitter](https://gitter.im/cossacklabs/themis), or raise an [Issue](https://github.com/cossacklabs/themis/issues) to make sure nobody's on it yet.
+If you're looking for something to contribute to and gain eternal respect, just pick the things in the [list of issues](https://github.com/cossacklabs/themis/issues). 
+
+If you want to ask a technical question, feel free to raise an [issue](https://github.com/cossacklabs/themis/issues) or write an [email](mailto:dev@cossacklabs.com).
 
 To talk to the business wing of Cossack Labs Limited, drop us an [email](mailto:info@cossacklabs.com).
 
