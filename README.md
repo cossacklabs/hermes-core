@@ -45,6 +45,18 @@ Amazing tutorials available for Hermes-core with Client side written in [C](http
 We also advise you to check out the ever-evolving [Implementing Hermes-based Security Systems](https://github.com/cossacklabs/hermes-core/wiki/Hermes-Scientific-Paper-Redirect#implementing-hermes-based-security-systems) document to find out more about Hermes-core and implementing Hermes-based systems in the real world.
 
 
+# Languages and tutorials
+
+Hermes-core is available on C, however, clients are implemented on C, Python and Go: 
+
+| Platform | Tutorial | Code example |
+| :----- | :----- | :------ |
+| C core / C client | [Local CLI tutorial](https://github.com/cossacklabs/hermes-core/wiki/Local-CLI-example) | [docs/examples/c/mid_hermes_low_level](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/c/mid_hermes_low_level) |
+| C core / C client | [C tutorial](https://github.com/cossacklabs/hermes-core/wiki/C-tutorial) | [docs/examples/c](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/c) |
+| C core / Python client | [Python tutorial](https://github.com/cossacklabs/hermes-core/wiki/Python-tutorial) | [docs/examples/python](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/python) |
+| C core / Go client | [Go tutorial](https://github.com/cossacklabs/hermes-core/wiki/Go-tutorial) | [docs/examples/go](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/go) |
+
+
 # Quick start
 
 You can get Hermes-core library from repository or build it from sources.
@@ -126,7 +138,7 @@ wget -qO - https://pkgs.cossacklabs.com/stable/centos/cossacklabs.repo | \
 sudo yum install libhermes-core
 ```
 
-That's all! Hermes-core is ready to use. The easiest way is to follow one of the tutorials provided below.
+That's all! Hermes-core is ready to use. The easiest way is to follow one of the tutorials provided above.
 
 ## Building from source
 
@@ -161,19 +173,7 @@ cd hermes-core
 make && sudo make install
 ```
 
-That's all! Hermes-core is ready to use. The easiest way is to follow one of the tutorials provided below.
-
-# Languages and tutorials
-
-Hermes-core is available on C, however, clients are implemented on C, Python and Go: 
-
-| Platform | Tutorial | Code example |
-| :----- | :----- | :------ |
-| C core / C client | [Local CLI tutorial](https://github.com/cossacklabs/hermes-core/wiki/Local-CLI-example) | [docs/examples/c/mid_hermes_low_level](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/c/mid_hermes_low_level) |
-| C core / C client | [C tutorial](https://github.com/cossacklabs/hermes-core/wiki/C-tutorial) | [docs/examples/c](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/c) |
-| C core / Python client | [Python tutorial](https://github.com/cossacklabs/hermes-core/wiki/Python-tutorial) | [docs/examples/python](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/python) |
-| C core / Go client | [Go tutorial](https://github.com/cossacklabs/hermes-core/wiki/Go-tutorial) | [docs/examples/go](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/go) |
-
+That's all! Hermes-core is ready to use. The easiest way is to follow one of the tutorials provided above.
  
 # Repository status    
 This repository holds public proof-of-concept version of **Hermes** - **Hermes-core**, which should be used for studying and verification of the methodology and cryptographic backend. 
