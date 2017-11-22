@@ -180,7 +180,8 @@ This repository holds public proof-of-concept version of **Hermes** - **Hermes-c
 
 
 # License
-There is a separate, commercial licensed Hermes version for industrial use (its core crypto code is similar to this repository, yet it holds additional convenience interfaces and services). 
+Hermes-core license is GNU Affero General Public License v3.0.
+There is a separate, commercial licensed Hermes version for industrial use (its core crypto code is similar to this repository, yet it holds additional convenience interfaces and services).
 
 # Contributing to us
 
