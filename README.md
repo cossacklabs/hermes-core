@@ -184,13 +184,14 @@ There is a separate, commercial licensed Hermes version for industrial use (its 
 
 # Contributing to us
 
-If you're looking for something to contribute to and gain eternal respect, just pick the things in the [list of issues](https://github.com/cossacklabs/themis/issues). 
+If you're looking for something to contribute to and gain eternal respect, just pick the things in the [list of issues](https://github.com/cossacklabs/hermes-core/issues). 
 
-If you want to ask a technical question, feel free to raise an [issue](https://github.com/cossacklabs/themis/issues) or write an [email](mailto:dev@cossacklabs.com).
-
-To talk to the business wing of Cossack Labs Limited, drop us an [email](mailto:info@cossacklabs.com).
-
+Check [Contributing guide](https://github.com/cossacklabs/hermes-core/wiki/contributing) for more details.
 
 # Contacts
-For all questions and inquiries, use [info@cossacklabs.com](mailto:info@cossacklabs.com) or raise an Issue.      
-[![Twitter CossackLabs](https://img.shields.io/badge/twitter-cossacklabs-fbb03b.svg)](http://twitter.com/cossacklabs) [![Blog](https://img.shields.io/badge/blog-cossacklabs.com-7a7c98.svg)](https://cossacklabs.com/)
+
+If you want to ask a technical question, feel free to raise an [issue](https://github.com/cossacklabs/hermes-core/issues) or write to [dev@cossacklabs.com](mailto:dev@cossacklabs.com).
+
+To talk to the business wing of Cossack Labs Limited, drop us an email to [info@cossacklabs.com](mailto:info@cossacklabs.com).
+   
+[![Blog](https://img.shields.io/badge/blog-cossacklabs.com-7a7c98.svg)](https://cossacklabs.com/) [![Twitter CossackLabs](https://img.shields.io/badge/twitter-cossacklabs-fbb03b.svg)](http://twitter.com/cossacklabs) [![Medium CossackLabs](https://img.shields.io/badge/medium-%40cossacklabs-orange.svg)](https://medium.com/@cossacklabs/)
