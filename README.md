@@ -47,10 +47,123 @@ We also advise you to check out the ever-evolving [Implementing Hermes-based Sec
 
 # Quick start
 
+You can get Hermes-core library from repository or build it from sources.
+
 ## Installing from repository
+
+> Please refer to the [Installing from repository](https://github.com/cossacklabs/hermes-core/wiki/Installing-Hermes-core) page if you want to install dev packages or to catch more details.
+
+Hermes-core is available for the following versions of operating systems:       
+`*.deb:`
+- Debian: Wheezy, Jessie, Stretch;
+- Ubuntu: Trusty Tahr, Xenial Xerus, Yakkety Yak, Zesty Zapus.
+
+`*.rpm:`
+- CentOS: 7.
+
+
+### Installing for Debian / Ubuntu
+
+**1. Import the public key used by Cossack Labs to sign packages:**
+```console
+wget -qO - https://pkgs.cossacklabs.com/gpg | sudo apt-key add -
+```
+> Note: If you wish to validate key fingerprint, it is: `29CF C579 AD90 8838 3E37 A8FA CE53 BCCA C8FF FACB`.
+
+**2. You may need to install the apt-transport-https package before proceeding:**
+```console
+sudo apt-get install apt-transport-https
+```
+
+**3. Add Cossack Labs repository to your `sources.list`.**
+You should add a line that specifies your OS name and the release name:
+```console
+deb https://pkgs.cossacklabs.com/stable/$OS $RELEASE main
+```
+* `$OS` should be `debian` or `ubuntu`.
+* `$RELEASE` should be one of Debian or Ubuntu release names. You can determine this by running `lsb_release -cs`, if you have `lsb_release` installed.
+
+We currently build packages for the following OS and RELEASE combinations:
+
+- *Debian "Wheezy" (Debian 7)*
+- *Debian "Jessie" (Debian 8)*
+- *Debian "Stretch" (Debian 9)*
+- *Ubuntu Trusty Tahr (Ubuntu 14.04)*
+- *Ubuntu Xenial Xerus (Ubuntu 16.04)*
+- *Ubuntu Yakkety Yak (Ubuntu 16.10)*
+- *Ubuntu Zesty Zapus (Ubuntu 17.04)*
+
+For example, if you are running *Debian 9 "Stretch"*, run:
+```console
+echo "deb https://pkgs.cossacklabs.com/stable/debian stretch main" | \
+  sudo tee /etc/apt/sources.list.d/cossacklabs.list
+```
+**4. Reload local package database:**
+```console
+sudo apt-get update
+```
+**5. Install the package**
+```console
+sudo apt-get install libhermes-core
+```
+
+### Installing for CentOS / RHEL / OEL
+> Note, we only build RPM packages for x86_64.
+
+**1. Import the public key used by Cossack Labs to sign packages:**
+```console
+sudo rpm --import https://pkgs.cossacklabs.com/gpg
+```
+>Note: If you wish to validate key fingerprint, it is: `29CF C579 AD90 8838 3E37 A8FA CE53 BCCA C8FF FACB`.
+
+**2. Create a Yum repository file for Cossack Labs package repository:**
+```console
+wget -qO - https://pkgs.cossacklabs.com/stable/centos/cossacklabs.repo | \
+  sudo tee /etc/yum.repos.d/cossacklabs.repo
+```
+**3. Install the package:**
+```console
+sudo yum install libhermes-core
+```
+
+That's all! Hermes-core is ready to use. The easiest way is to follow one of the tutorials provided below.
+
 ## Building from source
 
-# Languages
+> You can check the [Building Hermes-core](https://github.com/cossacklabs/hermes-core/wiki/Building-Hermes-core) page to see how to run tests.
+
+Let's install the libraries and utilities that we're going to need.
+For Debian 9 "Stretch" the command will be:
+```console
+sudo apt-get update && sudo apt-get install build-essential libssl1.0-dev git
+```
+
+For all other Debian versions, use:
+```console
+sudo apt-get update && sudo apt-get install build-essential libssl-dev git 
+```
+
+We need `build-essential` for building binary libraries and `libssl` as backend for [Themis](https://github.com/cossacklabs/themis).
+
+Let's download and install Themis into your system:
+
+```console
+git clone https://github.com/cossacklabs/themis
+cd themis
+make && sudo make install
+cd ..
+```
+
+Now you should download and install Hermes-core:
+```console
+git clone https://github.com/cossacklabs/hermes-core
+cd hermes-core
+make && sudo make install
+```
+
+That's all! Hermes-core is ready to use. The easiest way is to follow one of the tutorials provided below.
+
+# Languages and tutorials
 
 Hermes-core is available on C, however, clients are implemented on C, Python and Go: 
 
@@ -79,5 +192,5 @@ To talk to the business wing of Cossack Labs Limited, drop us an [email](mailto:
 
 
 # Contacts
-For all questions and inquieries, use [info@cossacklabs.com](mailto:info@cossacklabs.com) or raise an Issue.      
+For all questions and inquiries, use [info@cossacklabs.com](mailto:info@cossacklabs.com) or raise an Issue.      
 [![Twitter CossackLabs](https://img.shields.io/badge/twitter-cossacklabs-fbb03b.svg)](http://twitter.com/cossacklabs) [![Blog](https://img.shields.io/badge/blog-cossacklabs.com-7a7c98.svg)](https://cossacklabs.com/)
