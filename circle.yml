@@ -49,11 +49,11 @@ test:
     - ./docs/examples/c/tests/test_mid_hermes_ll.sh;
 
     - |
-      cppcheck
-        --force
-        --enable=warning,performance,portability,information,missingInclude
-        --inconclusive
-        --std=posix --std=c89
-        -I include
-        --error-exitcode=1
+      cppcheck \
+        --force \
+        --enable=warning,performance,portability,information,missingInclude \
+        --inconclusive \
+        --std=posix --std=c89 \
+        -I include \
+        --error-exitcode=1 \
         ./src
