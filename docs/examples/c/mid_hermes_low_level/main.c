@@ -138,12 +138,12 @@ int main(int argc, char *argv[]) {
             finalize();
             return FAIL;
         }
-//     } else if (strcmp(argv[1], "rotate") == 0) {
-//         if (argc != 5 || 0 != rotate_block(argv[2], argv[3], argv[4])) {
-//             fprintf(stderr, "error: block rotate error\n");
-//             finalize();
-//             return FAIL;
-//         }
+//    } else if (strcmp(argv[1], "rotate") == 0) {
+//        if (argc != 5 || 0 != rotate_block(argv[2], argv[3], argv[4])) {
+//            fprintf(stderr, "error: block rotate error\n");
+//            finalize();
+//            return FAIL;
+//        }
     } else {
         fprintf(stderr, "error: undefined command %s\n\n%s", argv[1], HELP);
         finalize();

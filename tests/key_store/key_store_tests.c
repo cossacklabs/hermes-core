@@ -220,42 +220,44 @@ void* client(void* param){
                                                                          wtoken.user_id, sizeof(wtoken.user_id),
                                                                          rtoken.user_id, sizeof(rtoken.user_id),
                                                                          rtoken.token, sizeof(rtoken.token)), "key store client sync calling"); 
-  uint8_t *token=NULL, *owner_id=NULL;
+  uint8_t *out_read_token=NULL, *out_write_token=NULL,
+          *out_read_owner=NULL, *out_write_owner=NULL,
+          *test_token=NULL, *test_owner=NULL;
   size_t token_length=0, owner_id_length=0;
   //read rtoken
   testsuite_fail_if(HM_SUCCESS!=hm_key_store_client_sync_call_get_rtoken(c,
                                                                          rtoken.block_id, sizeof(rtoken.block_id),
                                                                          wtoken.user_id, sizeof(wtoken.user_id),
-                                                                         &token, &token_length,
-                                                                         &owner_id, &owner_id_length), "key store client sync calling"); 
-  free(token);
-  free(owner_id);
+                                                                         &out_read_token, &token_length,
+                                                                         &out_read_owner, &owner_id_length), "key store client sync calling");
+  free(out_read_token);
+  free(out_read_owner);
   //read wtoken
   testsuite_fail_if(HM_SUCCESS!=hm_key_store_client_sync_call_get_wtoken(c,
                                                                          rtoken.block_id, sizeof(rtoken.block_id),
                                                                          wtoken.user_id, sizeof(wtoken.user_id),
-                                                                         &token, &token_length,
-                                                                         &owner_id, &owner_id_length), "key store client sync calling"); 
-  free(token);
-  free(owner_id);
+                                                                         &out_write_token, &token_length,
+                                                                         &out_write_owner, &owner_id_length), "key store client sync calling");
+  free(out_write_token);
+  free(out_write_owner);
   //try to read rtoken
   testsuite_fail_if(HM_SUCCESS==hm_key_store_client_sync_call_get_rtoken(c,
                                                                          rtoken.block_id, sizeof(rtoken.block_id),
                                                                          rtoken.user_id, sizeof(rtoken.user_id),
-                                                                         &token, &token_length,
-                                                                         &owner_id, &owner_id_length), "key store client sync calling"); 
+                                                                         &test_token, &token_length,
+                                                                         &test_owner, &owner_id_length), "key store client sync calling");
   //try to read update token
   testsuite_fail_if(HM_SUCCESS==hm_key_store_client_sync_call_get_wtoken(c,
                                                                          rtoken.block_id, sizeof(rtoken.block_id),
                                                                          rtoken.user_id, sizeof(rtoken.user_id),
-                                                                         &token, &token_length,
-                                                                         &owner_id, &owner_id_length), "key store client sync calling"); 
+                                                                         &test_token, &token_length,
+                                                                         &test_owner, &owner_id_length), "key store client sync calling");
   //try to read rtoken from absent document
   testsuite_fail_if(HM_SUCCESS==hm_key_store_client_sync_call_get_rtoken(c,
                                                                          wtoken.block_id, sizeof(wtoken.block_id),
                                                                          rtoken.user_id, sizeof(rtoken.user_id),
-                                                                         &token, &token_length,
-                                                                         &owner_id, &owner_id_length), "key store client sync calling"); 
+                                                                         &test_token, &token_length,
+                                                                         &test_owner, &owner_id_length), "key store client sync calling");
   
   
   hm_key_store_client_sync_destroy(&c);

@@ -43,6 +43,8 @@ int mid_hermes_ll_block_tests(void){
     private_key = malloc(private_key_length);
     public_key = malloc(public_key_length);
     if(!private_key || !public_key){
+        free(private_key);
+        free(public_key);
         testsuite_fail_if(true, "malloc memory for private|public key");
         return TEST_FAIL;
     }

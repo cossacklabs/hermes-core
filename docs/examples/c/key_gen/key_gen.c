@@ -37,7 +37,11 @@ int main(int argc, char* argv[]){
     }
     private_key=malloc(private_key_length);
     public_key=malloc(public_key_length);
-    if(!private_key || !public_key){return 2;}
+    if(!private_key || !public_key){
+        free(private_key);
+        free(public_key);
+        return 2;
+    }
     if(themis_gen_ec_key_pair(private_key, &private_key_length, public_key, &public_key_length)!=THEMIS_SUCCESS){
 	fprintf(stderr, "key generation error 1\n");
 	return 1;
