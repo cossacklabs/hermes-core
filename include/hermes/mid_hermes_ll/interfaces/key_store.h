@@ -73,22 +73,6 @@ uint8_t *hermes_key_store_iterator_get_user_id(hermes_key_store_iterator_t *iter
 
 size_t hermes_key_store_iterator_get_user_id_length(hermes_key_store_iterator_t *iterator);
 
-uint8_t *hermes_key_store_iterator_get_rtoken(hermes_key_store_iterator_t *iterator);
-
-size_t hermes_key_store_iterator_get_rtoken_length(hermes_key_store_iterator_t *iterator);
-
-uint8_t *hermes_key_store_iterator_get_rtoken_owner(hermes_key_store_iterator_t *iterator);
-
-size_t hermes_key_store_iterator_get_rtoken_owner_length(hermes_key_store_iterator_t *iterator);
-
-uint8_t *hermes_key_store_iterator_get_wtoken(hermes_key_store_iterator_t *iterator);
-
-size_t hermes_key_store_iterator_get_wtoken_length(hermes_key_store_iterator_t *iterator);
-
-uint8_t *hermes_key_store_iterator_get_wtoken_owner(hermes_key_store_iterator_t *iterator);
-
-size_t hermes_key_store_iterator_get_wtoken_owner_length(hermes_key_store_iterator_t *iterator);
-
 hermes_status_t hermes_key_store_iterator_destroy(hermes_key_store_iterator_t **iterator);
 
 
