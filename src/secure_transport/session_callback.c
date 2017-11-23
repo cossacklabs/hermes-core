@@ -64,6 +64,7 @@ secure_session_user_callbacks_t* get_session_callback_with_remote_credential_sto
     }
     hm_credential_store_client_sync_t* db = hm_credential_store_client_sync_create(transport);
     if (!db){
+        free(session_callback);
         return NULL;
     }
 

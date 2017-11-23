@@ -124,17 +124,6 @@ uint32_t write_whole_file(const char* filename, const uint8_t* buf, const size_t
 }
 
 
-char* build_path(char* to, ...){
-  va_list valist;
-  va_start(valist, to);
-  const char* u=va_arg(valist, const char*);
-  while(u){
-    sprintf(to, "%s/%s", to, u);
-    u=va_arg(valist, const char*);
-  }
-  return to;
-}
-
 char* build_typed_path(char* to, ...){
   sprintf(to, ".");
   va_list valist;
@@ -160,6 +149,7 @@ char* build_typed_path(char* to, ...){
     }
     t=(char)va_arg(valist, int);
   }
+  va_end(valist);
   return to;
 }
 

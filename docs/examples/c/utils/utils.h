@@ -30,10 +30,6 @@
 char* buf_to_string(const uint8_t* buf, const size_t buf_length, char* string);
 size_t string_to_buf(const char* string, uint8_t* buf);
 
-char* build_path(char* to, ...);
-
-#define BUILD_PATH(to, ...) build_path(to, __VA_ARGS__, NULL)
-
 char* build_typed_path(char* to, ...);
 
 #define C(a) 'c', a

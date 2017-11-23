@@ -233,33 +233,6 @@ size_t hermes_key_store_iterator_get_user_id_length(hermes_key_store_iterator_t*
   return i->user_id_length;
 }
 
-uint8_t* hermes_key_store_iterator_get_rtoken(hermes_key_store_iterator_t* i){
-  return i->rtoken;
-}
-size_t hermes_key_store_iterator_get_rtoken_length(hermes_key_store_iterator_t* i){
-  return i->rtoken_length;
-}
-
-uint8_t* hermes_key_store_iterator_get_rtoken_owner(hermes_key_store_iterator_t* i){
-  return i->rtoken_owner;
-}
-size_t hermes_key_store_iterator_get_rtoken_owner_length(hermes_key_store_iterator_t* i){
-  return i->rtoken_owner_length;
-}
-
-uint8_t* hermes_key_store_iterator_get_wtoken(hermes_key_store_iterator_t* i){
-  return i->wtoken;
-}
-size_t hermes_key_store_iterator_get_wtoken_length(hermes_key_store_iterator_t* i){
-  return i->wtoken_length;
-}
-
-uint8_t* hermes_key_store_iterator_get_wtoken_owner(hermes_key_store_iterator_t* i){
-  return i->wtoken_owner;
-}
-size_t hermes_key_store_iterator_get_wtoken_owner_length(hermes_key_store_iterator_t* i){
-  return i->wtoken_owner_length;
-}
 uint32_t hermes_key_store_iterator_destroy(hermes_key_store_iterator_t** i){
   if(!i || !(*i)){
     return HM_FAIL;

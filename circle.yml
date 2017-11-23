@@ -8,7 +8,7 @@ machine:
 
 dependencies:
   pre:
-    - sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libssl-dev build-essential python-dev python3-dev python-setuptools python3-setuptools netcat
+    - sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libssl-dev build-essential python-dev python3-dev python-setuptools python3-setuptools netcat cppcheck
     - git clone https://github.com/cossacklabs/themis && cd themis && sudo make install
 
   override:
@@ -47,3 +47,13 @@ test:
 
     # test c midhermes low level
     - ./docs/examples/c/tests/test_mid_hermes_ll.sh;
+
+    - |
+      cppcheck \
+        --force \
+        --enable=warning,performance,portability,information,missingInclude \
+        --inconclusive \
+        --std=posix --std=c89 \
+        -I include \
+        --error-exitcode=1 \
+        ./src

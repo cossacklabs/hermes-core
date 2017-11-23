@@ -62,6 +62,7 @@ static int param_pack_general_flow(void){
   param3 = malloc(param3_length);
   if(!param3){
     testsuite_fail_if(!param3, "memory allocation");
+    free(param1);
     return TEST_FAIL;
   }
   hm_param_pack_t* pack=HM_PARAM_PACK(HM_PARAM_BUFFER(param1, param1_length), HM_PARAM_INT32(param2), HM_PARAM_BUFFER_C(param3, param3_length));
@@ -177,6 +178,7 @@ void* client_func(void *param){
   param3 = malloc(param3_length);
   if(!param3){
     testsuite_fail_if(!param3, "memory allocation");
+    free(param1);
     return (void*)TEST_FAIL;
   }
   hm_param_pack_t* pack=HM_PARAM_PACK(HM_PARAM_BUFFER(param1, param1_length), HM_PARAM_INT32(param2), HM_PARAM_BUFFER_C(param3, param3_length));
