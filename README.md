@@ -1,5 +1,21 @@
+<h1 align="center">
 
-# Hermes-core library 0.5 PoC
+
+  HERMES-CORE 0.5 PoC
+</h1>
+<p align="center">
+  <a href="https://github.com/cossacklabs/hermes-core/releases/latest"><img src="https://img.shields.io/github/release/cossacklabs/hermes-core.svg" alt="GitHub release"></a>
+  <a href="https://circleci.com/gh/cossacklabs/hermes-core"><img src="https://circleci.com/gh/cossacklabs/hermes-core/tree/master.svg?style=shield&circle-token=75820c008f79dd9751880eff37673be5ca34aa13" alt="Circle CI"></a>
+  <a href="https://github.com/cossacklabs/hermes-core/releases/latest"><img src="https://img.shields.io/badge/platform-Debian%20%7C%20Ubuntu%20%7C%20CentOS%20%7C%20OSX-green.svg" alt="Platforms"></a>
+</p>
+<br>
+
+
+
+#### Hermes-core is a security tool for distributed data sharing and collaboration that enforces access control cryptographically.
+<br>
+
+# What is Hermes
 
 **Hermes-core** is a proof of concept for **Hermes**.
 
@@ -18,26 +34,47 @@ The 4th entity of Hermes is **Client**:
 - **Client** (or clients) is the active entity in the Hermes architecture, the one that actually produces or consumes the data. The Client only possesses the keypair that allows decrypting the asymmetrically encrypted data from the Server. The READ permissions are always checked on Client. The absence of the key for performing READ operations will not allow the Client to decrypt the downloaded piece of data.
 The WRITE permissions are checked both on Client and Server so they cannot “fool” each other.
 
-# For better understanding of the concepts behind Hermes and Hermes-core:
-- Read the [scientific paper](https://github.com/cossacklabs/hermes-core/wiki/Hermes-Scientific-Paper-Redirect#hermes-scientific-paper) to understand Hermes better.
-- Read the [documentation that accompanies Hermes-core](https://github.com/cossacklabs/hermes-core/wiki).
-- Fast forward to hands-on tutorials available for Hermes-core with Client side written in [C](https://github.com/cossacklabs/hermes-core/wiki/C-tutorial), [Python](https://github.com/cossacklabs/hermes-core/wiki/Python-tutorial), and [Go](https://github.com/cossacklabs/hermes-core/wiki/Go-tutorial).
-- We also advise you to check out the ever-evolving [Implementing Hermes-based Security Systems](https://github.com/cossacklabs/hermes-core/wiki/Hermes-Scientific-Paper-Redirect#implementing-hermes-based-security-systems) document to find out more about Hermes-core and implementing Hermes-based systems in the real world.
+## Documentation
 
-*** 
-### Repository status    
-This repository holds public proof-of-concept version of **Hermes** - **Hermes-core**, which should be used for studying and verification of the methodology and cryptographic backend. 
-***
-### License
-There is a separate, commercial licensed Hermes version for industrial use (its core crypto code is similar to this repository, yet it holds additional convenience interfaces and services). 
+[Project's GitHub Wiki](https://www.github.com/cossacklabs/hermes-core/wiki) contains the ever-evolving official documentation, which contains everything from deployment guidelines to use-cases, including charts and tutorials you might find useful. 
 
-*** 
+The [scientific paper](https://github.com/cossacklabs/hermes-core/wiki/Hermes-Scientific-Paper-Redirect#hermes-scientific-paper) explains the concept behind Hermes, math model, risk & threats analysis and provides implementation details.
 
-# Installing
+Amazing tutorials available for Hermes-core with Client side written in [C](https://github.com/cossacklabs/hermes-core/wiki/C-tutorial), [Python](https://github.com/cossacklabs/hermes-core/wiki/Python-tutorial), and [Go](https://github.com/cossacklabs/hermes-core/wiki/Go-tutorial).
 
-## Debian / Ubuntu
+We also advise you to check out the ever-evolving [Implementing Hermes-based Security Systems](https://github.com/cossacklabs/hermes-core/wiki/Hermes-Scientific-Paper-Redirect#implementing-hermes-based-security-systems) document to find out more about Hermes-core and implementing Hermes-based systems in the real world.
 
-> Note: Depending on your permissions, adding `sudo` might be necessary!
+
+# Languages and tutorials
+
+Hermes-core is available on C, however, clients are implemented on C, Python and Go: 
+
+| Platform | Tutorial | Code example |
+| :----- | :----- | :------ |
+| C core / C client | [Local CLI tutorial](https://github.com/cossacklabs/hermes-core/wiki/Local-CLI-example) | [docs/examples/c/mid_hermes_low_level](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/c/mid_hermes_low_level) |
+| C core / C client | [C tutorial](https://github.com/cossacklabs/hermes-core/wiki/C-tutorial) | [docs/examples/c](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/c) |
+| C core / Python client | [Python tutorial](https://github.com/cossacklabs/hermes-core/wiki/Python-tutorial) | [docs/examples/python](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/python) |
+| C core / Go client | [Go tutorial](https://github.com/cossacklabs/hermes-core/wiki/Go-tutorial) | [docs/examples/go](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/go) |
+
+
+# Quick start
+
+You can get Hermes-core library from repository or build it from sources.
+
+## Installing from repository
+
+> Please refer to the [Installing from repository](https://github.com/cossacklabs/hermes-core/wiki/Installing-Hermes-core) page if you want to install dev packages or to catch more details.
+
+Hermes-core is available for the following versions of operating systems:       
+`*.deb:`
+- Debian: Wheezy, Jessie, Stretch;
+- Ubuntu: Trusty Tahr, Xenial Xerus, Yakkety Yak, Zesty Zapus.
+
+`*.rpm:`
+- CentOS: 7.
+
+
+### Installing for Debian / Ubuntu
 
 **1. Import the public key used by Cossack Labs to sign packages:**
 ```console
@@ -49,6 +86,7 @@ wget -qO - https://pkgs.cossacklabs.com/gpg | sudo apt-key add -
 ```console
 sudo apt-get install apt-transport-https
 ```
+
 **3. Add Cossack Labs repository to your `sources.list`.**
 You should add a line that specifies your OS name and the release name:
 ```console
@@ -56,17 +94,18 @@ deb https://pkgs.cossacklabs.com/stable/$OS $RELEASE main
 ```
 * `$OS` should be `debian` or `ubuntu`.
 * `$RELEASE` should be one of Debian or Ubuntu release names. You can determine this by running `lsb_release -cs`, if you have `lsb_release` installed.
-* We currently build packages for the following OS and RELEASE combinations:
-*Debian "Wheezy" (Debian 7)*
-*Debian "Jessie" (Debian 8)*
-*Debian "Stretch" (Debian 9)*
-*Ubuntu Precise Pangolin (Ubuntu 12.04)*
-*Ubuntu Trusty Tahr (Ubuntu 14.04)*
-*Ubuntu Xenial Xerus (Ubuntu 16.04)*
-*Ubuntu Yakkety Yak (Ubuntu 16.10)*
-*Ubuntu Zesty Zapus (Ubuntu 17.04)*
 
-* For example, if you are running *Debian 9 "Stretch"*, run:
+We currently build packages for the following OS and RELEASE combinations:
+
+- *Debian "Wheezy" (Debian 7)*
+- *Debian "Jessie" (Debian 8)*
+- *Debian "Stretch" (Debian 9)*
+- *Ubuntu Trusty Tahr (Ubuntu 14.04)*
+- *Ubuntu Xenial Xerus (Ubuntu 16.04)*
+- *Ubuntu Yakkety Yak (Ubuntu 16.10)*
+- *Ubuntu Zesty Zapus (Ubuntu 17.04)*
+
+For example, if you are running *Debian 9 "Stretch"*, run:
 ```console
 echo "deb https://pkgs.cossacklabs.com/stable/debian stretch main" | \
   sudo tee /etc/apt/sources.list.d/cossacklabs.list
@@ -80,12 +119,12 @@ sudo apt-get update
 sudo apt-get install libhermes-core
 ```
 
-## CentOS / RHEL / OEL
+### Installing for CentOS / RHEL / OEL
 > Note, we only build RPM packages for x86_64.
 
 **1. Import the public key used by Cossack Labs to sign packages:**
-```
-rpm --import https://pkgs.cossacklabs.com/gpg
+```console
+sudo rpm --import https://pkgs.cossacklabs.com/gpg
 ```
 >Note: If you wish to validate key fingerprint, it is: `29CF C579 AD90 8838 3E37 A8FA CE53 BCCA C8FF FACB`.
 
@@ -95,85 +134,65 @@ wget -qO - https://pkgs.cossacklabs.com/stable/centos/cossacklabs.repo | \
   sudo tee /etc/yum.repos.d/cossacklabs.repo
 ```
 **3. Install the package:**
+```console
 sudo yum install libhermes-core
-
-## Running a local example
-
-You can try Hermes-core using a local example that contains all the storage entities Hermes-core needs for correct work.
-This local example can be found in `docs/examples/c/mid_hermes_low_level` folder of the repository.
-* Before using this local example you need to register some "users" in Hermes.   
-To register a user with ID "USER", type this into the command line:
-```console
-cd docs/examples/c/mid_hermes_low_level
-mkdir -p ./db/credential_store
-../key_gen/key_pair_gen USER.priv ./db/credential_store/$(echo -n USER | base64)
 ```
-* Create first file file.1block:
+
+That's all! Hermes-core is ready to use. The easiest way is to follow one of the tutorials provided above.
+
+## Building from source
+
+> You can check the [Building Hermes-core](https://github.com/cossacklabs/hermes-core/wiki/Building-Hermes-core) page to see how to run tests.
+
+Let's install the libraries and utilities that we're going to need.
+For Debian 9 "Stretch" the command will be:
 ```console
-echo "smth" > file1.block
+sudo apt-get update && sudo apt-get install build-essential libssl1.0-dev git
 ```
-* Add the block `file1.block` with meta "first block in HERMES" to Hermes-core as a USER, using the following command:
 
+For all other Debian versions, use:
 ```console
-./hermes_client_ll add_block USER $(cat USER.priv | base64) file1.block "first block in Hermes"
+sudo apt-get update && sudo apt-get install build-essential libssl-dev git 
 ```
-* Now you can see some new files in the Hermes-core storages:
+
+We need `build-essential` for building binary libraries and `libssl` as backend for [Themis](https://github.com/cossacklabs/themis).
+
+Let's download and install Themis into your system:
+
 ```console
-./db/data_store/ZmlsZTEuYmxvY2sK/data                - encrypted block
-./db/data_store/ZmlsZTEuYmxvY2sK/mac                 - Update TAG
-./db/data_store/ZmlsZTEuYmxvY2sK/meta                - block meta
-./db/key_store/ZmlsZTEuYmxvY2sK/VVNFUgo=/r/token     - read token
-./db/key_store/ZmlsZTEuYmxvY2sK/VVNFUgo=/r/owner     - read token owner
-./db/key_store/ZmlsZTEuYmxvY2sK/VVNFUgo=/w/token     - update token
-./db/key_store/ZmlsZTEuYmxvY2sK/VVNFUgo=/w/owner     - update token owner
+git clone https://github.com/cossacklabs/themis
+cd themis
+make && sudo make install
+cd ..
 ```
-> ZmlsZTEuYmxvY2sK - base64 encoded string "file1.block"
 
-> VVNFUgo=         - base64 encoded string "USER"
-
-* Find the list of all the other commands supported by the example using the following command:
+Now you should download and install Hermes-core:
 ```console
-docs/examples/c/mid_hermes_low_level/hermes_client_ll --help
-usage: hermes_client_ll <command> <user id> <base64 encoded user private key>  <name of file for proceed> <meta> <for user>.
-           <command>                         - executes the command to be performed by the client, see below;
-           <user id>                         - user identifier (user needs to be registered in Credential store);
-           <base64 encoded user private key> - base64 encoded private key of the user;
-           <name of file to be processed>    - filename of the file to be processed (file name is used as block ID in Hermes);
-           <meta>                            - some data associated with a file that is stored in the database in plaintext;
-           <for user>                        - identifier of the user for which permissions are provided/revoked from (this information is needed by some commands).
-
-commands:
-           add_block -  add <name of file to be processed> block with <meta> to Hermes system
-           read_block -  read <name of file to be processed> block with <meta> from Hermes system
-           update_block -  update <name of file to be processed> block with <meta> in Hermes system
-           delete_block -  delete <name of file to be processed> block from Hermes system
-           rotate -   rotate <name of file to be processed> block from Hermes system
-           grant_read - grant read access for <for user> to <name of file to be processed> block in Hermes system
-           grant_update - grant update access for <for user> to <name of file to be processed> block in Hermes system
-           revoke_read - deny read access for <for user> to <name of file to be processed> block in Hermes system
-           revoke_update - deny update access for <for user> to <name of file to be processed> block in Hermes system
+git clone https://github.com/cossacklabs/hermes-core
+cd hermes-core
+make && sudo make install
 ```
-***
-# Building from source
 
-> Note: This open-source version of Hermes-core is only checked to work on Linux.     
+That's all! Hermes-core is ready to use. The easiest way is to follow one of the tutorials provided above.
+ 
+# Repository status    
+This repository holds public proof-of-concept version of **Hermes** - **Hermes-core**, which should be used for studying and verification of the methodology and cryptographic backend. 
 
-To build Hermes-core, some dependencies need to be satisfied. You need to install:
-* The standard build environment (for Debian-like systems you need to install `build-essential` development libraries and header files through `$ apt-get install build-essential openssl-dev`),
-* Our crypto SDK [Themis](https://github.com/cossacklabs/themis/wiki/Building-and-installing).  
 
-## Download and install   
+# License
+Hermes-core license is GNU Affero General Public License v3.0.
+There is a separate, commercial licensed Hermes version for industrial use (its core crypto code is similar to this repository, yet it holds additional convenience interfaces and services).
 
-To build Hermes-core, open the terminal and type in the following command:
-```console
-$ git clone https://github.com/cossacklabs/hermes-core
-$ cd hermes-core
-$ make && sudo make install
-``` 
-Hermes-core is ready to use.
+# Contributing to us
 
-For more detailed instructions on building and installing Hermes-core and for tests, see [Building Hermes-core](https://github.com/cossacklabs/hermes-core/wiki/Building-Hermes-core/).
-***
+If you're looking for something to contribute to and gain eternal respect, just pick the things in the [list of issues](https://github.com/cossacklabs/hermes-core/issues). 
+
+Check [Contributing guide](https://github.com/cossacklabs/hermes-core/wiki/contributing) for more details.
+
 # Contacts
-For all questions and inquieries, use info@cossacklabs.com or raise an Issue.      
-[![Twitter CossackLabs](https://img.shields.io/badge/twitter-cossacklabs-fbb03b.svg)](http://twitter.com/cossacklabs) [![Blog](https://img.shields.io/badge/blog-cossacklabs.com-7a7c98.svg)](https://cossacklabs.com/)
+
+If you want to ask a technical question, feel free to raise an [issue](https://github.com/cossacklabs/hermes-core/issues) or write to [dev@cossacklabs.com](mailto:dev@cossacklabs.com).
+
+To talk to the business wing of Cossack Labs Limited, drop us an email to [info@cossacklabs.com](mailto:info@cossacklabs.com).
+   
+[![Blog](https://img.shields.io/badge/blog-cossacklabs.com-7a7c98.svg)](https://cossacklabs.com/) [![Twitter CossackLabs](https://img.shields.io/badge/twitter-cossacklabs-fbb03b.svg)](http://twitter.com/cossacklabs) [![Medium CossackLabs](https://img.shields.io/badge/medium-%40cossacklabs-orange.svg)](https://medium.com/@cossacklabs/)
