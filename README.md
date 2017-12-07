@@ -105,11 +105,13 @@ We currently build packages for the following OS and RELEASE combinations:
 - *Ubuntu Yakkety Yak (Ubuntu 16.10)*
 - *Ubuntu Zesty Zapus (Ubuntu 17.04)*
 
-For example, if you are running *Debian 9 "Stretch"*, run:
+For example, if you are running *Debian 8 "Jessie"*, run:
 ```console
-echo "deb https://pkgs.cossacklabs.com/stable/debian stretch main" | \
+echo "deb https://pkgs.cossacklabs.com/stable/debian jessie main" | \
   sudo tee /etc/apt/sources.list.d/cossacklabs.list
 ```
+**Note:** If you want to install Hermes-core on a machine running Debian 9 "Stretch", the package management system will ask you to delete the newer version of libssl and replace it for the libssl version supported by [Themis](https://github.com/cossacklabs/themis) (libssl1.0-dev). Please check the list of the files to be removed to avoid breaking the dependencies on your machine.
+
 **4. Reload local package database:**
 ```console
 sudo apt-get update
