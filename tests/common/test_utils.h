@@ -31,7 +31,7 @@
 extern "C"{
 #endif
 
-#define UNUSED(expr) (void)(expr)
+#define UNUSED(x) (void)(x)
 
 typedef int test_utils_status_t;
 
