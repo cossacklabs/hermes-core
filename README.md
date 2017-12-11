@@ -1,7 +1,7 @@
 <h1 align="center">
 
 
-  HERMES-CORE 0.5 PoC
+  HERMES-CORE 0.5.1 PoC
 </h1>
 <p align="center">
   <a href="https://github.com/cossacklabs/hermes-core/releases/latest"><img src="https://img.shields.io/github/release/cossacklabs/hermes-core.svg" alt="GitHub release"></a>
