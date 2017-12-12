@@ -6,7 +6,7 @@
 <p align="center">
   <a href="https://github.com/cossacklabs/hermes-core/releases/latest"><img src="https://img.shields.io/github/release/cossacklabs/hermes-core.svg" alt="GitHub release"></a>
   <a href="https://circleci.com/gh/cossacklabs/hermes-core"><img src="https://circleci.com/gh/cossacklabs/hermes-core/tree/master.svg?style=shield&circle-token=75820c008f79dd9751880eff37673be5ca34aa13" alt="Circle CI"></a>
-  <a href="https://github.com/cossacklabs/hermes-core/releases/latest"><img src="https://img.shields.io/badge/platform-Debian%20%7C%20Ubuntu%20%7C%20CentOS%20%7C%20OSX-green.svg" alt="Platforms"></a>
+  <a href="https://github.com/cossacklabs/hermes-core/releases/latest"><img src="https://img.shields.io/badge/platform-Debian%20%7C%20Ubuntu%20%7C%20CentOS%20%7C%20macOS-green.svg" alt="Platforms"></a>
 </p>
 <br>
 
