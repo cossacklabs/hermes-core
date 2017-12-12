@@ -1,4 +1,4 @@
-# v0.5.1 (13-12-2017)
+# [v0.5.1](https://github.com/cossacklabs/hermes-core/releases/tag/0.5.1) (13-12-2017)
 
 ### Docs
 
