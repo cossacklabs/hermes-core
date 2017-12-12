@@ -31,7 +31,7 @@ except ImportError:
 
 from unittest import TestCase, main
 
-import hermes
+import hermes_core
 
 QUEUE_TIMEOUT = THREAD_TIMEOUT = 2
 
@@ -92,7 +92,7 @@ class TestHermesTransport(TestCase):
 
     def create_transport(self, user_id, private, public_id, public, transport, is_server, result):
         def f():
-            hermes_transport = hermes.SecureHermesTransport(user_id, private, public_id, public, transport, is_server)
+            hermes_transport = hermes_core.SecureHermesTransport(user_id, private, public_id, public, transport, is_server)
             if is_server:
                 result.put((hermes_transport, True), timeout=QUEUE_TIMEOUT)
             else:
@@ -128,12 +128,12 @@ class TestHermesTransport(TestCase):
         buffer_out = Queue()
         transportClient = BufferTransport(buffer_out, buffer_in)
         transportServer = BufferTransport(buffer_in, buffer_out)
-        hermes_transport_server = hermes.HermesTransport(transportServer)
-        hermes_transport_client = hermes.HermesTransport(transportClient)
+        hermes_transport_server = hermes_core.HermesTransport(transportServer)
+        hermes_transport_client = hermes_core.HermesTransport(transportClient)
 
     def test_get_hermes_transport(self):
         """check correct decreasing reference on C side"""
-        transport = hermes.HermesTransport(None)
+        transport = hermes_core.HermesTransport(None)
         transport.get_hermes_transport()
         transport.get_hermes_transport()
 
@@ -161,26 +161,26 @@ class TestHermes(TestCase):
 
     def test_secure_midhermes(self):
         try:
-            credential_store_transport1 = hermes.SecureHermesTransport(
+            credential_store_transport1 = hermes_core.SecureHermesTransport(
                 self.USER_ID1, self.PRIVATE_KEY1, self.CREDENTIAL_ID, self.CREDENTIAL_PUBLIC,
                 TCPTransport("127.0.0.1", 8888), False)
-            key_store_transport1 = hermes.SecureHermesTransport(
+            key_store_transport1 = hermes_core.SecureHermesTransport(
                 self.USER_ID1, self.PRIVATE_KEY1, self.KEY_STORE_ID, self.KEY_STORE_PUBLIC,
                 TCPTransport("127.0.0.1", 8889), False)
-            data_store_transport1 = hermes.SecureHermesTransport(
+            data_store_transport1 = hermes_core.SecureHermesTransport(
                 self.USER_ID1, self.PRIVATE_KEY1, self.DATA_STORE_ID, self.DATA_STORE_PUBLIC,
                 TCPTransport("127.0.0.1", 8890), False)
 
-            credential_store_transport2 = hermes.SecureHermesTransport(
+            credential_store_transport2 = hermes_core.SecureHermesTransport(
                 self.USER_ID1, self.PRIVATE_KEY1, self.CREDENTIAL_ID, self.CREDENTIAL_PUBLIC,
                 TCPTransport("127.0.0.1", 8888), False)
-            key_store_transport2 = hermes.SecureHermesTransport(
+            key_store_transport2 = hermes_core.SecureHermesTransport(
                 self.USER_ID1, self.PRIVATE_KEY1, self.KEY_STORE_ID, self.KEY_STORE_PUBLIC,
                 TCPTransport("127.0.0.1", 8889), False)
-            data_store_transport2 = hermes.SecureHermesTransport(
+            data_store_transport2 = hermes_core.SecureHermesTransport(
                 self.USER_ID1, self.PRIVATE_KEY1, self.DATA_STORE_ID, self.DATA_STORE_PUBLIC,
                 TCPTransport("127.0.0.1", 8890), False)
-        except (IOError, hermes.HermesTransportError):
+        except (IOError, hermes_core.HermesTransportError):
             self.skipTest("credential|key|data store service not started on 8888|8889|8890 port respectively")
             return
 
@@ -190,13 +190,13 @@ class TestHermes(TestCase):
     def test_simple_transport_mid_hermes(self):
         # TODO test midhermes without secure session transport
         try:
-            credential_store_transport1 = hermes.HermesTransport(TCPTransport("127.0.0.1", 8888))
-            key_store_transport1 = hermes.HermesTransport(TCPTransport("127.0.0.1", 8889))
-            data_store_transport1 = hermes.HermesTransport(TCPTransport("127.0.0.1", 8890))
+            credential_store_transport1 = hermes_core.HermesTransport(TCPTransport("127.0.0.1", 8888))
+            key_store_transport1 = hermes_core.HermesTransport(TCPTransport("127.0.0.1", 8889))
+            data_store_transport1 = hermes_core.HermesTransport(TCPTransport("127.0.0.1", 8890))
 
-            credential_store_transport2 = hermes.HermesTransport(TCPTransport("127.0.0.1", 8888))
-            key_store_transport2 = hermes.HermesTransport(TCPTransport("127.0.0.1", 8889))
-            data_store_transport2 = hermes.HermesTransport(TCPTransport("127.0.0.1", 8890))
+            credential_store_transport2 = hermes_core.HermesTransport(TCPTransport("127.0.0.1", 8888))
+            key_store_transport2 = hermes_core.HermesTransport(TCPTransport("127.0.0.1", 8889))
+            data_store_transport2 = hermes_core.HermesTransport(TCPTransport("127.0.0.1", 8890))
         except IOError:
             self.skipTest("credential|key|data store service not started on 8888|8889|8890 port respectively")
             return
@@ -205,12 +205,12 @@ class TestHermes(TestCase):
 
     def _test_mid_hermes(self, credential_store_transport1, key_store_transport1, data_store_transport1,
                          credential_store_transport2, key_store_transport2, data_store_transport2):
-        mid_hermes1 = hermes.MidHermes(
+        mid_hermes1 = hermes_core.MidHermes(
             self.USER_ID1, self.PRIVATE_KEY1,
             credential_store_transport1, data_store_transport1,
             key_store_transport1)
 
-        mid_hermes2 = hermes.MidHermes(
+        mid_hermes2 = hermes_core.MidHermes(
             self.USER_ID2, self.PRIVATE_KEY2,
             credential_store_transport2, data_store_transport2,
             key_store_transport2)
