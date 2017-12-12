@@ -52,7 +52,7 @@ static void HermesTransportWrapper_dealloc(pyhermes_HermesTransportWrapperObject
 
 PyTypeObject pyhermes_HermesTransportWrapperType = {
         PyVarObject_HEAD_INIT(NULL, 0)
-        "pyhermes.HermesTransportWrapper",             /* tp_name */
+        "hermes.HermesTransportWrapper",             /* tp_name */
         sizeof(pyhermes_HermesTransportWrapperObject_t), /* tp_basicsize */
         0,                         /* tp_itemsize */
         (destructor) HermesTransportWrapper_dealloc,         /* tp_dealloc */

@@ -24,7 +24,7 @@ import socket
 import argparse
 import base64
 import json
-import pyhermes
+import hermes
 
 
 class Transport(object):
@@ -104,18 +104,18 @@ credential_store_transport = Transport(config['credential_store_host'], config['
 key_store_transport = Transport(config['key_store_host'], config['key_store_port'])
 data_store_transport = Transport(config['data_store_host'], config['data_store_port'])
 
-credential_store_secure_transport = pyhermes.SecureHermesTransport(
+credential_store_secure_transport = hermes.SecureHermesTransport(
     args.id.encode('utf-8'), private_key, config['credential_store_id'].encode("utf-8"),
     base64.b64decode(config['credential_store_public_key'].encode('utf-8')), credential_store_transport, False)
-key_store_secure_transport = pyhermes.SecureHermesTransport(
+key_store_secure_transport = hermes.SecureHermesTransport(
     args.id.encode('utf-8'), private_key, config['key_store_id'].encode("utf-8"),
     base64.b64decode(config['key_store_public_key'].encode('utf-8')), key_store_transport, False)
-data_store_secure_transport = pyhermes.SecureHermesTransport(
+data_store_secure_transport = hermes.SecureHermesTransport(
     args.id.encode('utf-8'), private_key, config['data_store_id'].encode("utf-8"),
     base64.b64decode(config['data_store_public_key'].encode('utf-8')), data_store_transport, False)
 
 
-mid_hermes = pyhermes.MidHermes(
+mid_hermes = hermes.MidHermes(
     args.id, private_key, credential_store_secure_transport,
     data_store_secure_transport, key_store_secure_transport)
 
