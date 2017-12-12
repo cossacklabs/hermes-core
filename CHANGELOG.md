@@ -11,7 +11,7 @@
 
 * Fixed leaks and warnings from cppcheck ([#105](https://github.com/cossacklabs/hermes-core/pull/105)), updated the code style according to clang std=c89 standard ([#96](https://github.com/cossacklabs/hermes-core/pull/96), [#98](https://github.com/cossacklabs/hermes-core/pull/98), [#100](https://github.com/cossacklabs/hermes-core/pull/100), [#104](https://github.com/cossacklabs/hermes-core/pull/104)).
 
-* Updated Hermes Low-level example and documentation ([#101](https://github.com/cossacklabs/hermes-core/pull/101), [#103](https://github.com/cossacklabs/hermes-core/pull/103)).
+* Updated Hermes low-level example and documentation ([#101](https://github.com/cossacklabs/hermes-core/pull/101), [#103](https://github.com/cossacklabs/hermes-core/pull/103)).
 
 * Improved Secure Session interface ([#81](https://github.com/cossacklabs/hermes-core/pull/81)).
 
