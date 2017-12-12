@@ -31,19 +31,19 @@ extern PyTypeObject pyhermes_HermesTransportType;
 
 static PyModuleDef pyhermesmodule = {
         PyModuleDef_HEAD_INIT,
-        "hermes",
-        "Hermes",
+        "hermes_core",
+        "Python wrapper for hermes core",
         -1,
         NULL, NULL, NULL, NULL, NULL
 };
 
 #define INITERROR return NULL
 
-PyMODINIT_FUNC PyInit_hermes(void)
+PyMODINIT_FUNC PyInit_hermes_core(void)
 #else
 #define INITERROR return
 
-void inithermes(void)
+void inithermes_core(void)
 #endif
 {
     if (PyType_Ready(&pyhermes_MidHermesType) < 0) {
@@ -62,16 +62,16 @@ void inithermes(void)
 #if PY_MAJOR_VERSION >= 3
     m = PyModule_Create(&pyhermesmodule);
 #else
-    m =  Py_InitModule("hermes", NULL);
+    m =  Py_InitModule("hermes_core", NULL);
 #endif
     if (m == NULL)
         INITERROR;
 
-    HermesError = PyErr_NewException("hermes.HermesError", NULL, NULL);
+    HermesError = PyErr_NewException("hermes_core.HermesError", NULL, NULL);
     Py_INCREF(HermesError);
     PyModule_AddObject(m, "HermesError", HermesError);
 
-    HermesTransportError = PyErr_NewException("hermes.HermesTransportError", NULL, NULL);
+    HermesTransportError = PyErr_NewException("hermes_core.HermesTransportError", NULL, NULL);
     Py_INCREF(HermesTransportError);
     PyModule_AddObject(m, "HermesTransportError", HermesTransportError);
 
@@ -91,11 +91,11 @@ void inithermes(void)
 
 int main(int argc, char *argv[]) {
 #if PY_MAJOR_VERSION >= 3
-    PyImport_AppendInittab("hermes", PyInit_hermes);
+    PyImport_AppendInittab("hermes_core", PyInit_hermes_core);
 #endif
     //  Py_SetProgramName(argv[0]);
     Py_Initialize();
-    PyImport_ImportModule("hermes");
+    PyImport_ImportModule("hermes_core");
     return 0;
 }
 

@@ -71,7 +71,7 @@ static PyMethodDef HermesTransport_methods[] = {
 
 PyTypeObject pyhermes_HermesTransportType = {
         PyVarObject_HEAD_INIT(NULL, 0)
-        "hermes.HermesTransport",             /* tp_name */
+        "hermes_core.HermesTransport",             /* tp_name */
         sizeof(pyhermes_HermesTransportObject_t), /* tp_basicsize */
         0,                         /* tp_itemsize */
         (destructor) HermesTransport_dealloc,         /* tp_dealloc */

@@ -21,7 +21,7 @@
 from distutils.core import setup, Extension
 
 py_c_hermes = Extension(
-    'hermes',
+    'hermes_core',
     sources=['pyhermes.c', 'transport.c', 'py_secure_transport.c', 'py_midhermes.c', 'py_transport_wrapper.c',
              'py_transport.c'
              ],
@@ -29,7 +29,7 @@ py_c_hermes = Extension(
                'hermes_key_store', 'hermes_rpc', 'hermes_common', 'themis', 'soter', 'hermes_secure_transport'])
 
 setup(
-    name='hermes',
+    name='hermes_core',
     version='0.5',
     description='python bindings for Hermes',
     ext_modules=[py_c_hermes],

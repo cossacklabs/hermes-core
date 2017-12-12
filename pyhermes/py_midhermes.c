@@ -280,7 +280,7 @@ static PyMethodDef MidHermes_methods[] = {
 
 PyTypeObject pyhermes_MidHermesType = {
         PyVarObject_HEAD_INIT(NULL, 0)
-        "hermes.MidHermes",             /* tp_name */
+        "hermes_core.MidHermes",             /* tp_name */
         sizeof(pyhermes_MidHermesObject), /* tp_basicsize */
         0,                         /* tp_itemsize */
         (destructor) MidHermes_dealloc,         /* tp_dealloc */
