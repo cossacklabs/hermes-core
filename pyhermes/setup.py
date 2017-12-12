@@ -30,7 +30,7 @@ py_c_hermes = Extension(
 
 setup(
     name='hermes_core',
-    version='0.5',
+    version='0.5.1',
     description='python bindings for Hermes',
     ext_modules=[py_c_hermes],
 
