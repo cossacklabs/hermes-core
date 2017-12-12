@@ -49,26 +49,33 @@ mid_hermes_ll_block_t *mid_hermes_ll_block_create_new(
     HERMES_CHECK_IN_PARAM_RET_NULL(read_token);
     HERMES_CHECK_IN_PARAM_RET_NULL(write_token);
     mid_hermes_ll_block_t *block = mid_hermes_ll_block_create_empty(user);
+    if(!block){
+        return NULL;
+    }
     mid_hermes_ll_buffer_t *rt = mid_hermes_ll_token_get_data(read_token);
     if (!rt) {
+        free(block);
         return NULL;
     }
     block->block = mid_hermes_ll_buffer_create(NULL, 0);
     if (!(block->block) || HM_SUCCESS != hm_encrypt(
             rt->data, rt->length, block_data->data, block_data->length, meta->data, meta->length,
             &(block->block->data), &(block->block->length))) {
+        free(block);
         mid_hermes_ll_buffer_destroy_secure(&rt);
         return NULL;
     }
     mid_hermes_ll_buffer_destroy_secure(&rt);
     mid_hermes_ll_buffer_t *wt = mid_hermes_ll_token_get_data(write_token);
     if (!wt) {
+        free(block);
         return NULL;
     }
     block->mac = mid_hermes_ll_buffer_create(NULL, 0);
     if (!(block->mac) || HM_SUCCESS != hm_mac_create(
             wt->data, wt->length, block_data->data, block_data->length, meta->data, meta->length,
             &(block->mac->data), &(block->mac->length))) {
+        free(block);
         mid_hermes_ll_buffer_destroy_secure(&wt);
         return NULL;
     }

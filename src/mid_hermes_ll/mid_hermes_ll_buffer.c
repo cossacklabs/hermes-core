@@ -101,8 +101,8 @@ hermes_status_t mid_hermes_ll_buffer_destroy(mid_hermes_ll_buffer_t** buffer){
   HERMES_CHECK_IN_PARAM(buffer);
   HERMES_CHECK_IN_PARAM(*buffer);
   free((*buffer)->data);
-  free(*buffer);
   (*buffer)->data=NULL;
+  free(*buffer);
   *buffer=NULL;
   return HM_SUCCESS;
 }
@@ -113,8 +113,8 @@ hermes_status_t mid_hermes_ll_buffer_destroy_secure(mid_hermes_ll_buffer_t** buf
   memset(((*buffer)->data), 0, (*buffer)->length);
   (*buffer)->length=0;
   free((*buffer)->data);
-  free(*buffer);
   (*buffer)->data=NULL;
+  free(*buffer);
   *buffer=NULL;
   return HM_SUCCESS;
 }

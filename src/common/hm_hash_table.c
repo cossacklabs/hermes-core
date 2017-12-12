@@ -61,7 +61,6 @@ uint32_t hm_hash_table_entry_destroy(hm_hash_table_entry_t *entry) {
     }
     if (entry->next) {
         hm_hash_table_entry_destroy(entry->next);
-        free(entry->next);
     }
     free(entry->key);
     free(entry->val);
@@ -114,6 +113,7 @@ uint32_t hm_hash_table_set(
         last = next;
         next = next->next;
     }
+
     if (next && next->key && 0 == memcmp(key, next->key, key_length)) {
         return HM_FAIL; //key already exist
     } else {
