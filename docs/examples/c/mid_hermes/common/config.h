@@ -25,7 +25,7 @@
 
 #include <stdint.h>
 
-#define UNUSED(expr) (void)(expr)
+#define UNUSED(x) (void)(x)
 
 #define CREDENTIAL_STORE_IP   "127.0.0.1"
 #define DATA_STORE_IP         "127.0.0.1"
