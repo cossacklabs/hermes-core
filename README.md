@@ -178,7 +178,7 @@ make && sudo make install
 That's all! Hermes-core is ready to use. The easiest way is to follow one of the tutorials provided above.
  
 # Repository status    
-This repository holds public proof-of-concept version of **Hermes** - **Hermes-core**, which should be used for studying and verification of the methodology and cryptographic backend. 
+This repository holds public proof-of-concept version of **Hermes** - **Hermes-core 0.5.1**, which should be used for studying and verification of the methodology and cryptographic backend. 
 
 
 # License
