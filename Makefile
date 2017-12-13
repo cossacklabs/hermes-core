@@ -341,6 +341,7 @@ GIT_VERSION := $(shell if [ -d ".git" ]; then git version; fi 2>/dev/null)
 GIT_TAG_STATUS := $(shell git describe --tags HEAD 2>/dev/null)
 GIT_TAG_STATUS := $(.SHELLSTATUS)
 
+DEFAULT_VERSION := 0.5.1
 ifdef GIT_VERSION
 # if has tag then use it
         ifeq ($(GIT_TAG_STATUS),0)
@@ -348,7 +349,7 @@ ifdef GIT_VERSION
                 VERSION = $(shell git describe --tags HEAD | cut -b 1-)
         else
 # <base_version>-<total_commit_count>-<last_commit_hash>
-                VERSION = 0.5.0-$(shell git rev-list --all --count)-$(shell git describe --always HEAD)
+                VERSION = $(DEFAULT_VERSION)-$(shell git rev-list --all --count)-$(shell git describe --always HEAD)
         endif
 else
 # if it's not git repo then use date as version
@@ -397,7 +398,7 @@ PACKAGE_CATEGORY = security
 
 LIBRARY_SO_VERSION := $(shell echo $(VERSION) | sed 's/^\([0-9.]*\)\(.*\)*$$/\1/')
 ifeq ($(LIBRARY_SO_VERSION),)
-	LIBRARY_SO_VERSION := 0.5.0
+	LIBRARY_SO_VERSION := $(DEFAULT_VERSION)
 endif
 DEBIAN_CODENAME := $(shell lsb_release -cs 2> /dev/null)
 DEBIAN_STRETCH_VERSION := libssl1.0.2
