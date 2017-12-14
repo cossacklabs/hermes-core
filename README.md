@@ -110,7 +110,6 @@ For example, if you are running *Debian 8 "Jessie"*, run:
 echo "deb https://pkgs.cossacklabs.com/stable/debian jessie main" | \
   sudo tee /etc/apt/sources.list.d/cossacklabs.list
 ```
-**Note:** If you want to install Hermes-core on a machine running Debian 9 "Stretch", the package management system will ask you to delete the newer version of libssl and replace it for the libssl version supported by [Themis](https://github.com/cossacklabs/themis) (libssl1.0-dev). Please check the list of the files to be removed to avoid breaking the dependencies on your machine.
 
 **4. Reload local package database:**
 ```console
@@ -147,12 +146,7 @@ That's all! Hermes-core is ready to use. The easiest way is to follow one of the
 > You can check the [Building Hermes-core](https://github.com/cossacklabs/hermes-core/wiki/Building-Hermes-core) page to see how to run tests.
 
 Let's install the libraries and utilities that we're going to need.
-For Debian 9 "Stretch" the command will be:
-```console
-sudo apt-get update && sudo apt-get install build-essential libssl1.0-dev git
-```
-
-For all other Debian versions, use:
+For all supported Debian versions, use:
 ```console
 sudo apt-get update && sudo apt-get install build-essential libssl-dev git 
 ```
