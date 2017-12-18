@@ -63,6 +63,43 @@ mid_hermes_t *mid_hermes_create(
     return mid_hermes;
 }
 
+/*! \brief create mid_hermes instance that will use initialized services
+ *
+ * mid_hermes may be initialized with one of services but at least one should be not NULL
+ *
+ * @param [in] user_id - user's id registerd in credential store
+ * @param [in] user_id_length user_id memory size
+ * @param [in] private_key of user
+ * @param [in] private_key_length private_key memory size
+ * @param [in] key_store that implements all functions in mid_hermes_ll/interfaces/key_store.h
+ * @param [in] data_store that implements all functions in mid_hermes_ll/interfaces/data_store.h
+ * @param [in] credential_store that implements all functions in mid_hermes_ll/interfaces/credential_store.h
+ * @return mid_hermes pointer or NULL on error
+ */
+mid_hermes_t* mid_hermes_create_with_services(
+        const uint8_t *user_id, size_t user_id_length,
+        const uint8_t *private_key, size_t private_key_length,
+        hermes_key_store_t* key_store,
+        hermes_data_store_t *data_store,
+        hermes_credential_store_t *credential_store){
+    if(user_id == NULL || user_id_length == 0 || private_key == NULL || private_key_length == 0 ||
+            (key_store == NULL && data_store == NULL && credential_store == NULL)){
+        return NULL;
+    }
+    mid_hermes_t *mid_hermes = calloc(1, sizeof(mid_hermes_t));
+    assert(mid_hermes);
+    mid_hermes->user = mid_hermes_ll_local_user_load_c(
+            user_id, user_id_length, private_key, private_key_length, credential_store);
+    if (mid_hermes->user == NULL){
+        free(mid_hermes);
+        return NULL;
+    }
+    mid_hermes->cs = credential_store;
+    mid_hermes->ks = key_store;
+    mid_hermes->ds = data_store;
+    return mid_hermes;
+}
+
 hermes_status_t mid_hermes_destroy(mid_hermes_t **mh) {
     if (!mh || !(*mh)) {
         return HM_INVALID_PARAMETER;
@@ -418,6 +455,4 @@ hermes_status_t mid_hermes_deny_update_access(
     mid_hermes_ll_block_destroy(&bl);
     mid_hermes_ll_token_destroy(&write_token);
     return HM_SUCCESS;
-
 }
-

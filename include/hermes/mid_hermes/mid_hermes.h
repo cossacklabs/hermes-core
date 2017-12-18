@@ -25,7 +25,10 @@
 
 #include <hermes/common/errors.h>
 #include <hermes/rpc/transport.h>
-
+#include <hermes/credential_store/db.h>
+#include <hermes/mid_hermes_ll/interfaces/key_store.h>
+#include <hermes/mid_hermes_ll/interfaces/data_store.h>
+#include <hermes/mid_hermes_ll/interfaces/credential_store.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -37,6 +40,13 @@ mid_hermes_t *mid_hermes_create(
         hm_rpc_transport_t *key_store_transport,
         hm_rpc_transport_t *data_store_transport,
         hm_rpc_transport_t *credential_store_transport);
+
+mid_hermes_t* mid_hermes_create_with_services(
+        const uint8_t *user_id, size_t user_id_length,
+        const uint8_t *private_key, size_t private_key_length,
+        hermes_key_store_t* key_store,
+        hermes_data_store_t *data_store,
+        hermes_credential_store_t *credential_store);
 
 hermes_status_t mid_hermes_destroy(mid_hermes_t **mh);
 
