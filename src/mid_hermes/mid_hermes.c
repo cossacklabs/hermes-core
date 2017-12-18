@@ -217,7 +217,8 @@ hermes_status_t mid_hermes_delete_block(
         mid_hermes_ll_block_destroy(&bl);
         return 1;
     }
-    if (!bl->delete(bl, NULL, mid_hermes->ds, mid_hermes->ks)) {
+    mid_hermes_ll_rights_list_t *rights_list = bl->access_rights(bl, mid_hermes->ks, mid_hermes->cs);
+    if (!bl->delete(bl, rights_list, mid_hermes->ds, mid_hermes->ks)) {
         mid_hermes_ll_block_destroy(&bl);
         return HM_FAIL;
     }
