@@ -39,6 +39,9 @@ test:
     # test golang tutorial
     - ./tests/scripts/test_services.sh docs/examples/go/tests/go_test.sh;
 
+    # go unittests
+    - go test ./gohermes/...
+
     # test python tutorial
     - ./tests/scripts/test_services.sh docs/examples/python/tests/test.sh;
 

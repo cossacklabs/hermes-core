@@ -17,7 +17,7 @@
 // along with Hermes-core.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
-package gohermes
+package rpc
 
 /*
 #cgo LDFLAGS: -lhermes_mid_hermes -lhermes_mid_hermes_ll -lhermes_credential_store -lhermes_data_store -lhermes_key_store -lhermes_rpc -lhermes_common -lthemis -lsoter -lhermes_secure_transport
@@ -29,11 +29,14 @@ import (
 	"log"
 	"runtime"
 	"unsafe"
+
+	"github.com/cossacklabs/hermes-core/gohermes"
 )
 
 type Transport interface {
 	Write([]byte) error
 	Read([]byte) error
+	Close() error
 }
 
 type HermesTransport struct {
@@ -94,11 +97,15 @@ func (transport *HermesTransport) GetHermesTransport() *C.hm_rpc_transport_t {
 	return transport.secureHermesTransport
 }
 
+func (transport *HermesTransport) Close() error {
+	return transport.transportImplementation.Close()
+}
+
 //export transport_send
 func transport_send(transportPtr, buf unsafe.Pointer, buf_length C.size_t) C.uint32_t {
 	var transport *HermesTransport
 	transport = (*HermesTransport)(unsafe.Pointer(uintptr(transportPtr) - unsafe.Offsetof(transport.hermesTransport)))
-	data := CArrayToSlice(buf, int(buf_length))
+	data := gohermes.CArrayToSlice(buf, int(buf_length))
 	err := transport.transportImplementation.Write(data)
 	if nil != err {
 		log.Printf("error - %v\n", err)
@@ -111,7 +118,7 @@ func transport_send(transportPtr, buf unsafe.Pointer, buf_length C.size_t) C.uin
 func transport_recv(transportPtr, buf unsafe.Pointer, buf_length C.size_t) C.uint32_t {
 	var transport *HermesTransport
 	transport = (*HermesTransport)(unsafe.Pointer(uintptr(transportPtr) - unsafe.Offsetof(transport.hermesTransport)))
-	data := CArrayToSlice(buf, int(buf_length))
+	data := gohermes.CArrayToSlice(buf, int(buf_length))
 	err := transport.transportImplementation.Read(data)
 	if nil != err {
 		log.Printf("error - %v\n", err)

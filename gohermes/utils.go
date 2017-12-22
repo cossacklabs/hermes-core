@@ -19,14 +19,37 @@
 //
 package gohermes
 
+// #include <string.h>
+// #include <stdint.h>
+import "C"
 import (
+	"errors"
 	"reflect"
 	"unsafe"
 )
+
+var ErrCAlloc = errors.New("can't allocate memory")
 
 //CArrayToSlice return buffer as byte slice with len/cap equals to bufferLength
 func CArrayToSlice(buffer unsafe.Pointer, bufferLength int) []byte {
 	sliceHeader := reflect.SliceHeader{uintptr(buffer), int(bufferLength), bufferLength}
 	data := *(*[]byte)(unsafe.Pointer(&sliceHeader))
 	return data
+}
+
+// SetOutBufferPointerFromByteSlice allocate memory, set pointer of memory into outBuffer, copy value to outBuffer and set size
+// of memory to outBufferLength
+func SetOutBufferPointerFromByteSlice(value []byte, outBuffer, outBufferLength unsafe.Pointer) error {
+	if value == nil {
+		*(**C.uint8_t)(outBuffer) = nil
+		*(*C.size_t)(outBufferLength) = 0
+		return nil
+	}
+	*(**C.uint8_t)(outBuffer) = (*C.uint8_t)(C.malloc(C.size_t(len(value))))
+	if *(**C.uint8_t)(outBuffer) == nil {
+		return ErrCAlloc
+	}
+	*(*C.size_t)(outBufferLength) = C.size_t(len(value))
+	C.memcpy(unsafe.Pointer(*(**C.uint8_t)(outBuffer)), unsafe.Pointer(&value[0]), (C.size_t)(len(value)))
+	return nil
 }

@@ -21,55 +21,42 @@
 package gohermes
 
 /*
-#cgo LDFLAGS: -lhermes_mid_hermes -lhermes_mid_hermes_ll -lhermes_credential_store -lhermes_data_store -lhermes_key_store -lhermes_rpc -lhermes_common -lthemis -lsoter
+#cgo LDFLAGS: -lhermes_mid_hermes
 #include <hermes/mid_hermes/mid_hermes.h>
 #include <string.h>
 */
 import "C"
-
 import (
 	"errors"
-	"runtime"
+	"fmt"
 	"unsafe"
 )
 
+var ErrEmptyParameter = errors.New("empty parameter")
+
+// MidHermesWrapper hide fetching C pointer to mid_hermes from go wrappers
+type MidHermesWrapper interface {
+	GetMidHermes() unsafe.Pointer
+	Close() error
+}
+
+// MidHermes used to pass Go function call to C
 type MidHermes struct {
-	mid_hermes                 *C.mid_hermes_t
-	credential_store_transport *HermesTransport
-	key_store_transport        *HermesTransport
-	data_store_transport       *HermesTransport
+	wrapper    MidHermesWrapper
+	mid_hermes *C.mid_hermes_t
 }
 
-func MidHermes_finalize(mid_hermes *MidHermes) {
-	mid_hermes.Close()
-}
-
-func NewMidHermes(
-	id []byte, private_key []byte,
-	credential_store_transport *HermesTransport,
-	data_store_transport *HermesTransport,
-	key_store_transport *HermesTransport) (*MidHermes, error) {
-
-	mh := &MidHermes{
-		credential_store_transport: credential_store_transport,
-		data_store_transport:       data_store_transport,
-		key_store_transport:        key_store_transport}
-	mh.mid_hermes = C.mid_hermes_create(
-		(*C.uint8_t)(unsafe.Pointer(&id[0])), C.size_t(len(id)),
-		(*C.uint8_t)(unsafe.Pointer(&private_key[0])), C.size_t(len(private_key)),
-		mh.key_store_transport.GetHermesTransport(),
-		mh.data_store_transport.GetHermesTransport(),
-		mh.credential_store_transport.GetHermesTransport())
-	if nil == mh.mid_hermes {
-		return nil, errors.New("MidHermes object creation error")
-	}
-	runtime.SetFinalizer(mh, MidHermes_finalize)
-	return mh, nil
+// NewMidHermes return new MidHermes
+func NewMidHermes(wrapper MidHermesWrapper) (*MidHermes, error) {
+	hermes := (*C.mid_hermes_t)(wrapper.GetMidHermes())
+	return &MidHermes{wrapper: wrapper, mid_hermes: hermes}, nil
 }
 
 func (mh *MidHermes) Close() error {
-	C.mid_hermes_destroy(&(mh.mid_hermes))
-	return nil
+	// TODO: use multierror like https://github.com/hashicorp/go-multierror
+	//hermes := mh.mid_hermes
+	//C.mid_hermes_destroy(&(hermes))
+	return mh.wrapper.Close()
 }
 
 func (mh *MidHermes) AddBlock(id []byte, data []byte, meta []byte) error {
@@ -92,14 +79,17 @@ func (mh *MidHermes) AddBlock(id []byte, data []byte, meta []byte) error {
 }
 
 func (mh *MidHermes) ReadBlock(id []byte) ([]byte, []byte, error) {
+	if len(id) == 0 {
+		return nil, nil, ErrEmptyParameter
+	}
 	var block, meta *C.uint8_t
 	var block_length, meta_length C.size_t
-	if 0 != C.mid_hermes_read_block(
+	if status := C.mid_hermes_read_block(
 		mh.mid_hermes,
 		(*C.uint8_t)(unsafe.Pointer(&id[0])), C.size_t(len(id)),
 		&block, &block_length,
-		&meta, &meta_length) {
-		return nil, nil, errors.New("MidHermes read block error")
+		&meta, &meta_length); 0 != status {
+		return nil, nil, fmt.Errorf("MidHermes read block error with status <%v>", status)
 	}
 
 	return (*[1 << 30]byte)(unsafe.Pointer(block))[0:block_length], (*[1 << 30]byte)(unsafe.Pointer(meta))[0:meta_length], nil
@@ -143,7 +133,7 @@ func (mh *MidHermes) GrantReadAccess(id []byte, for_user []byte) error {
 	}
 	return nil
 }
-func (mh *MidHermes) GrantUpdateAccess(id []byte, for_user []byte) error {
+func (mh *MidHermes) GrantWriteAccess(id []byte, for_user []byte) error {
 	if 0 != C.mid_hermes_grant_update_access(
 		mh.mid_hermes,
 		(*C.uint8_t)(unsafe.Pointer(&id[0])), C.size_t(len(id)),
@@ -163,7 +153,7 @@ func (mh *MidHermes) RevokeReadAccess(id []byte, for_user []byte) error {
 	return nil
 }
 
-func (mh *MidHermes) RevokeUpdateAccess(id []byte, for_user []byte) error {
+func (mh *MidHermes) RevokeWriteAccess(id []byte, for_user []byte) error {
 	if 0 != C.mid_hermes_deny_update_access(
 		mh.mid_hermes,
 		(*C.uint8_t)(unsafe.Pointer(&id[0])), C.size_t(len(id)),
