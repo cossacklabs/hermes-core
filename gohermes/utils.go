@@ -32,7 +32,7 @@ var ErrCAlloc = errors.New("can't allocate memory")
 
 //CArrayToSlice return buffer as byte slice with len/cap equals to bufferLength
 func CArrayToSlice(buffer unsafe.Pointer, bufferLength int) []byte {
-	sliceHeader := reflect.SliceHeader{uintptr(buffer), int(bufferLength), bufferLength}
+	sliceHeader := reflect.SliceHeader{Data: uintptr(buffer), Len: int(bufferLength), Cap: bufferLength}
 	data := *(*[]byte)(unsafe.Pointer(&sliceHeader))
 	return data
 }

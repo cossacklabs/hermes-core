@@ -15,7 +15,7 @@ package gohermes
 
 import "errors"
 
-var ErrMacNotMatched = errors.New("Mac not matched")
+var ErrMacNotMatched = errors.New("mac not matched")
 
 // DataStore interface of hermes-core data store and should be implemented by go implementations
 type DataStore interface {

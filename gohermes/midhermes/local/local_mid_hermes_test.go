@@ -64,6 +64,9 @@ func (store *SimpleKeyStore) Delete(docId, userId []byte, isUpdate int) error {
 func (store *SimpleKeyStore) GetIndexedRights(blockId []byte, index int) ([]byte, int, error) {
 	return nil, 0, nil
 }
+func (store *SimpleKeyStore) Close() error {
+	return nil
+}
 
 type SimpleDataStore struct {
 	data []byte

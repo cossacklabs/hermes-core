@@ -15,8 +15,8 @@ package gohermes
 
 import "errors"
 
-var ErrPublicKeyNotFound = errors.New("Public key not found")
-var ErrUserCredentialsExists = errors.New("User's credentials already exists")
+var ErrPublicKeyNotFound = errors.New("public key not found")
+var ErrUserCredentialsExists = errors.New("user's credentials already exists")
 
 // CredentialStore interface of hermes-core credential store and should be implemented by go implementations
 type CredentialStore interface {

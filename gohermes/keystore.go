@@ -22,13 +22,13 @@ const (
 	WRITE_ACCESS = 1
 )
 
-var ErrInvalidUserId = errors.New("Invalid user id")
-var ErrInvalidDocumentId = errors.New("Invalid document id")
-var ErrIncorrectRightsValue = errors.New("Used incorrect rights value")
-var ErrKeyStoreGet = errors.New("Get command - Failed")
-var ErrKeyStoreDelete = errors.New("Delete command - Failed")
-var ErrKeyStoreAdd = errors.New("Add command - Failed")
-var ErrKeyStoreGetIndexedRights = errors.New("GetIndexedRights command - Failed")
+var ErrInvalidUserId = errors.New("invalid user id")
+var ErrInvalidDocumentId = errors.New("invalid document id")
+var ErrIncorrectRightsValue = errors.New("used incorrect rights value")
+var ErrKeyStoreGet = errors.New("get command - Failed")
+var ErrKeyStoreDelete = errors.New("delete command - Failed")
+var ErrKeyStoreAdd = errors.New("add command - Failed")
+var ErrKeyStoreGetIndexedRights = errors.New("getIndexedRights command - Failed")
 
 // KeyStore interface of hermes-core key store and should be implemented by go implementations
 type KeyStore interface {
@@ -36,4 +36,5 @@ type KeyStore interface {
 	Add(docId, userId, key, ownerId []byte, isUpdate int) error
 	Delete(docId, userId []byte, isUpdate int) error
 	GetIndexedRights(blockId []byte, index int) ([]byte, int, error)
+	Close() error
 }
