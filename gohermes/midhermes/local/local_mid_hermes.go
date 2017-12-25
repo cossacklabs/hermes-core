@@ -44,7 +44,7 @@ func NewLocalMidHermes(id []byte, private_key []byte, credentialStore *MidHermes
 	mh.mid_hermes = C.mid_hermes_create_with_services(
 		(*C.uint8_t)(unsafe.Pointer(&id[0])), C.size_t(len(id)),
 		(*C.uint8_t)(unsafe.Pointer(&private_key[0])), C.size_t(len(private_key)),
-		(*C.hermes_key_store_t)(unsafe.Pointer(keyStore.GetHermesCredentialStore())), (*C.hermes_data_store_t)(unsafe.Pointer(dataStore.GetHermesDataStore())), (*C.hermes_credential_store_t)(unsafe.Pointer(credentialStore.GetHermesCredentialStore())))
+		(*C.hermes_key_store_t)(unsafe.Pointer(keyStore.GetHermesKeyStore())), (*C.hermes_data_store_t)(unsafe.Pointer(dataStore.GetHermesDataStore())), (*C.hermes_credential_store_t)(unsafe.Pointer(credentialStore.GetHermesCredentialStore())))
 	if nil == mh.mid_hermes {
 		return mh, errors.New("LocalMidHermes object creation error")
 	}

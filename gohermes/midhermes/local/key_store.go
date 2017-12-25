@@ -33,7 +33,7 @@ func NewKeyStore(store gohermes.KeyStore) (*MidHermesKeyStore, error) {
 	return keyStore, nil
 }
 
-func (store *MidHermesKeyStore) GetHermesCredentialStore() *C.hermes_key_store_t {
+func (store *MidHermesKeyStore) GetHermesKeyStore() *C.hermes_key_store_t {
 	return &store.hermesKeyStore
 }
 
