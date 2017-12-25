@@ -26,6 +26,8 @@ dependencies:
     - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} $TEMP_GOPATH/src/github.com/cossacklabs/${CIRCLE_PROJECT_REPONAME}
     # fetch go example's dependencies
     - go get -t -d ./docs/examples/go/...
+    # fetch dependencies of tests (gothemis)
+    - go get -t -d ./gohermes/...
     - go build docs/examples/go/hermes_client.go
     - cd pyhermes && python setup.py install
 
@@ -38,6 +40,9 @@ test:
 
     # test golang tutorial
     - ./tests/scripts/test_services.sh docs/examples/go/tests/go_test.sh;
+
+    # go unittests
+    - go test ./gohermes/...
 
     # test python tutorial
     - ./tests/scripts/test_services.sh docs/examples/python/tests/test.sh;

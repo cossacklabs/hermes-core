@@ -17,7 +17,7 @@
 // along with Hermes-core.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
-package gohermes
+package rpc
 
 /*
 #cgo LDFLAGS: -lhermes_mid_hermes -lhermes_mid_hermes_ll -lhermes_credential_store -lhermes_data_store -lhermes_key_store -lhermes_rpc -lhermes_common -lthemis -lsoter -lhermes_secure_transport
@@ -29,11 +29,14 @@ import (
 	"log"
 	"runtime"
 	"unsafe"
+
+	"github.com/cossacklabs/hermes-core/gohermes"
 )
 
 type Transport interface {
 	Write([]byte) error
 	Read([]byte) error
+	Close() error
 }
 
 type HermesTransport struct {
@@ -55,35 +58,35 @@ func finalizeTransport(transport *HermesTransport) {
 
 // NewTransport return new HermesTransport that wraps transport into hm_rpc_transport_t
 func NewTransport(transport Transport) (*HermesTransport, error) {
-	test_transport := &HermesTransport{transportImplementation: transport}
-	test_transport.hermesTransport = C.create_transport(&test_transport.hermesTransport)
-	if test_transport.hermesTransport == nil {
+	testTransport := &HermesTransport{transportImplementation: transport}
+	testTransport.hermesTransport = C.create_transport(&testTransport.hermesTransport)
+	if testTransport.hermesTransport == nil {
 		return nil, errors.New("can't allocate memory for hm_rpc_transport_t struct")
 	}
 
-	runtime.SetFinalizer(test_transport, finalizeTransport)
-	return test_transport, nil
+	runtime.SetFinalizer(testTransport, finalizeTransport)
+	return testTransport, nil
 }
 
 //NewSecureTransport return *HermesTransport that wrap transport into hm_rpc_transport_t and secure session using hermes-core
 func NewSecureTransport(userId, privateKey, publicKeyId, publicKey []byte, transport Transport, isServer bool) (*HermesTransport, error) {
-	test_transport := &HermesTransport{transportImplementation: transport}
-	test_transport.hermesTransport = C.create_transport(&test_transport.hermesTransport)
-	if test_transport.hermesTransport == nil {
+	testTransport := &HermesTransport{transportImplementation: transport}
+	testTransport.hermesTransport = C.create_transport(&testTransport.hermesTransport)
+	if testTransport.hermesTransport == nil {
 		return nil, errors.New("can't allocate memory for hm_rpc_transport_t struct")
 	}
-	test_transport.secureHermesTransport = C.create_secure_transport(
+	testTransport.secureHermesTransport = C.create_secure_transport(
 		(*C.uint8_t)(unsafe.Pointer(&userId[0])), C.size_t(len(userId)),
 		(*C.uint8_t)(unsafe.Pointer(&privateKey[0])), C.size_t(len(privateKey)),
 		(*C.uint8_t)(unsafe.Pointer(&publicKey[0])), C.size_t(len(publicKey)),
 		(*C.uint8_t)(unsafe.Pointer(&publicKeyId[0])), C.size_t(len(publicKeyId)),
-		test_transport.hermesTransport, (C.bool)(isServer))
-	if test_transport.secureHermesTransport == nil {
-		finalizeTransport(test_transport)
+		testTransport.hermesTransport, (C.bool)(isServer))
+	if testTransport.secureHermesTransport == nil {
+		finalizeTransport(testTransport)
 		return nil, errors.New("can't create secure transport")
 	}
-	runtime.SetFinalizer(test_transport, finalizeTransport)
-	return test_transport, nil
+	runtime.SetFinalizer(testTransport, finalizeTransport)
+	return testTransport, nil
 }
 
 // GetHermesTransport return C hermes struct hm_rpc_transport_t that wrapped
@@ -94,11 +97,15 @@ func (transport *HermesTransport) GetHermesTransport() *C.hm_rpc_transport_t {
 	return transport.secureHermesTransport
 }
 
+func (transport *HermesTransport) Close() error {
+	return transport.transportImplementation.Close()
+}
+
 //export transport_send
-func transport_send(transportPtr, buf unsafe.Pointer, buf_length C.size_t) C.uint32_t {
+func transport_send(transportPtr, buf unsafe.Pointer, bufLength C.size_t) C.uint32_t {
 	var transport *HermesTransport
 	transport = (*HermesTransport)(unsafe.Pointer(uintptr(transportPtr) - unsafe.Offsetof(transport.hermesTransport)))
-	data := CArrayToSlice(buf, int(buf_length))
+	data := gohermes.CArrayToSlice(buf, int(bufLength))
 	err := transport.transportImplementation.Write(data)
 	if nil != err {
 		log.Printf("error - %v\n", err)
@@ -108,10 +115,10 @@ func transport_send(transportPtr, buf unsafe.Pointer, buf_length C.size_t) C.uin
 }
 
 //export transport_recv
-func transport_recv(transportPtr, buf unsafe.Pointer, buf_length C.size_t) C.uint32_t {
+func transport_recv(transportPtr, buf unsafe.Pointer, bufLength C.size_t) C.uint32_t {
 	var transport *HermesTransport
 	transport = (*HermesTransport)(unsafe.Pointer(uintptr(transportPtr) - unsafe.Offsetof(transport.hermesTransport)))
-	data := CArrayToSlice(buf, int(buf_length))
+	data := gohermes.CArrayToSlice(buf, int(bufLength))
 	err := transport.transportImplementation.Read(data)
 	if nil != err {
 		log.Printf("error - %v\n", err)

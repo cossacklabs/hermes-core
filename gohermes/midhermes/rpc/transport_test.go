@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with Hermes-core.  If not, see <http://www.gnu.org/licenses/>.
 //
-package gohermes
+package rpc
 
 import (
 	"testing"
@@ -52,8 +52,8 @@ func TestNewTransport(t *testing.T) {
 
 //TestNewSecureTransport create server and client transports that should connect to each other
 func TestNewSecureTransport(t *testing.T) {
-	bufferAChannel := make(chan []byte, 3)
-	bufferBChannel := make(chan []byte, 3)
+	bufferAChannel := make(chan []byte)
+	bufferBChannel := make(chan []byte)
 	finishAChannel := make(chan bool)
 	finishBChannel := make(chan bool)
 

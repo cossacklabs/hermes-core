@@ -173,3 +173,4 @@ $BIN/hermes_client -command=delete_block -id=$USER_ID -private_key=$PRIVATE_KEY 
 if [ ! $? -eq $SUCCESS ]; then
     exit 1
 fi
+echo "finished successfully"

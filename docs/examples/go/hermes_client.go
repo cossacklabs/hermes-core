@@ -23,6 +23,7 @@ package main
 import (
 	"net"
 	"github.com/cossacklabs/hermes-core/gohermes"
+	"github.com/cossacklabs/hermes-core/gohermes/midhermes/rpc"
 	"encoding/base64"
 	"flag"
 	"fmt"
@@ -66,8 +67,8 @@ func (t TCPTransport) Read(buf []byte) error {
 	return nil
 }
 
-func (t TCPTransport) Close() {
-	t.connection.Close()
+func (t TCPTransport) Close() error {
+	return t.connection.Close()
 }
 
 type Config struct {
@@ -137,7 +138,7 @@ func main() {
 		panic(err)
 	}
 	defer CredentialStoreTransport.Close()
-	secureCredentialTransport, err := gohermes.NewSecureTransport([]byte(*userId), privateKey, []byte(conf.CredentialStoreId), credentialPublic, CredentialStoreTransport, false)
+	secureCredentialTransport, err := rpc.NewSecureTransport([]byte(*userId), privateKey, []byte(conf.CredentialStoreId), credentialPublic, CredentialStoreTransport, false)
 	if err != nil {
 		panic(err)
 	}
@@ -152,7 +153,7 @@ func main() {
 		return
 	}
 	defer DataStoreTransport.Close()
-	secureDataStoreTransport, err := gohermes.NewSecureTransport([]byte(*userId), privateKey, []byte(conf.DataStoreId), dataStorePublic, DataStoreTransport, false)
+	secureDataStoreTransport, err := rpc.NewSecureTransport([]byte(*userId), privateKey, []byte(conf.DataStoreId), dataStorePublic, DataStoreTransport, false)
 	if err != nil {
 		panic(err)
 	}
@@ -166,12 +167,15 @@ func main() {
 		panic(err)
 	}
 	defer KeyStoreTransport.Close()
-	secureKeyStoreTransport, err := gohermes.NewSecureTransport([]byte(*userId), privateKey, []byte(conf.KeyStoreId), keyPublic, KeyStoreTransport, false)
+	secureKeyStoreTransport, err := rpc.NewSecureTransport([]byte(*userId), privateKey, []byte(conf.KeyStoreId), keyPublic, KeyStoreTransport, false)
 	if err != nil {
 		panic(err)
 	}
-
-	mid_hermes, err := gohermes.NewMidHermes([]byte(*userId), privateKey, secureCredentialTransport, secureDataStoreTransport, secureKeyStoreTransport)
+	rpcHermes, err := rpc.NewRPCMidHermes([]byte(*userId), privateKey, secureCredentialTransport, secureDataStoreTransport, secureKeyStoreTransport)
+	if err != nil{
+		panic(err)
+	}
+	mid_hermes, err := gohermes.NewMidHermes(rpcHermes)
 	if nil != err {
 		panic(err)
 		return
@@ -234,7 +238,7 @@ func main() {
 			flag.Usage()
 			return
 		}
-		err := mid_hermes.GrantUpdateAccess([]byte(*docFileName), []byte(*forUser))
+		err := mid_hermes.GrantWriteAccess([]byte(*docFileName), []byte(*forUser))
 		if nil != err {
 			panic(err)
 		}
@@ -252,7 +256,7 @@ func main() {
 			flag.Usage()
 			return
 		}
-		err := mid_hermes.RevokeUpdateAccess([]byte(*docFileName), []byte(*forUser))
+		err := mid_hermes.RevokeWriteAccess([]byte(*docFileName), []byte(*forUser))
 		if nil != err {
 			panic(err)
 		}
