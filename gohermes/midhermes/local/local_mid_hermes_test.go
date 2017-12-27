@@ -106,23 +106,7 @@ func (store *SimpleDataStore) DeleteBlock(id []byte, oldMac []byte) error { retu
 func (store *SimpleDataStore) Close() error { return nil }
 
 func TestNewLocalMidHermes(t *testing.T) {
-	credentialStore := &SimpleCredentialStore{}
-	midhermesCredentialStore, err := NewCredentialStore(credentialStore)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	midhermesKeyStore, err := NewKeyStore(&SimpleKeyStore{})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	midhermesDataStore, err := NewDataStore(&SimpleDataStore{})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	hermesWrapper, err := NewLocalMidHermes(userId, userPrivateKey, midhermesCredentialStore, midhermesKeyStore, midhermesDataStore)
+	hermesWrapper, err := NewLocalMidHermes(userId, userPrivateKey, &SimpleCredentialStore{}, &SimpleKeyStore{}, &SimpleDataStore{})
 	if err != nil {
 		t.Fatal(err)
 	}
