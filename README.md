@@ -1,7 +1,5 @@
 <h1 align="center">
-
-
-  HERMES-CORE 0.5.1 PoC
+  <a href="https://www.cossacklabs.com/hermes/"><img src="https://github.com/cossacklabs/hermes-core/wiki/images/hermes_logo.png" alt="End-to-end secure data storage, processing, and sharing framework with zero trust to storage/exchange infrastructure." width="420"></a>
 </h1>
 <p align="center">
   <a href="https://github.com/cossacklabs/hermes-core/releases/latest"><img src="https://img.shields.io/github/release/cossacklabs/hermes-core.svg" alt="GitHub release"></a>
@@ -12,7 +10,7 @@
 
 
 
-#### Hermes-core is a security tool for distributed data sharing and collaboration that enforces access control cryptographically.
+#### End-to-end secure data storage, processing, and sharing framework with zero trust to storage/exchange infrastructure.
 <br>
 
 # What is Hermes
