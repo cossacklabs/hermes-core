@@ -91,14 +91,17 @@ Hermes-core is available on C, however, client side applications are implemented
 | C core / Python client | [Python tutorial](https://github.com/cossacklabs/hermes-core/wiki/Python-tutorial) | [docs/examples/python](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/python) |
 | C core / Go client | [Go tutorial](https://github.com/cossacklabs/hermes-core/wiki/Go-tutorial) | [docs/examples/go](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/go) |
 
-TODO: write about other languages
+
+Moreover, Hermes natively supports:
+
+| Server side | Client side (language) |
+| :----- | :------ |
+| Docker, VMs, GCP, AWS, <br/>Ubuntu, Debian, CentOS, macOS | iOS, Android, Java, Ruby, PHP,<br/>Python, Node.js, Go, Rust, C/C++  |
 
 
 # Availability
 
-[Hermes itself](https://www.cossacklabs.com/hermes/) supports the following architectures: x86/x64, armv*, various Android architectures. 
-
-Hermes supports, but not limited to:
+[Hermes itself](https://www.cossacklabs.com/hermes/) supports the following architectures: x86/x64, armv*, various Android architectures:
 
 * Debian (8, 9), CentOS 7, Ubuntu (14.04, 16.04, 18.04),
 * macOS (10.12, 10.13, 10.14),
