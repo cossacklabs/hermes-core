@@ -18,11 +18,19 @@
 
 # What is Hermes
 
-**Hermes** — security framework for building multi-user end-to-end encrypted data storage and sharing/processing with zero leakage risks from storage and transport infrastructure. In other words, Hermes enables collaboration and distributed data sharing through enforcing access control with the help of cryptographic methods. It's platform agnostic: works for mobile, web, or server applications storing data in any database/datastore.
+**Hermes** — cryptographic framework for building multi-user end-to-end encrypted data storage and sharing/processing with zero leakage risks from storage and transport infrastructure (so called **end-to-end encrypted zero knowledge architectures**).
 
-**Hermes-core** is an open source repository for developers and security community that illustrates proof of concept of Hermes. [Hermes is a proprietary software](https://www.cossacklabs.com/hermes/) licensed by Cossack Labs.
+Hermes acts as a **protected data circulation layer** with cryptographic access control for your distributed application, with zero security risk of data exposure from servers and storage.
 
-Hermes is **cryptography-based scheme** of providing protected data storage and sharing that allows enforcing cryptographically checked CRUD permissions to data blocks and doesn't let server that's running Hermes do anything worse than DoS. 
+Hermes allows deploying end-to-end encrypted data exchange, sharing, and collaboration in your apps. Hermes is platform agnostic: works for mobile, web, or server applications storing data in any database/datastore.
+
+## What is Hermes-core
+
+[Hermes is a proprietary framework](https://www.cossacklabs.com/hermes/) licensed by Cossack Labs. 
+
+**Hermes-core** is an open source (AGPL 3.0) repository for developers and security community that illustrates proof of concept of Hermes, which should be used for studying and verification of the methodology and cryptographic backend. Hermes-core is not a production version of Hermes, more a sneak peek of its core layer. 
+
+Drop us an email to [info@cossacklabs.com](mailto:info@cossacklabs.com) if you are interested in commercial license or support.
 
 ## Data model
 
@@ -43,20 +51,38 @@ The WRITE permissions are checked both on Client and Server so they cannot “fo
 
 ## Use cases and industries
 
-## Documentation
+TODO:
+
+Healthcare
+Share FHIR and other medical records safely and distribute granular access to personnel in a secure way. Cut HIPAA costs by pushing many security controls to the encryption layer.	Finance
+Finance
+Store and process customer payment data securely, minimise insider threats and enable secure, accountable cross-organisation data exchange.
+Enterprise
+Enterprise
+Protect commercially sensitive data and enforce access control, integrate with existing PKI and IAM stack, enforce group policies and efficient key/storage management – all the while keeping the data end-to-end encrypted.	B2C: Customer apps
+B2C: Customer apps
+Instill greater trust in your product by implementing end-to-end encryption of customer data. It’s not only E2EE messengers that deserve the right to use user trust as competitive advantage. Implement it in your products or infrastructure, hassle-free.
+
+## Documentation and papers
 
 [Project's GitHub Wiki](https://www.github.com/cossacklabs/hermes-core/wiki) contains the ever-evolving official documentation, which contains everything from deployment guidelines to use-cases, including charts and tutorials you might find useful. 
 
 The scientific paper ["Hermes – a framework for cryptographically assured access control and data security"](https://www.cossacklabs.com/files/hermes-theory-paper-rev1.pdf) explains the concept behind Hermes, math model, risk & threats analysis and provides implementation details.
 
-Amazing tutorials available for Hermes-core with Client side written in [C](https://github.com/cossacklabs/hermes-core/wiki/C-tutorial), [Python](https://github.com/cossacklabs/hermes-core/wiki/Python-tutorial), and [Go](https://github.com/cossacklabs/hermes-core/wiki/Go-tutorial).
-
 We also advise you to check out the ever-evolving [Implementing Hermes-based Security Systems](https://www.cossacklabs.com/hermes/implementing-hermes-based-systems/) document to find out more about Hermes-core and implementing Hermes-based systems in the real world.
 
 
-# Languages and tutorials
+# Installation
 
-Hermes-core is available on C, however, clients are implemented on C, Python and Go: 
+You can build it manually from source, or install from the available package manager.
+
+- If you are running Ubuntu, Debian or CentOS, check [Installing from repository](https://github.com/cossacklabs/hermes-core/wiki/Installing-Hermes-core) page.
+
+- If you want to have the latest version of Hermes-core, you can build it from sources: [Building Hermes core](https://github.com/cossacklabs/hermes-core/wiki/Building-Hermes-core).
+
+# Languages
+
+Hermes-core is available on C, however, client side applications are implemented on C, Python and Go: 
 
 | Platform | Tutorial | Code example |
 | :----- | :----- | :------ |
@@ -68,126 +94,36 @@ Hermes-core is available on C, however, clients are implemented on C, Python and
 TODO: write about other languages
 
 
-# Quick start
+# Availability
 
-You can get Hermes-core library from repository or build it from sources.
+[Hermes itself](https://www.cossacklabs.com/hermes/) supports the following architectures: x86/x64, armv*, various Android architectures. 
 
-## Installing from repository
+Hermes supports, but not limited to:
 
-> Please refer to the [Installing from repository](https://github.com/cossacklabs/hermes-core/wiki/Installing-Hermes-core) page if you want to install dev packages or to catch more details.
+* Debian (8, 9), CentOS 7, Ubuntu (14.04, 16.04, 18.04),
+* macOS (10.12, 10.13, 10.14),
+* Android (4 - 9) / CyanogenMod 11+,
+* iOS (9 - 12),
+* Docker-containers, VMs.
 
-Hermes-core is available for the following versions of operating systems:       
-`*.deb:`
-- Debian: Wheezy, Jessie, Stretch;
-- Ubuntu: Trusty Tahr, Xenial Xerus, Yakkety Yak, Zesty Zapus.
+Hermes-core has limited support, only x86/x64 platforms.
 
-`*.rpm:`
-- CentOS: 7.
+# Examples and tutorials
 
+Consider checking full tutorials to understand how to add and update blocks, grant READ and UPDATE access right for users, revoke access rights.
 
-### Installing for Debian / Ubuntu
+- [Usage examples](https://github.com/cossacklabs/hermes-core/wiki/Usage-examples) describe how examples work and what are possible usages for Hermes-core.
+- [C tutorial](https://github.com/cossacklabs/hermes-core/wiki/C-tutorial), where both Hermes and client app are written in C. 
+- [Python tutorial](https://github.com/cossacklabs/hermes-core/wiki/Python-tutorial), where Hermes app is C-based, but client code runs on Python. 
+- [Go tutorial](https://github.com/cossacklabs/hermes-core/wiki/Go-tutorial), where Hermes app is C-based, but client code runs on Go. 
 
-**1. Import the public key used by Cossack Labs to sign packages:**
-```console
-wget -qO - https://pkgs.cossacklabs.com/gpg | sudo apt-key add -
-```
-> Note: If you wish to validate key fingerprint, it is: `29CF C579 AD90 8838 3E37 A8FA CE53 BCCA C8FF FACB`.
+# Licensing and commercial support
 
-**2. You may need to install the apt-transport-https package before proceeding:**
-```console
-sudo apt-get install apt-transport-https
-```
-
-**3. Add Cossack Labs repository to your `sources.list`.**
-You should add a line that specifies your OS name and the release name:
-```console
-deb https://pkgs.cossacklabs.com/stable/$OS $RELEASE main
-```
-* `$OS` should be `debian` or `ubuntu`.
-* `$RELEASE` should be one of Debian or Ubuntu release names. You can determine this by running `lsb_release -cs`, if you have `lsb_release` installed.
-
-We currently build packages for the following OS and RELEASE combinations:
-
-- *Debian "Wheezy" (Debian 7)*
-- *Debian "Jessie" (Debian 8)*
-- *Debian "Stretch" (Debian 9)*
-- *Ubuntu Trusty Tahr (Ubuntu 14.04)*
-- *Ubuntu Xenial Xerus (Ubuntu 16.04)*
-- *Ubuntu Yakkety Yak (Ubuntu 16.10)*
-- *Ubuntu Zesty Zapus (Ubuntu 17.04)*
-
-For example, if you are running *Debian 8 "Jessie"*, run:
-```console
-echo "deb https://pkgs.cossacklabs.com/stable/debian jessie main" | \
-  sudo tee /etc/apt/sources.list.d/cossacklabs.list
-```
-
-**4. Reload local package database:**
-```console
-sudo apt-get update
-```
-**5. Install the package**
-```console
-sudo apt-get install libhermes-core
-```
-
-### Installing for CentOS / RHEL / OEL
-> Note, we only build RPM packages for x86_64.
-
-**1. Import the public key used by Cossack Labs to sign packages:**
-```console
-sudo rpm --import https://pkgs.cossacklabs.com/gpg
-```
->Note: If you wish to validate key fingerprint, it is: `29CF C579 AD90 8838 3E37 A8FA CE53 BCCA C8FF FACB`.
-
-**2. Create a Yum repository file for Cossack Labs package repository:**
-```console
-wget -qO - https://pkgs.cossacklabs.com/stable/centos/cossacklabs.repo | \
-  sudo tee /etc/yum.repos.d/cossacklabs.repo
-```
-**3. Install the package:**
-```console
-sudo yum install libhermes-core
-```
-
-That's all! Hermes-core is ready to use. The easiest way is to follow one of the tutorials provided above.
-
-## Building from source
-
-> You can check the [Building Hermes-core](https://github.com/cossacklabs/hermes-core/wiki/Building-Hermes-core) page to see how to run tests.
-
-Let's install the libraries and utilities that we're going to need.
-For all supported Debian versions, use:
-```console
-sudo apt-get update && sudo apt-get install build-essential libssl-dev git 
-```
-
-We need `build-essential` for building binary libraries and `libssl` as backend for [Themis](https://github.com/cossacklabs/themis).
-
-Let's download and install Themis into your system:
-
-```console
-git clone https://github.com/cossacklabs/themis
-cd themis
-make && sudo make install
-cd ..
-```
-
-Now you should download and install Hermes-core:
-```console
-git clone https://github.com/cossacklabs/hermes-core
-cd hermes-core
-make && sudo make install
-```
-
-That's all! Hermes-core is ready to use. The easiest way is to follow one of the tutorials provided above.
- 
-# Repository status    
-This repository holds public proof-of-concept version of **Hermes** - **Hermes-core 0.5.1**, which should be used for studying and verification of the methodology and cryptographic backend. 
-
-# License
 Hermes-core license is GNU Affero General Public License v3.0.
-There is a separate, commercial licensed Hermes version for industrial use (its core crypto code is similar to this repository, yet it holds additional convenience interfaces and services).
+
+There is a separate, commercial licensed Hermes version for industrial use (its core crypto code is similar to this repository, yet it holds additional convenience interfaces and services). Commercial license can include custom cryptographic engineering (building cryptographic scheme based on Hermes for your use-case) and engineering support.
+
+Drop us an email to [info@cossacklabs.com](mailto:info@cossacklabs.com) if you are interested.
 
 # Contacts
 
