@@ -1,6 +1,14 @@
 <h1 align="center">
   <a href="https://www.cossacklabs.com/hermes/"><img src="https://github.com/cossacklabs/hermes-core/wiki/images/hermes_logo.png" alt="End-to-end secure data storage, processing, and sharing framework with zero trust to storage/exchange infrastructure." width="420"></a>
 </h1>
+<h3 align="center">
+  <br>
+  End-to-end secure data storage, processing, and sharing framework with zero trust to storage/exchange infrastructure.
+  <br>
+</h3>
+
+---
+
 <p align="center">
   <a href="https://github.com/cossacklabs/hermes-core/releases/latest"><img src="https://img.shields.io/github/release/cossacklabs/hermes-core.svg" alt="GitHub release"></a>
   <a href="https://circleci.com/gh/cossacklabs/hermes-core"><img src="https://circleci.com/gh/cossacklabs/hermes-core/tree/master.svg?style=shield&circle-token=75820c008f79dd9751880eff37673be5ca34aa13" alt="Circle CI"></a>
@@ -8,22 +16,23 @@
 </p>
 <br>
 
-
-
-#### End-to-end secure data storage, processing, and sharing framework with zero trust to storage/exchange infrastructure.
-<br>
-
 # What is Hermes
 
-**Hermes-core** is a proof of concept for **Hermes**.
+**Hermes** — security framework for building multi-user end-to-end encrypted data storage and sharing/processing with zero leakage risks from storage and transport infrastructure. In other words, Hermes enables collaboration and distributed data sharing through enforcing access control with the help of cryptographic methods. It's platform agnostic: works for mobile, web, or server applications storing data in any database/datastore.
 
-**Hermes** is a cryptography-based method of providing protected data storage and sharing that allows enforcing cryptographically checked CRUD permissions to data blocks and doesn't let server that's running Hermes do anything worse than DoS. In other words, Hermes enables collaboration and distributed data sharing through enforcing access control with the help of cryptographic methods.
+**Hermes-core** is an open source repository for developers and security community that illustrates proof of concept of Hermes. [Hermes is a proprietary software](https://www.cossacklabs.com/hermes/) licensed by Cossack Labs.
 
-**Hermes** operates with data that is subdivided into records, which represent the hierarchy of recordsets and groups of recordsets. Each blob of data is encrypted using a symmetric key, from which a set of hashes is generated. Possession of a symmetric key by a user allows reading and carrying out other processes on hashes (including with writing data).
+Hermes is **cryptography-based scheme** of providing protected data storage and sharing that allows enforcing cryptographically checked CRUD permissions to data blocks and doesn't let server that's running Hermes do anything worse than DoS. 
 
-In **Hermes-core** a document equals a block and is not subdivided further as Hermes-core is a basic building block for the hierarchic infrastructure of Hermes.
+## Data model
 
-There are 3 storage entities in **Hermes** (and, consequently, in **Hermes-core**) that constitute the **Server** side: 
+Hermes operates with data that is subdivided into records, which represent the hierarchy of recordsets and groups of recordsets. Each blob of data is encrypted using a symmetric key, from which a set of hashes is generated. Possession of a symmetric key by a user allows reading and carrying out other processes on hashes (including with writing data).
+
+In Hermes-core `a document` equals `a block` and is not subdivided further as Hermes-core is a basic building block for the hierarchic infrastructure of Hermes.
+
+## Hermes entities
+
+There are 3 storage entities in Hermes (and, consequently, in Hermes-core) that constitute the **Server side**: 
 - **Data store** contains the hierarchy of encrypted objects.
 - **Credential store** stores keys and hashes, asymmetrically encrypted in such a way that can only be decrypted by authorised user’s private key. Those can contain access control key which grants READ access and Update Tag which allows performing WRITE operations.
 - **Keystore** contains the symmetric keys (for READ and UPDATE), with as many copies of these keys as there are users authorised to access to the record, where every copy is wrapped (asymmetrically encrypted) with a public credential of the respective authorised user. If the permissions to READ and to WRITE extend to not just blocks, but to the list of blocks, they turn into permissions to DELETE/ADD elements.  
@@ -31,6 +40,8 @@ There are 3 storage entities in **Hermes** (and, consequently, in **Hermes-core*
 The 4th entity of Hermes is **Client**:
 - **Client** (or clients) is the active entity in the Hermes architecture, the one that actually produces or consumes the data. The Client only possesses the keypair that allows decrypting the asymmetrically encrypted data from the Server. The READ permissions are always checked on Client. The absence of the key for performing READ operations will not allow the Client to decrypt the downloaded piece of data.
 The WRITE permissions are checked both on Client and Server so they cannot “fool” each other.
+
+## Use cases and industries
 
 ## Documentation
 
@@ -53,6 +64,8 @@ Hermes-core is available on C, however, clients are implemented on C, Python and
 | C core / C client | [C tutorial](https://github.com/cossacklabs/hermes-core/wiki/C-tutorial) | [docs/examples/c](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/c) |
 | C core / Python client | [Python tutorial](https://github.com/cossacklabs/hermes-core/wiki/Python-tutorial) | [docs/examples/python](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/python) |
 | C core / Go client | [Go tutorial](https://github.com/cossacklabs/hermes-core/wiki/Go-tutorial) | [docs/examples/go](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/go) |
+
+TODO: write about other languages
 
 
 # Quick start
@@ -172,16 +185,9 @@ That's all! Hermes-core is ready to use. The easiest way is to follow one of the
 # Repository status    
 This repository holds public proof-of-concept version of **Hermes** - **Hermes-core 0.5.1**, which should be used for studying and verification of the methodology and cryptographic backend. 
 
-
 # License
 Hermes-core license is GNU Affero General Public License v3.0.
 There is a separate, commercial licensed Hermes version for industrial use (its core crypto code is similar to this repository, yet it holds additional convenience interfaces and services).
-
-# Contributing to us
-
-If you're looking for something to contribute to and gain eternal respect, just pick the things in the [list of issues](https://github.com/cossacklabs/hermes-core/issues). 
-
-Check [Contributing guide](https://github.com/cossacklabs/hermes-core/wiki/contributing) for more details.
 
 # Contacts
 
