@@ -16,7 +16,7 @@
 </p>
 <br>
 
-# What is Hermes
+## What is Hermes
 
 **Hermes** — cryptographic framework for building multi-user end-to-end encrypted data storage and sharing/processing with zero leakage risks from storage and transport infrastructure (so called **end-to-end encrypted zero knowledge architectures**).
 
@@ -32,13 +32,35 @@ Hermes allows deploying end-to-end encrypted data exchange, sharing, and collabo
 
 Drop us an email to [info@cossacklabs.com](mailto:info@cossacklabs.com) if you are interested in commercial license or support.
 
-## Data model
+### Features
+
+<table><tbody><tr><tr><td><li>End-to-end data security</li></td><td>Client apps are responsible for data encryption and access control through using Hermes, while the server-side knows nothing about the nature of data.</td>
+</tr><tr><td><li>Data model-agnostic </li></td><td>Hermes imposes no limitations on data structure and database choice.</td>
+</tr><tr><td><li>Cryptographically bulletproof </li></td><td>The ACL in Hermes relies completely on cryptography, where trust is bound to client’s keys. As long as the keys are safe – the system is safe.</td>
+</tr><tr><td><li>Security cornerstone </li></td><td>With a solid security foundation on the data layer, building other security controls gets easier, the risk model becomes precise, and the overall security cost goes down considerably. </td>
+</tr><tr><td><li>Defence in depth </li></td><td>Hermes provides a foundation layer of data protection, Hermes is fully compatible with next layers of security controls: TLS, firewalls, WAFs, SIEM, IDS, etc. </td>
+</tr><tr><td><li>Searchable encryption ᵉ</li></td><td rowspan=3>available in a <a href="mailto:info@cossacklabs.com">separate license</a></td>
+</tr><tr><td><li>Pseudonymisation ᵉ</li></td>
+</tr><tr><td><li>Cryptographically protected audit log ᵉ</li></td>
+</tr></tbody></table>
+
+### Use cases and industries
+
+<table><thead><tr><th colspan="2">Perfect Hermes-compatible applications and industries</th></tr></thead>
+<tbody>
+<tr><td>Healthcare</td><td>Share FHIR and other medical records safely and distribute granular access to personnel in a secure way. Cut HIPAA costs by pushing many security controls to the encryption layer.</td>
+</tr><tr><td>Finance</td><td>Store and process customer payment data securely, minimise insider threats and enable secure, accountable cross-organisation data exchange.</td>
+</tr><tr><td>Enterprise</td><td>Protect commercially sensitive data and enforce access control, integrate with existing PKI and IAM stack, enforce group policies and efficient key/storage management – while keeping the data end-to-end encrypted.</td>
+</tr><tr><td>B2C: Customer apps</td><td>Instill greater trust in your product by implementing end-to-end encryption of customer data. It’s not only E2EE messengers that deserve the right to use user trust as competitive advantage.</td>
+</tr></tbody></table>
+
+### Data model
 
 Hermes operates with data that is subdivided into records, which represent the hierarchy of recordsets and groups of recordsets. Each blob of data is encrypted using a symmetric key, from which a set of hashes is generated. Possession of a symmetric key by a user allows reading and carrying out other processes on hashes (including with writing data).
 
 In Hermes-core `a document` equals `a block` and is not subdivided further as Hermes-core is a basic building block for the hierarchic infrastructure of Hermes.
 
-## Hermes entities
+### Hermes entities
 
 There are 3 storage entities in Hermes (and, consequently, in Hermes-core) that constitute the **Server side**: 
 - **Data store** contains the hierarchy of encrypted objects.
@@ -49,30 +71,17 @@ The 4th entity of Hermes is **Client**:
 - **Client** (or clients) is the active entity in the Hermes architecture, the one that actually produces or consumes the data. The Client only possesses the keypair that allows decrypting the asymmetrically encrypted data from the Server. The READ permissions are always checked on Client. The absence of the key for performing READ operations will not allow the Client to decrypt the downloaded piece of data.
 The WRITE permissions are checked both on Client and Server so they cannot “fool” each other.
 
-## Use cases and industries
+### Documentation and papers
 
-TODO:
+- [Hermes page](https://www.cossacklabs.com/hermes/) and [Hermes product sheet](https://www.cossacklabs.com/files/hermes-productsheet.pdf) contain latest details about features and technical environments (supported technological stacks, databases and client sides).
 
-Healthcare
-Share FHIR and other medical records safely and distribute granular access to personnel in a secure way. Cut HIPAA costs by pushing many security controls to the encryption layer.	Finance
-Finance
-Store and process customer payment data securely, minimise insider threats and enable secure, accountable cross-organisation data exchange.
-Enterprise
-Enterprise
-Protect commercially sensitive data and enforce access control, integrate with existing PKI and IAM stack, enforce group policies and efficient key/storage management – all the while keeping the data end-to-end encrypted.	B2C: Customer apps
-B2C: Customer apps
-Instill greater trust in your product by implementing end-to-end encryption of customer data. It’s not only E2EE messengers that deserve the right to use user trust as competitive advantage. Implement it in your products or infrastructure, hassle-free.
+- [Project's GitHub Wiki](https://www.github.com/cossacklabs/hermes-core/wiki) contains the ever-evolving official documentation, which contains everything from deployment guidelines to use-cases, including charts and tutorials you might find useful. 
 
-## Documentation and papers
+- Ever-evolving [Implementing Hermes-based Security Systems](https://www.cossacklabs.com/hermes/implementing-hermes-based-systems/) document describes details implementing Hermes-based systems in the real world.
 
-[Project's GitHub Wiki](https://www.github.com/cossacklabs/hermes-core/wiki) contains the ever-evolving official documentation, which contains everything from deployment guidelines to use-cases, including charts and tutorials you might find useful. 
+- The scientific paper ["Hermes – a framework for cryptographically assured access control and data security"](https://www.cossacklabs.com/files/hermes-theory-paper-rev1.pdf) explains the concept behind Hermes, math model, risk & threats analysis and provides implementation details. Useful for security engineers and cryptographers.
 
-The scientific paper ["Hermes – a framework for cryptographically assured access control and data security"](https://www.cossacklabs.com/files/hermes-theory-paper-rev1.pdf) explains the concept behind Hermes, math model, risk & threats analysis and provides implementation details.
-
-We also advise you to check out the ever-evolving [Implementing Hermes-based Security Systems](https://www.cossacklabs.com/hermes/implementing-hermes-based-systems/) document to find out more about Hermes-core and implementing Hermes-based systems in the real world.
-
-
-# Installation
+## Installation
 
 You can build it manually from source, or install from the available package manager.
 
@@ -80,7 +89,7 @@ You can build it manually from source, or install from the available package man
 
 - If you want to have the latest version of Hermes-core, you can build it from sources: [Building Hermes core](https://github.com/cossacklabs/hermes-core/wiki/Building-Hermes-core).
 
-# Languages
+## Languages
 
 Hermes-core is available on C, however, client side applications are implemented on C, Python and Go: 
 
@@ -99,7 +108,7 @@ Moreover, Hermes natively supports:
 | Docker, VMs, GCP, AWS, <br/>Ubuntu, Debian, CentOS, macOS | iOS, Android, Java, Ruby, PHP,<br/>Python, Node.js, Go, Rust, C/C++  |
 
 
-# Availability
+### Availability
 
 [Hermes itself](https://www.cossacklabs.com/hermes/) supports the following architectures: x86/x64, armv*, various Android architectures:
 
@@ -111,7 +120,7 @@ Moreover, Hermes natively supports:
 
 Hermes-core has limited support, only x86/x64 platforms.
 
-# Examples and tutorials
+## Examples and tutorials
 
 Consider checking full tutorials to understand how to add and update blocks, grant READ and UPDATE access right for users, revoke access rights.
 
@@ -120,7 +129,12 @@ Consider checking full tutorials to understand how to add and update blocks, gra
 - [Python tutorial](https://github.com/cossacklabs/hermes-core/wiki/Python-tutorial), where Hermes app is C-based, but client code runs on Python. 
 - [Go tutorial](https://github.com/cossacklabs/hermes-core/wiki/Go-tutorial), where Hermes app is C-based, but client code runs on Go. 
 
-# Licensing and commercial support
+
+## GDPR and HIPAA
+
+Hermes can help you comply with GDPR and HIPAA regulations, and cut their costs by pushing security controls to the cryptography layer. Configuring and using Hermes in a designated form will cover most of the demands described in articles 25, 32, 33, and 34 of GDPR and the PII data protection demands of HIPAA.
+
+## Licensing and commercial support
 
 Hermes-core license is GNU Affero General Public License v3.0.
 
@@ -128,7 +142,7 @@ There is a separate, commercial licensed Hermes version for industrial use (its 
 
 Drop us an email to [info@cossacklabs.com](mailto:info@cossacklabs.com) if you are interested.
 
-# Contacts
+## Contacts
 
 If you want to ask a technical question, feel free to raise an [issue](https://github.com/cossacklabs/hermes-core/issues) or write to [dev@cossacklabs.com](mailto:dev@cossacklabs.com).
 
