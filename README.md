@@ -39,7 +39,7 @@ Drop us an email to [info@cossacklabs.com](mailto:info@cossacklabs.com) if you a
 </tr><tr><td><li>Cryptographically bulletproof </li></td><td>The ACL in Hermes relies completely on cryptography, where trust is bound to client’s keys. As long as the keys are safe – the system is safe.</td>
 </tr><tr><td><li>Security cornerstone </li></td><td>With a solid security foundation on the data layer, building other security controls gets easier, the risk model becomes precise, and the overall security cost goes down considerably. </td>
 </tr><tr><td><li>Defence in depth </li></td><td>Hermes provides a foundation layer of data protection, Hermes is fully compatible with next layers of security controls: TLS, firewalls, WAFs, SIEM, IDS, etc. </td>
-</tr><tr><td><li>Searchable encryption ᵉ</li></td><td rowspan=3>available in a <a href="mailto:info@cossacklabs.com">separate license</a></td>
+</tr><tr><td><li>Searchable encryption ᵉ</li></td><td rowspan=3>available for <a href="mailto:info@cossacklabs.com">enterprise customers in a separate license</a>.</td>
 </tr><tr><td><li>Pseudonymisation ᵉ</li></td>
 </tr><tr><td><li>Cryptographically protected audit log ᵉ</li></td>
 </tr></tbody></table>
