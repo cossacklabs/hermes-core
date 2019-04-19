@@ -36,12 +36,12 @@ Drop us an email to [info@cossacklabs.com](mailto:info@cossacklabs.com) if you a
 
 <table><tbody><tr><tr><td><li>End-to-end data security </li></td><td>Client apps are responsible for data encryption and access control through using Hermes, while the server-side knows nothing about the nature of data.</td>
 </tr><tr><td><li>Data model-agnostic </li></td><td>Hermes imposes no limitations on data structure and database choice.</td>
-</tr><tr><td><li>Cryptographically bulletproof </li></td><td>The ACL in Hermes relies completely on cryptography, where trust is bound to client’s keys. As long as the keys are safe – the system is safe.</td>
+</tr><tr><td><li>Bulletproof cryptographically</li></td><td>The ACL in Hermes relies completely on cryptography, where trust is bound to client’s keys. As long as the keys are safe – the system is safe.</td>
 </tr><tr><td><li>Security cornerstone </li></td><td>With a solid security foundation on the data layer, building other security controls gets easier, the risk model becomes precise, and the overall security cost goes down considerably. </td>
 </tr><tr><td><li>Defence in depth </li></td><td>Hermes provides a foundation layer of data protection, Hermes is fully compatible with the following layers of security controls: TLS, firewalls, WAFs, SIEM, IDS, etc. </td>
 </tr><tr><td><li>Searchable encryption ᵉ</li></td><td rowspan=3>available for <a href="mailto:info@cossacklabs.com">enterprise customers in a separate license</a>.</td>
 </tr><tr><td><li>Pseudonymisation ᵉ</li></td>
-</tr><tr><td><li>Cryptographically protected audit log ᵉ</li></td>
+</tr><tr><td><li>Audit log protected cryptographically ᵉ</li></td>
 </tr></tbody></table>
 
 ### Use cases and industries
