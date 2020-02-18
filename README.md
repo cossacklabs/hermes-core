@@ -130,9 +130,9 @@ Consider checking full tutorials to understand how to add and update blocks, gra
 - [Go tutorial](https://github.com/cossacklabs/hermes-core/wiki/Go-tutorial), where Hermes app is C-based, but client code runs on Go. 
 
 
-## GDPR and HIPAA
+## GDPR, HIPAA, CCPA
 
-Hermes can help you reach better compliance with GDPR and HIPAA regulations and cut the costs by pushing the security controls to the cryptography layer. Configuring and using Hermes in a designated form will cover most of the demands described in articles 25, 32, 33, and 34 of GDPR and the PII data protection demands of HIPAA.
+Hermes can help you reach better compliance with the current privacy regulations like GDPR, HIPAA, and CCPA, allowing you cut the costs by pushing the security controls to the cryptography layer. Configuring and using Hermes in a designated form will cover most of the demands described in articles 25, 32, 33, and 34 of GDPR and the PII data protection demands of HIPAA.
 
 ## Licensing and commercial support
 
