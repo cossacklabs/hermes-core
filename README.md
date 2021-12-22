@@ -75,7 +75,7 @@ The WRITE permissions are checked both on Client and Server so they cannot “fo
 
 - [Hermes page](https://www.cossacklabs.com/hermes/) and [Hermes product sheet](https://www.cossacklabs.com/files/hermes-productsheet.pdf) contain latest details about features and technical environments (supported technological stacks, databases and client sides).
 
-- [Project's GitHub Wiki](https://www.github.com/cossacklabs/hermes-core/wiki) contains the ever-evolving official documentation, which contains everything from deployment guidelines to use-cases, including charts and tutorials you might find useful. It can also be found on [Cossack Labs Documentation Server's section on Hermes](https://docs.cossacklabs.com/products/hermes/).
+- [Cossack Labs Documentation Server's section on Hermes](https://docs.cossacklabs.com/hermes/) contains the ever-evolving official documentation, with everything from deployment guidelines to use-cases, including charts and tutorials you might find useful.
 
 - Ever-evolving [Implementing Hermes-based Security Systems](https://www.cossacklabs.com/hermes/implementing-hermes-based-systems/) document describes the details of implementing Hermes-based systems in the real world.
 
@@ -85,9 +85,9 @@ The WRITE permissions are checked both on Client and Server so they cannot “fo
 
 You can build Hermes-core manually from source or install it from the available package manager.
 
-- If you are running Ubuntu, Debian or CentOS, check [Installing from repository](https://github.com/cossacklabs/hermes-core/wiki/Installing-Hermes-core) page.
+- If you are running Ubuntu, Debian or CentOS, check [Installing from repository](https://docs.cossacklabs.com/hermes/getting-started/installing/hermes-from-repository/) page.
 
-- If you want to have the latest version of Hermes-core, you can build it from sources: [Building Hermes core](https://github.com/cossacklabs/hermes-core/wiki/Building-Hermes-core).
+- If you want to have the latest version of Hermes-core, you can build it from sources: [Building Hermes core](https://docs.cossacklabs.com/hermes/getting-started/installing/building-hermes/).
 
 ## Languages
 
@@ -95,10 +95,10 @@ Hermes-core is available on C, however, client side applications are implemented
 
 | Platform | Tutorial | Code example |
 | :----- | :----- | :------ |
-| C core / C client | [Local CLI tutorial](https://github.com/cossacklabs/hermes-core/wiki/Local-CLI-example) | [docs/examples/c/mid_hermes_low_level](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/c/mid_hermes_low_level) |
-| C core / C client | [C tutorial](https://github.com/cossacklabs/hermes-core/wiki/C-tutorial) | [docs/examples/c](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/c) |
-| C core / Python client | [Python tutorial](https://github.com/cossacklabs/hermes-core/wiki/Python-tutorial) | [docs/examples/python](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/python) |
-| C core / Go client | [Go tutorial](https://github.com/cossacklabs/hermes-core/wiki/Go-tutorial) | [docs/examples/go](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/go) |
+| C core / C client | [Local CLI tutorial](https://docs.cossacklabs.com/hermes/guides/local-cli-example/) | [docs/examples/c/mid_hermes_low_level](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/c/mid_hermes_low_level) |
+| C core / C client | [C tutorial](https://docs.cossacklabs.com/hermes/guides/c-tutorial/) | [docs/examples/c](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/c) |
+| C core / Python client | [Python tutorial](https://docs.cossacklabs.com/hermes/guides/python-tutorial/) | [docs/examples/python](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/python) |
+| C core / Go client | [Go tutorial](https://docs.cossacklabs.com/hermes/guides/go-tutorial/) | [docs/examples/go](https://github.com/cossacklabs/hermes-core/tree/master/docs/examples/go) |
 
 
 Moreover, Hermes natively supports:
@@ -113,9 +113,9 @@ Moreover, Hermes natively supports:
 [Hermes itself](https://www.cossacklabs.com/hermes/) supports the following architectures: x86/x64, armv*, various Android architectures:
 
 * Debian (8, 9), CentOS 7, Ubuntu (14.04, 16.04, 18.04),    
-* macOS (10.12, 10.13, 10.14),     
-* Android (4 - 9) / CyanogenMod 11+,     
-* iOS (9 - 12),     
+* macOS (10.12 - 10.15, 11),     
+* Android (4 - 12) / CyanogenMod 11+,     
+* iOS (10 - 15),     
 * Docker-containers, VMs.     
 
 Hermes-core has limited support, only x86/x64 platforms.
@@ -124,10 +124,10 @@ Hermes-core has limited support, only x86/x64 platforms.
 
 Consider checking full tutorials to understand how to add and update blocks, grant READ and UPDATE access rights to users, revoke access rights.
 
-- [Usage examples](https://github.com/cossacklabs/hermes-core/wiki/Usage-examples) describe how examples work and what are the possible usages for Hermes-core.
-- [C tutorial](https://github.com/cossacklabs/hermes-core/wiki/C-tutorial), where both Hermes and client app are written in C. 
-- [Python tutorial](https://github.com/cossacklabs/hermes-core/wiki/Python-tutorial), where the Hermes app is C-based, but client code runs on Python. 
-- [Go tutorial](https://github.com/cossacklabs/hermes-core/wiki/Go-tutorial), where Hermes app is C-based, but client code runs on Go. 
+- [Usage examples](https://docs.cossacklabs.com/hermes/what-is-hermes/#use-cases-and-industries) describe how examples work and what are the possible usages for Hermes-core.
+- [C tutorial](https://docs.cossacklabs.com/hermes/guides/c-tutorial/), where both Hermes and client app are written in C. 
+- [Python tutorial](https://docs.cossacklabs.com/hermes/guides/python-tutorial/), where the Hermes app is C-based, but client code runs on Python. 
+- [Go tutorial](https://docs.cossacklabs.com/hermes/guides/go-tutorial/), where Hermes app is C-based, but client code runs on Go. 
 
 
 ## GDPR, HIPAA, CCPA
